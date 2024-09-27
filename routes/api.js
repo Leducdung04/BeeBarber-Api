@@ -3,6 +3,9 @@ const router = express.Router();
 
 
 const {get_list_banner,addBanner} = require('../controllers/bannerController');
+const {getListService,addService,updateService} = require('../controllers/serviceController');
+const {getListCategory,addCategory,updateCategory } = require('../controllers/categoryController');
+
 
 // restful Api banner 
 router.get('/get_list_banner',get_list_banner)
