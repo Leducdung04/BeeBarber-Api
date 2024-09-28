@@ -2,14 +2,22 @@ const express = require("express");
 const router = express.Router();
 
 
-const {get_list_banner,addBanner} = require('../controllers/bannerController');
 const { createVoucher, updateVoucher, getVouchers, getValidVouchers, getVoucherByCode } = require('../controllers/voucherController');
 const { getUserVouchers, useVoucher } = require('../controllers/uservoucherController');
+const {get_list_banner,addBanner,updateBanner,updateBannerStatus} = require('../controllers/bannerController');
+const {SigupUser,loginEmail,loginPhone,updateUser}  = require('../controllers/userController')
 
 // restful Api banner 
 router.get('/get_list_banner',get_list_banner)
 router.post('/addBanner',addBanner)
+router.put('/updateBanner/:id',updateBanner)
+router.put('/updateBannerStatus/:id',updateBannerStatus)
 
+// restful Api user
+router.post('/Singup',SigupUser)
+router.post('/loginEmail',loginEmail)
+router.post('/loginPhone',loginPhone)
+router.put('/updateUser/:id',updateUser)
 
 // RESTful API cho Voucher
 router.post('/vouchers', createVoucher);  // Tạo voucher mới
