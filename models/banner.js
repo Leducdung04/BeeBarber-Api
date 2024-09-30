@@ -21,8 +21,8 @@ const bannerSchema = new mongoose.Schema({
     },
     target_screen: {
         type: String,
-        enum: ['desktop', 'tablet','mobile'],  // Cho phép chỉnh sửa giá trị cho trư��ng này với danh sách giá trị cho phép
-        default: 'home'      // Mặc đ��nh target_screen là desktop
+        enum: ['desktop', 'tablet','mobile'],  // Cho phép chỉnh sửa giá trị cho trường này với danh sách giá trị cho phép
+        default: 'home'      // Mặc định target_screen là desktop
     },
     // createdAt: {
     //     type: Date,
