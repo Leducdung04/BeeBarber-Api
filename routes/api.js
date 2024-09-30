@@ -10,6 +10,7 @@ const {SigupUser,loginEmail,loginPhone,updateUser}  = require('../controllers/us
 // restful Api banner 
 router.get('/get_list_banner',get_list_banner)
 router.post('/addBanner',addBanner)
+
 router.put('/updateBanner/:id',updateBanner)
 router.put('/updateBannerStatus/:id',updateBannerStatus)
 
