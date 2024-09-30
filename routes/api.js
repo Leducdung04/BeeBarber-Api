@@ -2,43 +2,35 @@ const express = require("express");
 const router = express.Router();
 
 
-const {get_list_banner,addBanner} = require('../controllers/bannerController');
+const { createVoucher, updateVoucher, getVouchers, getValidVouchers, getVoucherByCode } = require('../controllers/voucherController');
+const { getUserVouchers, useVoucher } = require('../controllers/uservoucherController');
+const {get_list_banner,addBanner,updateBanner,updateBannerStatus} = require('../controllers/bannerController');
+const {SigupUser,loginEmail,loginPhone,updateUser}  = require('../controllers/userController')
 
 // restful Api banner 
 router.get('/get_list_banner',get_list_banner)
 router.post('/addBanner',addBanner)
 
+router.put('/updateBanner/:id',updateBanner)
+router.put('/updateBannerStatus/:id',updateBannerStatus)
 
-const {get_list_cart,add_Cart,update_Cart} = require('../controllers/cartController');
+// restful Api user
+router.post('/Singup',SigupUser)
+router.post('/loginEmail',loginEmail)
+router.post('/loginPhone',loginPhone)
+router.put('/updateUser/:id',updateUser)
 
-// restful Api cart 
-router.get('/get_list_cart',get_list_cart)
-router.post('/add_Cart',add_Cart)
-router.put('/update_Cart/:id',update_Cart)
-
-
-const {get_list_CartItem,addCartItem,updateCartItem} = require('../controllers/cartItemController');
-// restful Api cartItem 
-router.get('/get_list_CartItem',get_list_CartItem)
-router.post('/addCartItem',addCartItem)
-router.put('/updateCartItem/:id',updateCartItem)
-
-
-
-const {get_list_product,add_product,update_product} = require('../controllers/productController');
-
-// restful Api product 
-router.get('/get_list_product',get_list_product)
-router.post('/add_product',add_product)
-router.put('/update_product/:id',update_product)
+// RESTful API cho Voucher
+router.post('/vouchers', createVoucher);  // Tạo voucher mới
+router.put('/vouchers/:voucher_id', updateVoucher);  // Cập nhật voucher
+router.get('/vouchers', getVouchers);  // Lấy tất cả voucher
+router.get('/vouchers/valid', getValidVouchers);  // Lấy tất cả voucher còn hiệu lực
+router.get('/vouchers/:voucher_code', getVoucherByCode);  // Lấy voucher theo mã
 
 
-const {get_list_Category_Product,add_Category_Product,update_Category_Product} = require('../controllers/categoryProductController');
-
-// restful Api categoryProduct
-router.get('/get_list_Category_Product',get_list_Category_Product)
-router.post('/add_Category_Product',add_Category_Product)
-router.put('/update_Category_Product/:id',update_Category_Product)
+// RESTful API cho UserVoucher
+router.get('/user_vouchers/:user_id', getUserVouchers);  // Lấy danh sách voucher của người dùng
+router.put('/user_vouchers/:userVoucher_id/use', useVoucher);  // Sử dụng voucher
 
 
 module.exports = router;
