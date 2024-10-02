@@ -5,13 +5,14 @@ const router = express.Router();
 const { createVoucher, updateVoucher, getVouchers, getValidVouchers, getVoucherByCode } = require('../controllers/voucherController');
 const { getUserVouchers, useVoucher } = require('../controllers/uservoucherController');
 const {get_list_banner,addBanner,updateBanner,updateBannerStatus} = require('../controllers/bannerController');
-const {SigupUser,loginEmail,loginPhone,updateUser}  = require('../controllers/userController')
+const {SigupUser,loginEmail,loginPhone,updateUser}  = require('../controllers/userController');
+const Upload = require("../config/upload");
 
 // restful Api banner 
 router.get('/get_list_banner',get_list_banner)
-router.post('/addBanner',addBanner)
+router.post('/addBanner',Upload.single("image"),addBanner)
 
-router.put('/updateBanner/:id',updateBanner)
+router.put('/updateBanner/:id',Upload.single("image"),updateBanner)
 router.put('/updateBannerStatus/:id',updateBannerStatus)
 
 // restful Api user
