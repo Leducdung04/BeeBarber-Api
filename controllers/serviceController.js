@@ -1,4 +1,5 @@
 const Service = require("../models/service");
+const mongoose = require("mongoose")
 
 exports.getListService = async (req, res, next) => {
   try {
@@ -12,8 +13,12 @@ exports.getListService = async (req, res, next) => {
 
 exports.addService = async (req, res, next) => {
   try {
-    const { id_category, description, price, duration, images, name } =
-      req.body;
+    const { id_category, description, price, duration, name } = req.body;
+    const { file } = req;
+    let images = null;
+    if (req.file) {
+      images = `${req.protocol}://localhost:3000/uploads/${req.file.filename}`;
+    }
     const newService = new Service({
       id_category,
       description,
@@ -34,9 +39,22 @@ exports.addService = async (req, res, next) => {
 
 exports.updateService = async (req, res, next) => {
   try {
-    const {id} = req.params;
-    const { id_category, description, price, duration, images, name } =
-      req.body;
+    const { id } = req.params;
+    const { id_category, description, price, duration, name } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID không hợp lệ!" });
+    }
+
+    const currentService = await Service.findById(id);
+    if (!currentService) {
+      return res.status(404).json({ message: "Service không tồn tại" });
+    }
+    let images = currentService.images;
+
+    if (req.file) {
+      images = `${req.protocol}://localhost:3000/uploads/${req.file.filename}`; // Cập nhật image mới
+    }
     const result = await Service.findByIdAndUpdate(
       id,
       { id_category, description, price, duration, images, name },
