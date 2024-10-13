@@ -5,10 +5,9 @@ const { createVoucher, updateVoucher, getVouchers, getValidVouchers, getVoucherB
 const { getUserVouchers, useVoucher } = require('../controllers/uservoucherController');
 const {get_list_banner,addBanner,updateBanner,updateBannerStatus,get_list_banner_ByStatus} = require('../controllers/bannerController');
 const {SigupUser,loginEmail,loginPhone,updateUser,updateLoyaltyPoints}  = require('../controllers/userController');
-const {getListCategory,addCategory} = require('../controllers/categoryController');
 const {add_Category_Product,get_list_Category_Product} = require('../controllers/categoryProductController')
 const Upload = require("../config/upload");
-const {getListService,addService,updateService} = require('../controllers/serviceController');
+const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices} = require('../controllers/serviceController');
 const {getListCategory,addCategory,updateCategory } = require('../controllers/categoryController');
 
 // restful Api banner 
@@ -41,6 +40,8 @@ router.put('/user_vouchers/:userVoucher_id/use', useVoucher);  // Sử dụng vo
 router.get('/services/get_list_service',getListService)
 router.post('/services/add_service',Upload.single("images"),addService)
 router.put('/services/update_service/:id',Upload.single("images"),updateService)
+router.get('/services/getListServiceByCategory/:id_category',getListServiceByCategory)
+router.get('/getGroupedServices',getGroupedServices)
 
 //RESTful API cho Category
 router.get('/categorys/get_list_category',getListCategory)
