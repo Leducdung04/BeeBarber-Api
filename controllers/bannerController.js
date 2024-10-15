@@ -4,14 +4,12 @@ const Uploads = require("../config/upload")
 
 exports.addBanner = async (req, res, next) => {
   try {
-    const { title, description, status, target_screen } = req.body;
+    const { status, target_screen } = req.body;
     const { file } = req;
     let image = null;
     if (req.file) {image = `${req.protocol}://localhost:3000/uploads/${req.file.filename}`;}
     const newBanner = new Banner({
-      title,
       image,
-      description,
       status,
       target_screen,
     });
@@ -26,7 +24,7 @@ exports.addBanner = async (req, res, next) => {
 exports.updateBanner = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { title, description, status, target_screen } = req.body;
+    const { status, target_screen } = req.body;
 
     // Kiểm tra ID có hợp lệ không
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -49,9 +47,7 @@ exports.updateBanner = async (req, res, next) => {
     const updatedBanner = await Banner.findByIdAndUpdate(
       id,
       {
-        title: title,
         image: image, // Sử dụng image mới hoặc giữ nguyên cái cũ
-        description: description,
         status: status,
         target_screen: target_screen,
       },
@@ -115,3 +111,13 @@ exports.get_list_banner = async (req, res, next) => {
     res.status(400).json({ msg: error.message });
   }
 };
+
+exports.get_list_banner_ByStatus = async (req, res, next) => {
+  try {
+    const banner = await Banner.find({ status: true }).sort({ createdAt: -1 });
+    res.status(200).json(banner);
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+};
+

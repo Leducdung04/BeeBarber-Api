@@ -9,9 +9,13 @@ const category_productSchema = new mogoose.Schema({
         type: String,
         default: true
     },
-    imageUrl: {
+    image: {
         type: String,
         required: true
+    },
+    status:{
+        type: Boolean,
+        default: true
     }
 }); 
 
