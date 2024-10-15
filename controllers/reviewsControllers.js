@@ -1,4 +1,4 @@
-const Review = require("../models/review");  // Model Review đã định nghĩa
+const Review = require("../models/reviews");  // Model Review đã định nghĩa
 const Barber = require("../models/barber");  // Model Barber (liên kết với barber_id)
 const Service = require("../models/service"); // Model Service (liên kết với services_id)
 

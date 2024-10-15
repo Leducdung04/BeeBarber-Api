@@ -9,7 +9,7 @@ const {add_Category_Product,get_list_Category_Product} = require('../controllers
 const Upload = require("../config/upload");
 const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices} = require('../controllers/serviceController');
 const {getListCategory,addCategory,updateCategory } = require('../controllers/categoryController');
-const { createReview, updateReview } = require("../controllers/reviewController");
+const { createReview, updateReview } = require("../controllers/reviewsControllers");
 const { createBarber, updateBarber } = require("../controllers/barberController");
 const { createNotification, updateNotification } = require("../controllers/notificationController");
 

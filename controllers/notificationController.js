@@ -1,4 +1,4 @@
-const Notification = require("../models/notification");  
+const Notification = require("../models/notifications");  
 const User = require("../models/user");                  
 
 // Thêm thông báo mới
