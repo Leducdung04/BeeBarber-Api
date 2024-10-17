@@ -13,12 +13,16 @@ exports.get_list_Category_Product = async (req, res, next) => {
 
 exports.add_Category_Product = async (req, res, next) => {
     try {
-        const newCategory_Product = new Category_Product(req.body);
-        const result = await newCategory_Product.save();
-
-        res.status(201).json(result);
+        const {name,description,status} = req.body;
+        const { file } = req;
+        let image = null;
+        if (req.file) {image = `${req.protocol}://localhost:3000/uploads/${req.file.filename}`;}
+        const newCategory = new Category_Product({name,description,image,status});
+        const result = await newCategory.save()
+        res.status(201).json(result)
     } catch (error) {
-        res.status(400).json({msg: error.message});
+        console.error(error);
+        res.status(400).json({message: 'Server Error'});      
     }
 }
 

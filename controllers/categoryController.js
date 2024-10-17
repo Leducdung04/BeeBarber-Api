@@ -15,12 +15,12 @@ exports.addCategory = async(req,res,next) =>{
         const {name,description} = req.body;
         const { file } = req;
         let image = null;
+
         if (req.file) {
             image = `${req.protocol}://localhost:3000/uploads/${req.file.filename}`;
         }
         const newCategory = new Category({name,description,image});
         const result = await newCategory.save()
-
         res.status(201).json(result)
     } catch (error) {
         console.error(error);
