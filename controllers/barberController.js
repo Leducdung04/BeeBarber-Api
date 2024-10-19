@@ -1,24 +1,27 @@
 const Barber = require("../models/barber");  // Model Barber đã định nghĩa
-const User = require("../models/user");      // Model User (liên kết với user_id)
+const User = require("../models/user"); 
+const mongoose = require("mongoose");     // Model User (liên kết với user_id)
+
+exports.get_list_barber = async (req, res, next) => {
+  try {
+    const banner = await Barber.find().sort({ createdAt: -1 });
+    res.status(200).json(banner);
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+};
 
 // Thêm mới barber
 exports.createBarber = async (req, res) => {
   try {
-    const { user_id, experience, image, start_time, end_time, status } = req.body;
-
-    // Kiểm tra xem user_id có hợp lệ và có phải là một barber không
-    const userExists = await User.findById(user_id);
-    if (!userExists || userExists.role !== "barber") {
-      return res.status(400).json({ message: "Người dùng không hợp lệ hoặc không phải là barber" });
-    }
-
+    const { name, experience, status } = req.body;
+    let image = null;
+    if (req.file) {image = `${req.protocol}://localhost:3000/uploads/${req.file.filename}`;}
     // Tạo mới barber
     const newBarber = new Barber({
-      user_id,
+      name,
       experience,
       image,
-      start_time,
-      end_time,
       status
     });
 
@@ -36,19 +39,28 @@ exports.createBarber = async (req, res) => {
 exports.updateBarber = async (req, res) => {
   try {
     const { id } = req.params;
-    const { experience, image, start_time, end_time, status } = req.body;
+    const {name, experience, status } = req.body;
 
-    // Kiểm tra xem barber có tồn tại không
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID không hợp lệ!" });
+    }
+
+    // Tìm banner hiện tại
     const barberExists = await Barber.findById(id);
     if (!barberExists) {
-      return res.status(404).json({ message: "Không tìm thấy barber" });
+      return res.status(404).json({ message: "Banner không tồn tại" });
+    }
+
+    // Kiểm tra nếu có file được tải lên
+    let image = barberExists.image; // Giữ nguyên image cũ
+    if (req.file) {
+      image = `${req.protocol}://localhost:3000/uploads/${req.file.filename}`; // Cập nhật image mới
     }
 
     // Cập nhật các trường trong barber
+    barberExists.name = name || barberExists.name;  
     barberExists.experience = experience || barberExists.experience;
     barberExists.image = image || barberExists.image;
-    barberExists.start_time = start_time || barberExists.start_time;
-    barberExists.end_time = end_time || barberExists.end_time;
     barberExists.status = status !== undefined ? status : barberExists.status;  // Trạng thái true/false
     barberExists.updated_at = Date.now(); // Cập nhật thời gian sửa
 
