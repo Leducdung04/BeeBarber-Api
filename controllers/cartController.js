@@ -10,7 +10,7 @@ const Cart = require('../models/cart');
 //     }
 // }
 
-exports.get_list_cart = async (req, res, next) => {
+exprts.get_list_cart = async (req, res, next) => {
     try {
 
       const cart = await Cart.find();
