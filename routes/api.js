@@ -12,6 +12,7 @@ const {getListCategory,addCategory,updateCategory } = require('../controllers/ca
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
 const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
 const { createNotification, updateNotification } = require("../controllers/notificationController");
+const {get_list_product,add_product,update_product} = require("../controllers/productController")
 
 
 
@@ -53,13 +54,10 @@ router.get('/categorys/get_list_category',getListCategory)
 router.post('/categorys/add_category',Upload.single("image"),addCategory)
 router.put('/categorys/update_category/:id',Upload.single("image"),updateCategory)
 
-// RESTful API cho Category
-router.get('/getListCategory', getListCategory)
-router.post('/addCategory',Upload.single("image"),addCategory)
 
 // RESTful API cho CategoryProduct
-router.get('/get_list_Category_Product', get_list_Category_Product)
-router.post('/add_category_product',Upload.single("image"),add_Category_Product)
+router.get('/categoryProducts/get_list_Category_Product', get_list_Category_Product)
+router.post('/categoryProducts/add_category_product',Upload.single("image"),add_Category_Product)
 
 // RESTful API cho Review 
 router.post('/reviews', createReview);
@@ -74,6 +72,7 @@ router.put('/Update_Barbers/:id',Upload.single("image"), updateBarber);
 router.post('/notifications', createNotification);
 router.put('/notifications/:id', updateNotification);
 
-
+//Restful API cho Product
+router.get('/products/get_list_product',get_list_product)
 
 module.exports = router;
