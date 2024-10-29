@@ -2,7 +2,7 @@ const Product = require('../models/product');
 
 exports.get_list_product = async (req, res, next) => {
     try {
-        const products = await Product.find().sort("");
+        const products = await Product.find().sort({ createdAt: 1 });//Mới lên trước
         res.status(200).json(products);
     } catch (error) {
         res.status(400).json({ msg: error.message });
