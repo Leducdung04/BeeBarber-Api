@@ -7,12 +7,11 @@ const connectAndDropIndex = async () => {
         await mongoose.connect(local);
         console.log('Connection success');
 
-        const User = mongoose.model("User", new mongoose.Schema({}));
+        const SubcategoryProduct = mongoose.model("subcategoryproduct", new mongoose.Schema({}));
 
-        //Xóa email_1
-        await User.collection.dropIndex("email_1"); 
-        console.log("Index dropped successfully!");
-
+        // Drop the collection
+        await SubcategoryProduct.collection.drop();
+        console.log("Collection dropped successfully!");
     } catch (error) {
         console.error('Error:', error);
     } finally {

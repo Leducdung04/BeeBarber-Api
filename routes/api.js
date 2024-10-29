@@ -74,5 +74,11 @@ router.put('/notifications/:id', updateNotification);
 
 //Restful API cho Product
 router.get('/products/get_list_product',get_list_product)
+router.post('/products/add_product',Upload.single("image"),add_product)
+router.get('/products/update',Upload.single("image"),update_product)
+
+//Restful API cho subProduct
+router.post('/notifications', createNotification);
+router.put('/notifications/:id', updateNotification);
 
 module.exports = router;
