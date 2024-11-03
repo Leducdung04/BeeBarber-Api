@@ -8,11 +8,11 @@ const {SigupUser,loginEmail,loginPhone,updateUser,updateLoyaltyPoints}  = requir
 const {add_Category_Product,get_list_Category_Product} = require('../controllers/categoryProductController')
 const Upload = require("../config/upload");
 const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices} = require('../controllers/serviceController');
-const {getListCategory,addCategory,updateCategory } = require('../controllers/categoryController');
+const {getListCategory,addCategory,updateCategory, } = require('../controllers/categoryController');
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
 const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
 const { createNotification, updateNotification } = require("../controllers/notificationController");
-const {get_list_product,add_product,update_product} = require("../controllers/productController")
+const {get_list_product,add_product,update_product,get_list_product_by_category} = require("../controllers/productController")
 
 
 
@@ -57,7 +57,7 @@ router.put('/categorys/update_category/:id',Upload.single("image"),updateCategor
 
 // RESTful API cho CategoryProduct
 router.get('/categoryProducts/get_list_Category_Product', get_list_Category_Product)
-router.post('/categoryProducts/add_category_product',Upload.single("image"),add_Category_Product)
+router.post('/categoryProducts/add_category_product',Upload.array("image"),add_Category_Product)
 
 // RESTful API cho Review 
 router.post('/reviews', createReview);
@@ -73,12 +73,10 @@ router.post('/notifications', createNotification);
 router.put('/notifications/:id', updateNotification);
 
 //Restful API cho Product
-router.get('/products/get_list_product',get_list_product)
+router.get('/products/get_list_product', get_list_product)
+router.get('/products/get_list_product_by_category', get_list_product_by_category);
 router.post('/products/add_product',Upload.single("image"),add_product)
-router.get('/products/update',Upload.single("image"),update_product)
+router.put('/products/update_product',Upload.single("image"),update_product)
 
-//Restful API cho subProduct
-router.post('/notifications', createNotification);
-router.put('/notifications/:id', updateNotification);
 
 module.exports = router;
