@@ -1,14 +1,22 @@
 const Cart = require('../models/cart');
 const CartItem = require('../models/cartItem');
 
-// Lấy danh sách giỏ hàng của người dùng
-exports.get_list_cart = async (req, res) => {
+// exports.getlistCart = async (req, res, next) => {
+//     try {
+//         const cart = await Cart.findOne({user_id: req.user._id});
+//         console.log(cart);
+//         res.status(200).json(cart);
+//     } catch (error) {
+//         res.status(400).json({msg: error.message});
+//     }
+// }
+
+exports.get_list_cart = async (req, res, next) => {
     try {
-        const cart = await Cart.findOne({ user_id: req.user._id }).populate('items.product_id');
-        if (!cart) {
-            return res.status(404).json({ msg: "Giỏ hàng trống" });
-        }
-        res.status(200).json(cart);
+
+      const cart = await Cart.find();
+  
+      res.status(200).json(cart);
     } catch (error) {
         res.status(400).json({ msg: error.message });
     }

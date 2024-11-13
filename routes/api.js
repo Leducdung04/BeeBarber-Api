@@ -10,7 +10,7 @@ const Upload = require("../config/upload");
 const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices} = require('../controllers/serviceController');
 const {getListCategory,addCategory,updateCategory } = require('../controllers/categoryController');
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
-const { createBarber, updateBarber } = require("../controllers/barberController");
+const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
 const { createNotification, updateNotification } = require("../controllers/notificationController");
 
 
@@ -69,8 +69,9 @@ router.post('/reviews', createReview);
 router.put('/reviews/:id', updateReview);
 
 // RESTful API cho Barber
-router.post('/barbers', createBarber);
-router.put('/barbers/:id', updateBarber);
+router.get('/get_list_barber', get_list_barber)
+router.post('/add_Barbers',Upload.single("image"), createBarber);
+router.put('/Update_Barbers/:id',Upload.single("image"), updateBarber);
 
 // RESTful API cho Notifications
 router.post('/notifications', createNotification);
