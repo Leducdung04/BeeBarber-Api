@@ -1,42 +1,39 @@
 const Cart = require('../models/cart');
+const CartItem = require('../models/cartItem');
 
-// exports.getlistCart = async (req, res, next) => {
-//     try {
-//         const cart = await Cart.findOne({user_id: req.user._id});
-//         console.log(cart);
-//         res.status(200).json(cart);
-//     } catch (error) {
-//         res.status(400).json({msg: error.message});
-//     }
-// }
-
-exports.get_list_cart = async (req, res, next) => {
+// Lấy danh sách giỏ hàng của người dùng
+exports.get_list_cart = async (req, res) => {
     try {
-
-      const cart = await Cart.find();
-  
-      res.status(200).json(cart);
+        const cart = await Cart.findOne({ user_id: req.user._id }).populate('items.product_id');
+        if (!cart) {
+            return res.status(404).json({ msg: "Giỏ hàng trống" });
+        }
+        res.status(200).json(cart);
     } catch (error) {
-      res.status(400).json({ msg: error.message });
+        res.status(400).json({ msg: error.message });
     }
-  };
-  
+};
 
-exports.add_Cart = async (req, res, next) => {
+// Thêm giỏ hàng mới cho người dùng nếu chưa có
+exports.add_Cart = async (req, res) => {
     try {
-        const newCart = new Cart({user_id: req.user._id});
-        const result = await newCart.save();
+        let cart = await Cart.findOne({ user_id: req.user._id });
+        if (!cart) {
+            cart = new Cart({ user_id: req.user._id });
+            await cart.save();
+        }
+        res.status(201).json(cart);
+    } catch (error) {
+        res.status(400).json({ msg: error.message });
+    }
+};
+
+// Cập nhật giỏ hàng của người dùng (thêm, xóa hoặc sửa)
+exports.update_Cart = async (req, res) => {
+    try {
+        const result = await Cart.findOneAndUpdate({ user_id: req.user._id }, req.body, { new: true });
         res.status(201).json(result);
     } catch (error) {
-        res.status(400).json({msg: error.message});
+        res.status(400).json({ msg: error.message });
     }
-}
-
-exports.update_Cart = async (req, res, next) => {
-    try {
-        const result = await Cart.findOneAndUpdate({user_id: req.user._id}, req.body, {new: true});
-        res.status(201).json(result);
-    } catch (error) {
-        res.status(400).json({msg: error.message});
-    }
-}
+};

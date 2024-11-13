@@ -101,59 +101,104 @@ exports.loginPhone = async (req, res) => {
   }
 };
 
+// exports.SigupUser = async (req, res, next) => {
+//   try {
+//     const {
+//       name,
+//       phone,
+//       email,
+//       image,
+//       role,
+//       loyaltyPoints,
+//       password,
+//       status,
+//       deviceTokens,
+//     } = req.body;
+
+//     // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
+//     const hashedPassword = await bcrypt.hash(password, 10); // Sử dụng salt rounds là 10
+
+//     // Tạo người dùng mới với mật khẩu đã mã hóa
+//     const newUser = new User({
+//       name,
+//       phone,
+//       email,
+//       image,
+//       role,
+//       loyaltyPoints,
+//       password: hashedPassword, // Mật khẩu mã hóa
+//       status,
+//       deviceTokens,
+//     });
+
+//     const result = await newUser.save();
+
+//     // Tạo token sau khi đăng ký thành công
+//     const accessToken = JWT.sign({ id: result._id }, SECRETKEY, {
+//       expiresIn: "1d",
+//     });
+//     const refreshToken = JWT.sign({ id: result._id }, SECRETKEY, {
+//       expiresIn: "7d",
+//     });
+
+//     const userWithoutPassword = {
+//       _id: result._id,
+//       name: result.name,
+//       phone: result.phone,
+//       email: result.email,
+//       image: result.image,
+//       role: result.role,
+//       loyaltyPoints: result.loyaltyPoints,
+//       status: result.status,
+//       deviceTokens: result.deviceTokens,
+//     };
+
+//     // Trả về phản hồi với token và dữ liệu người dùng (không có password)
+//     res.status(201).json({
+//       status: 200,
+//       message: "Đăng ký thành công",
+//       data: userWithoutPassword,
+//       token: accessToken,
+//       refreshToken: refreshToken,
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(400).json({ message: "Server Error" });
+//   }
+// };
+
 exports.SigupUser = async (req, res, next) => {
   try {
-    const {
-      name,
-      phone,
-      email,
-      image,
-      role,
-      loyaltyPoints,
-      password,
-      status,
-      deviceTokens,
-    } = req.body;
+    const { phone, password, email } = req.body;
 
-    // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
-    const hashedPassword = await bcrypt.hash(password, 10); // Sử dụng salt rounds là 10
+    if (!phone || !password) {
+      return res.status(400).json({ message: "Số điện thoại và mật khẩu là bắt buộc" });
+    }
 
-    // Tạo người dùng mới với mật khẩu đã mã hóa
+    const existingUser = await User.findOne({ phone });
+    if (existingUser) {
+      return res.status(400).json({ message: "Số điện thoại đã được đăng ký" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = new User({
-      name,
       phone,
-      email,
-      image,
-      role,
-      loyaltyPoints,
-      password: hashedPassword, // Mật khẩu mã hóa
-      status,
-      deviceTokens,
+      password: hashedPassword,
+      email: email || null // Chỉ thêm email nếu nó có giá trị
     });
 
     const result = await newUser.save();
 
-    // Tạo token sau khi đăng ký thành công
-    const accessToken = JWT.sign({ id: result._id }, SECRETKEY, {
-      expiresIn: "1d",
-    });
-    const refreshToken = JWT.sign({ id: result._id }, SECRETKEY, {
-      expiresIn: "7d",
-    });
+    const accessToken = JWT.sign({ id: result._id }, SECRETKEY, { expiresIn: "1d" });
+    const refreshToken = JWT.sign({ id: result._id }, SECRETKEY, { expiresIn: "7d" });
 
     const userWithoutPassword = {
       _id: result._id,
-      name: result.name,
       phone: result.phone,
       email: result.email,
-      image: result.image,
-      role: result.role,
-      loyaltyPoints: result.loyaltyPoints,
-      status: result.status,
-      deviceTokens: result.deviceTokens,
     };
 
-    // Trả về phản hồi với token và dữ liệu người dùng (không có password)
     res.status(201).json({
       status: 200,
       message: "Đăng ký thành công",
@@ -162,10 +207,89 @@ exports.SigupUser = async (req, res, next) => {
       refreshToken: refreshToken,
     });
   } catch (err) {
-    console.error(err);
-    res.status(400).json({ message: "Server Error" });
+    console.error("Lỗi đăng ký:", err);
+    res.status(500).json({ message: "Lỗi server", error: err.message });
   }
 };
+
+
+exports.checkPhoneNumber = async (req, res, next) => {
+  try {
+    const { phone } = req.body;
+
+    if (!phone) {
+      return res.status(400).json({ message: "Số điện thoại là bắt buộc" });
+    }
+
+    const existingUser = await User.findOne({ phone });
+    if (existingUser) {
+      return res.status(200).json({ registered: true }); // Trả về registered: true nếu có người dùng
+    }
+
+    res.status(200).json({ registered: false }); // Trả về registered: false nếu không có người dùng
+  } catch (err) {
+    console.error("Lỗi kiểm tra số điện thoại:", err);
+    res.status(500).json({ message: "Lỗi server", error: err.message });
+  }
+};
+
+
+exports.checkPhoneAndGetId = async (req, res, next) => {
+  try {
+    const { phone } = req.body;
+
+    // Kiểm tra xem số điện thoại có được nhập hay không
+    if (!phone) {
+      return res.status(400).json({ message: "Số điện thoại là bắt buộc" });
+    }
+
+    // Tìm kiếm người dùng trong cơ sở dữ liệu
+    const existingUser = await User.findOne({ phone });
+    if (existingUser) {
+      // Nếu tìm thấy người dùng, trả về ID của họ
+      return res.status(200).json({
+        registered: true,
+        userId: existingUser._id // Trả về ID người dùng
+      });
+    }
+
+    // Nếu không tìm thấy người dùng, trả về thông tin tương ứng
+    res.status(200).json({ registered: false });
+  } catch (err) {
+    console.error("Lỗi kiểm tra số điện thoại:", err);
+    res.status(500).json({ message: "Lỗi server", error: err.message });
+  }
+};
+
+
+exports.getUserById = async (req, res) => {
+  const userId = req.params.id;
+  try {
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
+
+      // Chuyển đổi thông tin người dùng thành định dạng mà bạn muốn
+      const userWithoutPassword = {
+          _id: user._id,
+          name: user.name,
+          phone: user.phone,
+          email: user.email,
+          birthDate: user.birthDate ? user.birthDate.toISOString().split('T')[0] : null, // Chuyển đổi thành định dạng YYYY-MM-DD
+          role: user.role,
+          loyaltyPoints: user.loyaltyPoints,
+          status: user.status,
+          deviceTokens: user.deviceTokens,
+      };
+
+      res.status(200).json(userWithoutPassword); // Trả về thông tin người dùng đã chuyển đổi
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
 
 exports.updateUser = async (req, res, next) => {
   try {
@@ -174,7 +298,7 @@ exports.updateUser = async (req, res, next) => {
       name,
       phone,
       email,
-      image,
+      birthDate, // Thêm trường birthDate
       role,
       loyaltyPoints,
       password,
@@ -196,7 +320,7 @@ exports.updateUser = async (req, res, next) => {
     user.name = name !== undefined ? name : user.name;
     user.phone = phone !== undefined ? phone : user.phone;
     user.email = email !== undefined ? email : user.email;
-    user.image = image !== undefined ? image : user.image;
+    user.birthDate = birthDate !== undefined ? birthDate : user.birthDate; // Cập nhật trường birthDate
     user.role = role !== undefined ? role : user.role;
     user.loyaltyPoints =
       loyaltyPoints !== undefined ? loyaltyPoints : user.loyaltyPoints;
@@ -219,8 +343,8 @@ exports.updateUser = async (req, res, next) => {
       name: updatedUser.name,
       phone: updatedUser.phone,
       email: updatedUser.email,
-      image: updatedUser.image,
-      role: updatedUser.role,
+      birthDate: updatedUser.birthDate ? updatedUser.birthDate.toISOString().split('T')[0] : null, // Đảm bảo rằng giá trị là dạng date
+      role: updatedUser.role,      role: updatedUser.role,
       loyaltyPoints: updatedUser.loyaltyPoints,
       status: updatedUser.status,
       deviceTokens: updatedUser.deviceTokens,
@@ -230,12 +354,15 @@ exports.updateUser = async (req, res, next) => {
     res.status(200).json({
       message: "Cập nhật người dùng thành công",
       data: userWithoutPassword,
+      
     });
+    
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Lỗi máy chủ" });
   }
 };
+
 
 exports.updateLoyaltyPoints = async (req, res) => {
   try {
