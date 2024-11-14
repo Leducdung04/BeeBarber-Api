@@ -1,28 +1,46 @@
 const Appointment = require('../models/appointments');
+<<<<<<< HEAD
 const Payment = require('../models/payments');
+=======
+function convertToDate(dateString) {
+    const [day, month, year] = dateString.split('/').map(Number);
+    return new Date(year, month - 1, day); 
+}
+>>>>>>> 7ec9e349527e202a419c0b988f65b3ced08ff024
 exports.addAppointment = async (req, res, next) => {
     try {
-        const { barber_id, user_id, service_id, appointment_time, appointment_date,status, price } = req.body;
-        
+        const { barber_id, user_id, service_id, appointment_time, appointment_date, status, price } = req.body;
+
+        // Chuyển đổi ngày từ định dạng dd/mm/yyyy
+        const formattedDate = convertToDate(appointment_date);
+
         const newAppointment = new Appointment({
             barber_id,
             user_id,
             service_id,
             appointment_time,
-            appointment_date,
+            appointment_date: formattedDate, 
             status,
+<<<<<<< HEAD
             price 
         });
 
         const result = await newAppointment.save();
         
+=======
+            price
+        });
+
+        const result = await newAppointment.save();
+>>>>>>> 7ec9e349527e202a419c0b988f65b3ced08ff024
         res.status(201).json(result);
     } catch (err) {
         console.error(err);
-        res.status(400).json({ message: 'Server Error' });
+        res.status(400).json({ message: 'Lỗi máy chủ' });
     }
 }
 
+<<<<<<< HEAD
 exports.addAppointmentWithPayment = async (req, res) => {
     try {
         // Lấy dữ liệu từ đối tượng `appointment` trong `req.body`
@@ -58,6 +76,8 @@ exports.addAppointmentWithPayment = async (req, res) => {
 }
 
 
+=======
+>>>>>>> 7ec9e349527e202a419c0b988f65b3ced08ff024
 exports.updateAppointment = async (req, res, next) => {
     try {
         const { id } = req.params; // Lấy ID từ params
@@ -86,6 +106,7 @@ exports.getListAppointments = async (req, res, next) => {
     }
 }
 
+<<<<<<< HEAD
 exports.getAppointmentsWithPayments = async (req, res) => {
     try {
         const { userId } = req.params;
@@ -114,3 +135,23 @@ exports.getAppointmentsWithPayments = async (req, res) => {
         res.status(500).json({ message: "Server Error" });
     }
 };
+=======
+// Lấy lịch sử cắt theo id
+exports.getUserAppointments = async (req, res, next) => {
+    try {
+        const { user_id } = req.params; 
+
+        // Tìm các cuộc hẹn cho ID người dùng đã cho
+        const userAppointments = await Appointment.find({ user_id }).sort({ appointment_date: -1 });
+
+        if (!userAppointments.length) {
+            return res.status(404).json({ message: 'Không tìm thấy cuộc hẹn nào cho người dùng này' });
+        }
+
+        res.status(200).json(userAppointments);
+    } catch (err) {
+        console.error(err);
+        res.status(400).json({ message: 'Lỗi máy chủ' });
+    }
+}
+>>>>>>> 7ec9e349527e202a419c0b988f65b3ced08ff024
