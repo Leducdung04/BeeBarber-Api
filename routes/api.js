@@ -14,7 +14,8 @@ const { createBarber, updateBarber,get_list_barber } = require("../controllers/b
 const { createNotification, updateNotification } = require("../controllers/notificationController");
 const {get_list_product,add_product,update_product,get_list_product_by_category} = require("../controllers/productController")
 
-
+// restful Api notifications
+router.post("/notifications/createNotification",createNotification)
 
 // restful Api banner 
 router.get('/get_list_banner',get_list_banner)
@@ -76,7 +77,7 @@ router.put('/notifications/:id', updateNotification);
 router.get('/products/get_list_product', get_list_product)
 router.get('/products/get_list_product_by_category', get_list_product_by_category);
 router.post('/products/add_product',Upload.single("image"),add_product)
-router.put('/products/update_product',Upload.single("image"),update_product)
+router.put('/products/update_product/:id',Upload.single("image"),update_product)
 
 
 module.exports = router;
