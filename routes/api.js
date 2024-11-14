@@ -12,6 +12,8 @@ const {getListCategory,addCategory,updateCategory } = require('../controllers/ca
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
 const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
 const { createNotification, updateNotification } = require("../controllers/notificationController");
+const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment } = require("../controllers/appointmentControllers");
+const { addPayment, updatePayment_Canceled_ById, updatePaymentStatus } = require("../controllers/paymentsController");
 
 
 
@@ -74,6 +76,18 @@ router.put('/Update_Barbers/:id',Upload.single("image"), updateBarber);
 router.post('/notifications', createNotification);
 router.put('/notifications/:id', updateNotification);
 
+
+// RESTful API Appointment
+
+router.post('/add_Appointment',addAppointment)
+router.post('/addAppointmentWithPayment',addAppointmentWithPayment)
+
+router.get('/getAppointmentsByIduser/:userId',getAppointmentsWithPayments)
+
+// Restful API Payments
+router.post('/new_payment',addPayment);
+router.put('/updatePayment_Canceled_ById/:paymentId',updatePayment_Canceled_ById)
+router.put('/updatePaymentStatus_ById/:paymentId',updatePaymentStatus)
 
 
 module.exports = router;

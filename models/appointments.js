@@ -2,15 +2,18 @@ const mongoose = require('mongoose');
 
 const appointmentSchema = new mongoose.Schema({
     barber_id: {
-        type: mongoose.Schema.Types.ObjectId, // Giả sử barber_id là một ObjectId từ model khác
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Barber",
         required: true,
     },
     user_id: {
-        type: mongoose.Schema.Types.ObjectId, // Giả sử user_id cũng là một ObjectId
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "User",
         required: true,
     },
     service_id: {
-        type: mongoose.Schema.Types.ObjectId, // Giả sử service_id từ một model khác
+        type: [mongoose.Schema.Types.ObjectId], 
+        ref: "Service",
         required: true,
     },
     appointment_time: {
@@ -21,10 +24,14 @@ const appointmentSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
-    status: {
+    appointment_status: {
         type: String,
-        enum: ['pending', 'confirmed', 'completed', 'canceled'], // Trạng thái của cuộc hẹn
+        enum: ['pending', 'completed', 'canceled'], 
         default: 'pending',
+    },
+    status:{
+        type: Boolean,
+        default: true,
     },
     price: {
         type: Number,
