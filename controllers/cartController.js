@@ -35,8 +35,9 @@ exports.add_cart = async (req, res, next) => {
         res.status(201).json(result);
     } catch (error) {
         res.status(400).json({ msg: error.message });
+        res.status(400).json({ msg: error.message });
     }
-}
+};
 
 exports.update_cart = async (req, res, next) => {
     try {
@@ -51,5 +52,6 @@ exports.update_cart = async (req, res, next) => {
         res.status(200).json(result);
     } catch (error) {
         res.status(400).json({ msg: error.message });
+        res.status(400).json({ msg: error.message });
     }
-}
+};
