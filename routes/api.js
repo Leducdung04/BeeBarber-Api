@@ -13,6 +13,8 @@ const { createReview, updateReview } = require("../controllers/reviewsController
 const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
 const { createNotification, updateNotification } = require("../controllers/notificationController");
 const {get_list_product,add_product,update_product,get_list_product_by_category} = require("../controllers/productController")
+const {get_list_cartItem,add_cartItem,delete_cartItem,update_cartItem} = require("../controllers/cartItemController");
+const {get_user_cart,add_cart,update_cart} = require("../controllers/cartController")
 
 // restful Api notifications
 router.post("/notifications/createNotification",createNotification)
@@ -79,5 +81,13 @@ router.get('/products/get_list_product_by_category', get_list_product_by_categor
 router.post('/products/add_product',Upload.single("image"),add_product)
 router.put('/products/update_product/:id',Upload.single("image"),update_product)
 
+//Restful API cho cart
+router.get('/carts/get_user_cart',get_user_cart);
+router.post('./carts/add_cart',add_cart)
+router.put("./carts/")
+
+
+//Restful API cho giỏ hàng
+router.get('/cartItems/')
 
 module.exports = router;
