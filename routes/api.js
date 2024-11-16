@@ -12,10 +12,8 @@ const {getListCategory,addCategory,updateCategory } = require('../controllers/ca
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
 const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
 const { createNotification, updateNotification } = require("../controllers/notificationController");
-const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment } = require("../controllers/appointmentControllers");
+const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment, getAppointmentsByUserId } = require("../controllers/appointmentControllers");
 const { addPayment, updatePayment_Canceled_ById, updatePaymentStatus } = require("../controllers/paymentsController");
-
-
 
 // restful Api banner 
 router.get('/get_list_banner',get_list_banner)
@@ -33,7 +31,7 @@ router.post('/checkPhoneNumber', checkPhoneNumber);
 router.post('/checkPhoneAndGetId', checkPhoneAndGetId); // Gọi hàm kiểm tra số điện thoại và trả về ID người dùng
 router.get('/user/:id', getUserById);
 router.put('/updateUser/:id',updateUser)
-router.put('updateLoyaltyPoints/:id',updateLoyaltyPoints)
+router.put('/updateLoyaltyPoints/:id',updateLoyaltyPoints)
 
 // RESTful API cho Voucher
 router.post('/vouchers', createVoucher);  // Tạo voucher mới
@@ -85,8 +83,8 @@ router.put('/notifications/:id', updateNotification);
 router.post('/add_Appointment',addAppointment)
 router.post('/addAppointmentWithPayment',addAppointmentWithPayment)
 
-router.get('/getAppointmentsByIduser/:userId',getAppointmentsWithPayments)
-
+// router.get('/getAppointmentsByIduser/:userId',getAppointmentsWithPayments)
+router.get('/getAppointmentsByIduser/:user_id',getAppointmentsByUserId)
 // Restful API Payments
 router.post('/new_payment',addPayment);
 router.put('/updatePayment_Canceled_ById/:paymentId',updatePayment_Canceled_ById)
