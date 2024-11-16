@@ -88,18 +88,18 @@ router.put('/products/update_product/:id',Upload.single("image"),update_product)
 
 //Restful API cho cart
 router.get('/carts/get_user_cart',get_user_cart);
-router.post('./carts/add_cart',add_cart)
-router.put("./carts/")
+router.post('/carts/add_cart',add_cart)
+router.put("/carts/update_cart",update_cart);
 
+//Restful API cho cartItem
+router.get('/cartItems/get_list_cartItem',get_list_cartItem);
+router.post('/cartItems/add_cartItem',add_cartItem);
+router.delete('/cartItems/delete_cartItem/:id',delete_cartItem);
+router.put('/cartItems/update_cart',update_cartItem)
 
-//Restful API cho giỏ hàng
-router.get('/cartItems/')
 // RESTful API Appointment
-
 router.post('/add_Appointment',addAppointment)
 router.post('/addAppointmentWithPayment',addAppointmentWithPayment)
-
-router.get('/getAppointmentsByIduser/:userId',getAppointmentsWithPayments)
 
 // Restful API Payments
 router.post('/new_payment',addPayment);
