@@ -1,30 +1,52 @@
 const Notification = require("../models/notifications");  
 const User = require("../models/user");                  
+const admin = require("../config/firebase")
 
 // Thêm thông báo mới
 exports.createNotification = async (req, res) => {
   try {
-    const { user_id, relates_id, type, content } = req.body;
+    // const { user_id, relates_id, type, content } = req.body;
 
-    // Kiểm tra xem user_id có hợp lệ không
-    const userExists = await User.findById(user_id);
-    if (!userExists) {
-      return res.status(400).json({ message: "Người dùng không hợp lệ" });
-    }
+    // // Kiểm tra xem user_id có hợp lệ không
+    // const userExists = await User.findById(user_id);
+    // if (!userExists) {
+    //   return res.status(400).json({ message: "Người dùng không hợp lệ" });
+    // }
 
-    // Tạo mới thông báo
-    const newNotification = new Notification({
-      user_id,
-      relates_id,
-      type,
-      content,
-      status: "unread",  // Mặc định là chưa đọc
-    });
+    // // Tạo mới thông báo
+    // const newNotification = new Notification({
+    //   user_id,
+    //   relates_id,
+    //   type,
+    //   content,
+    //   status: "unread",  // Mặc định là chưa đọc
+    // });
 
-    // Lưu vào cơ sở dữ liệu
-    await newNotification.save();
+    // // Lưu vào cơ sở dữ liệu
+    // await newNotification.save();
 
-    res.status(201).json({ message: "Thông báo đã được tạo thành công", notification: newNotification });
+    // // Lấy FCM token của người dùng
+    // const user = await User.findById(user_id);
+    // if (!user || !user.fcmToken) {
+    //   return res.status(400).json({ message: "Không tìm thấy token của người dùng" });
+    // }
+
+    // // Gửi thông báo tới thiết bị của người dùng
+    // const message = {
+    //   notification: {
+    //     title: "Sản phẩm đã được thêm vào giỏ hàng",
+    //     body: content,
+    //   },
+    //   token: user.fcmToken, // Token của người dùng
+    // };
+
+    // // Gửi thông báo qua Firebase Cloud Messaging (FCM)
+    // await admin.messaging().send(message);
+
+    // res.status(201).json({
+    //   message: "Thông báo đã được tạo và gửi thành công",
+    //   notification: newNotification,
+    // });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Đã xảy ra lỗi", error });

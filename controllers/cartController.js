@@ -1,5 +1,4 @@
 const Cart = require('../models/cart');
-const CartItem = require('../models/cartItem');
 
 // exports.getlistCart = async (req, res, next) => {
 //     try {
@@ -11,37 +10,47 @@ const CartItem = require('../models/cartItem');
 //     }
 // }
 
-exports.get_list_cart = async (req, res, next) => {
+exports.get_user_cart = async (req, res, next) => {
     try {
-
-      const cart = await Cart.find();
-  
-      res.status(200).json(cart);
+        const cart = await Cart.findOne({ user_id: req.user._id });
+        if (!cart) {
+            return res.status(404).json({ msg: "Giỏ hàng không tồn tại" });
+        }
+        res.status(200).json(cart);
     } catch (error) {
         res.status(400).json({ msg: error.message });
     }
 };
 
-// Thêm giỏ hàng mới cho người dùng nếu chưa có
-exports.add_Cart = async (req, res) => {
+
+exports.add_cart = async (req, res, next) => {
     try {
         let cart = await Cart.findOne({ user_id: req.user._id });
-        if (!cart) {
-            cart = new Cart({ user_id: req.user._id });
-            await cart.save();
+        if (cart) {
+            return res.status(400).json({ msg: "Người Dùng Đã Có Giỏ Hàng" });
         }
-        res.status(201).json(cart);
+        const newCart = new Cart({ user_id: req.user._id });
+        const result = await newCart.save();
+        res.status(201).json(result);
     } catch (error) {
+        res.status(400).json({ msg: error.message });
         res.status(400).json({ msg: error.message });
     }
 };
 
-// Cập nhật giỏ hàng của người dùng (thêm, xóa hoặc sửa)
-exports.update_Cart = async (req, res) => {
+exports.update_cart = async (req, res, next) => {
     try {
-        const result = await Cart.findOneAndUpdate({ user_id: req.user._id }, req.body, { new: true });
-        res.status(201).json(result);
+        const result = await Cart.findOneAndUpdate(
+            { user_id: req.user._id },
+            req.body,
+            { new: true }
+        );
+        if (!result) {
+            return res.status(404).json({ msg: "Không tồn tại giỏ hàng này" });
+        }
+        res.status(200).json(result);
     } catch (error) {
+        res.status(400).json({ msg: error.message });
         res.status(400).json({ msg: error.message });
     }
 };
