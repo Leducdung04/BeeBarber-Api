@@ -1,3 +1,7 @@
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
+const SECRETKEY = "BeeBarber-Fpoly";
+const JWT = require("jsonwebtoken");
 exports.loginPhone = async (req, res) => {
   try {
     const { phone, password } = req.body;
@@ -10,13 +14,13 @@ exports.loginPhone = async (req, res) => {
 
     const user = await User.findOne({ phone });
     if (!user) {
-      return res.status(400).json({ message: "Số điện thoại hoặc mật khẩu không chính xác!" });
+      return res.status(400).json({ message: "Số điện thoại không tồn tại" });
     }
 
     // Kiểm tra mật khẩu đã mã hóa
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(400).json({ message: "Số điện thoại hoặc mật khẩu không chính xác!" });
+      return res.status(400).json({ message: "Mật khẩu không chính xác!" });
     }
 
     // Tạo JWT token sau khi đăng nhập thành công
@@ -45,6 +49,6 @@ exports.loginPhone = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Lỗi máy chủ" });
+    return res.status(500).json({ message: `Lỗi máy chủ: ${error}` });
   }
 };

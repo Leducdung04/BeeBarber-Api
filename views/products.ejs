@@ -1,0 +1,78 @@
+<%- include('header') -%>
+<div class="colorlib-product" style="padding-top: 10px">
+  <div style="padding-left:10px ; padding-right: 10px;">
+    <div class="row">
+      <div class="col-md-4 offset-md-8 text-right">
+        <div class="top-menu" style="padding-top: 10px">
+          <form class="search-wrap">
+            <div class="form-group">
+              <input
+                type="search"
+                id="query-search-product"
+                class="form-control search"
+                placeholder="Search"
+              />
+              <button
+                id="btn-search-product"
+                class="btn btn-primary submit-search text-center"
+                type="submit"
+              >
+                <i class="icon-search"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div
+        class="col-sm-8 offset-sm-2 text-center colorlib-heading"
+        style="height: 0px"
+      >
+        <h2>Sản Phẩm</h2>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-sm-12 text-left">
+        <button id="add-product-btn" class="btn btn-primary">Thêm</button>
+      </div>
+    </div>
+    <table class="table table-striped table-bordered table-hover ">
+      <thead>
+        <tr>
+          <th scope="col" style="text-align: center;">ID</th>
+          <th scope="col" style="text-align: center;">NAME</th>
+          <th scope="col" style="text-align: center;">IMAGE</th>
+          <th scope="col" style="text-align: center;width: 150px;">IMPORT PRICE</th>
+          <th scope="col" style="text-align: center;">PRICE</th>
+          <th scope="col" style="text-align: center;">QUANTITY</th>
+          <th scope="col" style="text-align: center;width: 120px;">STATUS</th>
+          <th scope="col" style="text-align: center;">DESCRIPTION</th>
+          <th scope="col" style="text-align: center;">CATEGORY</th>
+          <th scope="col" style="text-align: center;width: 120px;">ACTION</th>
+        </tr>
+      </thead>
+      <tbody id="products-list"></tbody>
+    </table>
+  </div>
+</div>
+<div class="modal fade" id="confirmModalProduct" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmModalLabel">Xác nhận ngừng bán</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Bạn có chắc chắn muốn ngừng bán đơn hàng?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy bỏ</button>
+        <button id="confirmProductBtn" type="button" class="btn btn-primary">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('footer'); -%>
