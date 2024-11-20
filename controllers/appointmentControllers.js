@@ -27,23 +27,44 @@ exports.addAppointment = async (req, res, next) => {
 
 exports.addAppointmentWithPayment = async (req, res) => {
     try {
-        // Lấy dữ liệu từ đối tượng `appointment` trong `req.body`
-        const appointment = req.body.appointment;
-        console.log('appointment: ' + appointment)
+        // Lấy dữ liệu từ `req.body`
+        const  appointment = req.body.appointment;
+        const  payment  = req.body.payment;
+
+        // Kiểm tra dữ liệu đầu vào
+        if (!appointment || !payment) {
+            return res.status(400).json({ message: 'Missing appointment or payment data' });
+        }
+
+        // Kiểm tra từng trường quan trọng trong `appointment`
+        const requiredFields = ['barber_id', 'user_id', 'service_id', 'appointment_time', 'appointment_date', 'price'];
+        for (const field of requiredFields) {
+            if (!appointment[field]) {
+                return res.status(400).json({ message: `Missing required field: ${field}` });
+            }
+        }
+        appointment.price = parseInt(appointment.price);
+        if (isNaN(appointment.price)) {
+            return res.status(400).json({ message: 'Invalid price format in appointment' });
+        }
+
         // Tạo một đối tượng Appointment mới
         const newAppointment = new Appointment(appointment);
 
         // Lưu Appointment và lấy `_id` của nó để dùng làm `related_id` cho Payment
         const appointmentResult = await newAppointment.save();
-        
-        // Lấy dữ liệu từ đối tượng `payment` trong `req.body`
-        let payment = req.body.payment;
 
-        // Tạo một đối tượng Payment mới với `related_id` là `_id` của Appointment đã lưu
+       
+
+        // Gắn `related_id` và tạo đối tượng Payment
         const newPayment = new Payment({
-            related_id: appointmentResult._id,  // Liên kết với Appointment đã tạo
-            ...payment
+            related_id: appointmentResult._id,
+            ...payment,
         });
+
+        if (isNaN(newPayment.price)) {
+            return res.status(400).json({ message: 'Invalid price format in payment' });
+        }
 
         const paymentResult = await newPayment.save();
 
@@ -51,13 +72,15 @@ exports.addAppointmentWithPayment = async (req, res) => {
             status: 201,
             message: 'Appointment and Payment added successfully',
             appointment: appointmentResult,
-            payment: paymentResult
+            payment: paymentResult,
         });
     } catch (err) {
-        console.error(err);
-        res.status(400).json({ message: 'Server Error' });
+        console.error('Error adding appointment with payment:', err);
+        res.status(500).json({ message: 'Server Error', error: err.message });
     }
-}
+};
+
+
 
 exports.updateAppointment = async (req, res, next) => {
     try {
