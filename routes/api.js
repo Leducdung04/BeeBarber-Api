@@ -4,7 +4,7 @@ const router = express.Router();
 const { createVoucher, updateVoucher, getVouchers, getValidVouchers, getVoucherByCode } = require('../controllers/voucherController');
 const { getUserVouchers, useVoucher } = require('../controllers/uservoucherController');
 const {get_list_banner,addBanner,updateBanner,updateBannerStatus,get_list_banner_ByStatus} = require('../controllers/bannerController');
-const {SigupUser,loginEmail,loginPhone,updateUser,updateLoyaltyPoints, checkPhoneNumber, checkPhoneAndGetId, getUserById }  = require('../controllers/userController');
+const {loginPhone,updateLoyaltyPoints, SigupUser }  = require('../controllers/userController');
 const {add_Category_Product,get_list_Category_Product} = require('../controllers/categoryProductController')
 const Upload = require("../config/upload");
 const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices} = require('../controllers/serviceController');
@@ -24,14 +24,14 @@ router.put('/updateBanner/:id',Upload.single("image"),updateBanner)
 router.put('/updateBannerStatus/:id',updateBannerStatus)
 
 // restful Api user
-router.post('/Singup',SigupUser)
-router.post('/loginEmail',loginEmail)
+// router.post('/Singup',SigupUser)
 router.post('/loginPhone',loginPhone)
-router.post('/checkPhoneNumber', checkPhoneNumber);
-router.post('/checkPhoneAndGetId', checkPhoneAndGetId); // Gọi hàm kiểm tra số điện thoại và trả về ID người dùng
-router.get('/user/:id', getUserById);
-router.put('/updateUser/:id',updateUser)
-router.put('/updateLoyaltyPoints/:id',updateLoyaltyPoints)
+router.post('/SigupUser',SigupUser)
+// router.post('/checkPhoneNumber', checkPhoneNumber);
+// router.post('/checkPhoneAndGetId', checkPhoneAndGetId); // Gọi hàm kiểm tra số điện thoại và trả về ID người dùng
+// router.get('/user/:id', getUserById);
+// router.put('/updateUser/:id',updateUser)
+// router.put('/updateLoyaltyPoints/:id',updateLoyaltyPoints)
 
 // RESTful API cho Voucher
 router.post('/vouchers', createVoucher);  // Tạo voucher mới
