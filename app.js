@@ -11,15 +11,17 @@ const CryptoJS = require('crypto-js'); // npm install crypto-js
 const moment = require('moment'); // npm install moment
 
 
-var indexRouter = require('./routes/index');
 var apiRouter = require("./routes/api");
-
+const signInRouter = require("./routes/signIn");
+const homeRouter = require("./routes/home");
+const categoriesRouter = require("./routes/categories");
+const productRouter = require("./routes/products");
 var app = express();
 
 const database = require('./config/db')
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'hbs');
+app.set("views", __dirname + "/views");
+app.set("view engine", "ejs");
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -28,9 +30,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.use('/', indexRouter);
+//app.use('/', indexRouter);
 app.use("/api", apiRouter);
-
+app.use("/", signInRouter);
+app.use("/", homeRouter);
+app.use("/", categoriesRouter);
+app.use("/", productRouter);
 // zalo pay 
 const config = {
   app_id: "2553",
