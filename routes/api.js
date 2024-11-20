@@ -12,14 +12,11 @@ const {getListCategory,addCategory,updateCategory, } = require('../controllers/c
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
 const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
 const { createNotification, updateNotification } = require("../controllers/notificationController");
-const {get_list_product,add_product,update_product,get_list_product_by_category} = require("../controllers/productController")
+const {get_list_product,add_product,update_product,get_list_product_by_category,get_product_detail,search_products_by_name} = require("../controllers/productController")
 const {get_list_cartItem,add_cartItem,delete_cartItem,update_cartItem} = require("../controllers/cartItemController");
 const {get_user_cart,add_cart,update_cart} = require("../controllers/cartController")
 const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment } = require("../controllers/appointmentControllers");
 const { addPayment, updatePayment_Canceled_ById, updatePaymentStatus } = require("../controllers/paymentsController");
-
-// restful Api notifications
-router.post("/notifications/createNotification",createNotification)
 
 // restful Api banner 
 router.get('/get_list_banner',get_list_banner)
@@ -84,7 +81,9 @@ router.put('/notifications/:id', updateNotification);
 router.get('/products/get_list_product', get_list_product)
 router.get('/products/get_list_product_by_category', get_list_product_by_category);
 router.post('/products/add_product',Upload.single("image"),add_product)
-router.put('/products/update_product/:id',Upload.single("image"),update_product)
+router.put('/products/update_product/:id',Upload.single("image"),update_product);
+router.get('/products/get_product_detail/:id',get_product_detail)
+router.get('/products/search_product_by_name',search_products_by_name)
 
 //Restful API cho cart
 router.get('/carts/get_user_cart',get_user_cart);

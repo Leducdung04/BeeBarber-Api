@@ -1,12 +1,10 @@
-const admin = require('firebase-admin');
+var admin = require("firebase-admin");
 
+var serviceAccount = require("../config/beebarber-3a718-firebase-adminsdk-g3v02-8bb261896a.json");
 
-// admin.initializeApp({
-//   credential: admin.credential.cert({
-//     private_key: privateKey,
-//     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,  
-//     project_id: "beebarber-3a718",
-//   }),
-// });
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://beebarber-3a718-default-rtdb.firebaseio.com"
+});
 
-module.exports = admin;
+module.exports = admin

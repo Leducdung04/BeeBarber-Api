@@ -51,10 +51,32 @@ exports.add_product = async (req, res, next) => {
         { ...req.body, image },
         { new: true }
       );
-      res.status(201).json(result);
+      res.status(200).json(result);
     } catch (error) {
       console.error(error);
       res.status(400).json({ msg: error.message });
     }
   };
   
+  exports.get_product_detail = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const data = await Product.findById(id)
+      .populate("category_id");
+      res.status(200).json({ data});
+    } catch (error) {
+      res.status(400).json({ msg: error.message });
+    }
+  }
+
+
+exports.search_products_by_name = async (req, res, next) => {
+  try {
+    const {name} = req.query;
+    const filter =  name ? {name} :{ };
+    const products = await Product.find(filter).sort({ createdAt: 1 }).populate("category_id");
+    res.status(200).json({ products});
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+}
