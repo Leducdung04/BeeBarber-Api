@@ -86,3 +86,27 @@ exports.getListAppointments = async (req, res, next) => {
         res.status(400).json({ msg: error.message });
     }
 }
+
+exports.getAppointmentsByUserId = async (req, res, next) => {
+    try {
+        const { user_id } = req.params;
+
+        // Kiểm tra nếu không có user_id được cung cấp
+        if (!user_id) {
+            return res.status(400).json({ msg: "user_id is required" });
+        }
+
+        const appointments = await Appointment.find({
+            user_id,
+            status: true,
+        })
+            .populate('barber_id') // Lấy thông tin từ bảng Barber
+            .populate('service_id') // Lấy thông tin từ bảng Service
+            .sort({ createdAt: -1 }); // Sắp xếp theo thời gian tạo mới nhất
+
+        res.status(200).json(appointments);
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ msg: error.message });
+    }
+};
