@@ -12,7 +12,7 @@ const {getListCategory,addCategory,updateCategory } = require('../controllers/ca
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
 const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
 const { createNotification, updateNotification } = require("../controllers/notificationController");
-const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment, getAppointmentsByUserId } = require("../controllers/appointmentControllers");
+const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment, getAppointmentsByUserId, updateAppointmentStatusToCanceled, updateAppointmentStatusToCanceled_ByZaloPay } = require("../controllers/appointmentControllers");
 const { addPayment, updatePayment_Canceled_ById, updatePaymentStatus } = require("../controllers/paymentsController");
 
 // restful Api banner 
@@ -76,13 +76,15 @@ router.put('/notifications/:id', updateNotification);
 
 router.post('/add_Appointment',addAppointment)
 router.post('/addAppointmentWithPayment',addAppointmentWithPayment)
+router.put('/updateAppointmentStatusToCanceled/:appointmentId',updateAppointmentStatusToCanceled)
+router.put('/updateAppointmentStatusToCanceled_ByZaloPay/:appointmentId',updateAppointmentStatusToCanceled_ByZaloPay)
 
 // router.get('/getAppointmentsByIduser/:userId',getAppointmentsWithPayments)
 router.get('/getAppointmentsByIduser/:user_id',getAppointmentsByUserId)
 // Restful API Payments
 router.post('/new_payment',addPayment);
 router.put('/updatePayment_Canceled_ById/:paymentId',updatePayment_Canceled_ById)
-router.put('/updatePaymentStatus_ById/:paymentId',updatePaymentStatus)
+router.put('/updatePaymentStatus_ById/:appointmentId',updatePaymentStatus)
 
 
 module.exports = router;
