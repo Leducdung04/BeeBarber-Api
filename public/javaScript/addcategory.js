@@ -36,16 +36,16 @@ addButton.addEventListener('click',  function(e) {
     const formData = new FormData();
     formData.append("name", nameInput.value)
     formData.append("description", descInput.value)
-    formData.append("file", imageInput.files[0])
+    formData.append("image", imageInput.files[0])
 
-        fetch("/api/post/add_category_product", {
+        fetch("/api/categoryProducts/add_category_product", {
             method: "POST",
             body: formData
 
         })
         .then(response=> response.json())
         .then(data =>{
-        if (data.message === "add category success") {
+        if (data.message === "Create new category product successfully") {
             alert(data.message);
             window.location.href = "/categories_product";
         } else {

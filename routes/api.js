@@ -64,7 +64,7 @@ router.get("/categorys/get_category/:id", getCategoryService)
 
 // RESTful API cho CategoryProduct
 router.get('/categoryProducts/get_list_Category_Product', get_list_Category_Product)
-router.post('/categoryProducts/add_category_product',Upload.array("image"),add_Category_Product)
+router.post('/categoryProducts/add_category_product',Upload.single("image"),add_Category_Product)
 
 // RESTful API cho Review 
 router.post('/reviews', createReview);

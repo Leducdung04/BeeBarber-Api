@@ -4,11 +4,11 @@ const btnSearchCategoryService
 let dataCategoriesService = [];
 getData()
 function getData(){
-  fetch("/api/categorys/get_list_category",{ cache: "no-store" })
+  fetch("/api/categorys/get_list_category")
   .then((response) => response.json())
   .then((data) => {
     console.log(data)
-    displayCategories(data)
+    displayCategoriesService(data)
     dataCategoriesService = data
   })
   .catch((error) => console.error("Error fetching category:", error));
@@ -22,11 +22,11 @@ btnSearchCategoryService
     return category.name.toLowerCase().includes(result_search);
   });
 
-  displayCategories(filteredCategories);
+  displayCategoriesService(filteredCategories);
 });
 
-async function displayCategories(categories) {
-  const tableBody = document.getElementById("category-table-body");
+async function displayCategoriesService(categories) {
+  const tableBody = document.getElementById("category-service-table-body");
   tableBody.innerHTML = ""; // Xóa bảng hiện có để hiển thị kết quả tìm kiếm mới
 
  await categories.forEach((category) => {
@@ -48,7 +48,7 @@ async function displayCategories(categories) {
 document.getElementById("add-category-service-btn").addEventListener('click', function(){
     window.location.href ="addcategoryService";
 })
-document.getElementById("category-table-body").addEventListener("click",async function (event) {
+document.getElementById("category-service-table-body").addEventListener("click",async function (event) {
   if (event.target.tagName === "A") {
     event.preventDefault(); 
     const productId = await event.target.getAttribute("href");
