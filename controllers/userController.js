@@ -175,3 +175,48 @@ exports.updateLoyaltyPoints = async (req, res) => {
     res.status(500).json({ message: "Lỗi máy chủ" });
   }
 };
+
+const mongoose = require("mongoose"); // Ensure this is at the top of your file
+
+exports.getUserDetailById = async (req, res) => {
+  try {
+    const { id } = req.params; // Get user ID from the route parameters
+
+    // Validate the user ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID không hợp lệ!" });
+    }
+
+    // Find the user by ID
+    const user = await User.findById(id);
+
+    // Check if the user exists
+    if (!user) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng với ID này!" });
+    }
+
+    // Exclude the password field from the response
+    const userData = {
+      _id: user._id,
+      name: user.name,
+      phone: user.phone,
+      email: user.email,
+      image: user.image,
+      role: user.role,
+      loyaltyPoints: user.loyaltyPoints,
+      status: user.status,
+      location : user.location,
+      deviceTokens: user.deviceTokens,
+    };
+
+    // Respond with the user's details
+    return res.status(200).json({
+      status: 200,
+      message: "Lấy thông tin người dùng thành công",
+      data: userData,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Lỗi máy chủ" });
+  }
+};

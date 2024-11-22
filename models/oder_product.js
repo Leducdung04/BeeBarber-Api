@@ -30,6 +30,7 @@ const orderProductSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, // Giả sử user_voucher_id là một ObjectId từ model khác
         default: null, // Có thể không có voucher
     },
+    
     createdAt: {
         type: Date,
         default: Date.now,
