@@ -8,7 +8,7 @@ const {SigupUser,loginPhone,getUserDetailById}  = require('../controllers/userCo
 const {add_Category_Product,get_list_Category_Product} = require('../controllers/categoryProductController')
 const Upload = require("../config/upload");
 const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices} = require('../controllers/serviceController');
-const {getListCategory,addCategory,updateCategory, } = require('../controllers/categoryController');
+const {getListCategory,addCategory,updateCategory, changeStatusCategoryService} = require('../controllers/categoryController');
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
 const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
 const { createNotification, updateNotification } = require("../controllers/notificationController");
@@ -57,6 +57,7 @@ router.get('/getGroupedServices',getGroupedServices)
 router.get('/categorys/get_list_category',getListCategory)
 router.post('/categorys/add_category',Upload.single("image"),addCategory)
 router.put('/categorys/update_category/:id',Upload.single("image"),updateCategory)
+router.get('/categorys/update_status_category/:id',changeStatusCategoryService)
 
 
 // RESTful API cho CategoryProduct

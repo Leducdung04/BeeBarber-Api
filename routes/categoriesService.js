@@ -4,7 +4,7 @@ const router = express.Router();
 router.get("/categories_service", (req, res) => {
   res.render("categoriesService");
 });
-router.get("/addcategory", (req, res) => {
-  res.render("addCategory");
+router.get("/addcategoryService", (req, res) => {
+  res.render("addCategoryService");
 });
 module.exports = router;
