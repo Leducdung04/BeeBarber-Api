@@ -18,7 +18,8 @@ const {get_user_cart,add_cart,update_cart} = require("../controllers/cartControl
 
 // restful Api notifications
 router.post("/notifications/createNotification",createNotification)
-const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment, getAppointmentsByUserId } = require("../controllers/appointmentControllers");
+const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment, getAppointmentsByUserId, updateAppointmentStatusToCanceled, updateAppointmentStatusToCanceled_ByZaloPay } = require("../controllers/appointmentControllers");
+
 const { addPayment, updatePayment_Canceled_ById, updatePaymentStatus } = require("../controllers/paymentsController");
 
 // restful Api banner 
@@ -97,6 +98,8 @@ router.put('/cartItems/update_cart',update_cartItem)
 // RESTful API Appointment
 router.post('/add_Appointment',addAppointment)
 router.post('/addAppointmentWithPayment',addAppointmentWithPayment)
+router.put('/updateAppointmentStatusToCanceled/:appointmentId',updateAppointmentStatusToCanceled)
+router.put('/updateAppointmentStatusToCanceled_ByZaloPay/:appointmentId',updateAppointmentStatusToCanceled_ByZaloPay)
 
 // router.get('/getAppointmentsByIduser/:userId',getAppointmentsWithPayments)
 router.get('/getAppointmentsByIduser/:user_id',getAppointmentsByUserId)
@@ -104,7 +107,7 @@ router.get('/getAppointmentsByIduser/:user_id',getAppointmentsByUserId)
 // Restful API Payments
 router.post('/new_payment',addPayment);
 router.put('/updatePayment_Canceled_ById/:paymentId',updatePayment_Canceled_ById)
-router.put('/updatePaymentStatus_ById/:paymentId',updatePaymentStatus)
+router.put('/updatePaymentStatus_ById/:appointmentId',updatePaymentStatus)
 
 
 module.exports = router;

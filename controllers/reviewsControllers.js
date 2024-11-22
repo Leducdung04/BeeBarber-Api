@@ -1,11 +1,13 @@
 const Review = require("../models/reviews");  // Model Review đã định nghĩa
 const Barber = require("../models/barber");  // Model Barber (liên kết với barber_id)
 const Service = require("../models/service"); // Model Service (liên kết với services_id)
+const Appointment = require("../models/appointments");
 
 // Thêm đánh giá mới
+
 exports.createReview = async (req, res) => {
   try {
-    const { barber_id, services_id, comment, rating_barber, rating_services } = req.body;
+    const { barber_id, services_id, rating, appointment_id } = req.body;
 
     // Kiểm tra xem barber và service có tồn tại không
     const barberExists = await Barber.findById(barber_id);
@@ -19,25 +21,36 @@ exports.createReview = async (req, res) => {
       return res.status(400).json({ message: "Dịch vụ không hợp lệ" });
     }
 
+    // Kiểm tra xem cuộc hẹn có tồn tại không
+    const appointment = await Appointment.findById(appointment_id);
+    if (!appointment) {
+      return res.status(400).json({ message: "Cuộc hẹn không tồn tại" });
+    }
+
     // Tạo mới đánh giá
     const newReview = new Review({
       barber_id,
       services_id,
-      comment,
-      rating_barber,
-      rating_services,
-      status: "pending",  // Mặc định status là pending
+      rating,
     });
 
-    // Lưu vào cơ sở dữ liệu
+    // Lưu đánh giá vào cơ sở dữ liệu
     await newReview.save();
 
-    res.status(201).json({ message: "Đánh giá đã được tạo thành công", review: newReview });
+    // Cập nhật trạng thái cuộc hẹn thành Evaluate
+    appointment.appointment_status = 'Evaluate';
+    await appointment.save();
+
+    res.status(201).json({
+      message: "Đánh giá đã được tạo thành công",
+      review: newReview,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Đã xảy ra lỗi", error });
   }
 };
+
 
 // Cập nhật đánh giá
 exports.updateReview = async (req, res) => {
