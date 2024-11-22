@@ -70,8 +70,12 @@ exports.addService = async (req, res, next) => {
     });
 
     const result = await newService.save();
-
-    res.status(201).json(result);
+    if(result){
+      return res.status(201).json({message:"Create new service successfully", data:result});
+    }else{
+      return res.json({message: "Create new service failed"})
+    }
+    
   } catch (error) {
     console.error(error);
     res.status(400).json({ message: "Server Error" });
@@ -108,3 +112,11 @@ exports.updateService = async (req, res, next) => {
     res.status(400).json({ message: "Server Error" });
   }
 };
+exports.changeStatusService = async (req,res)=>{
+  try {
+    const id = req.params.id
+    
+  } catch (error) {
+    return res.status(500).json({message: `${error}`})
+  }
+}

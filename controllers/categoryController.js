@@ -84,3 +84,16 @@ exports.changeStatusCategoryService = async (req,res)=>{
      return res.status(500).json({status:500, message: `${error}`})
   }
 }
+exports.getCategoryService = async (req,res)=>{
+  try {
+    const id = req.params.id
+    const category = await Category.findById(id)
+    if(category){
+      return res.json({message: "Get category service successfully", data: category})
+    }else{
+      return res.json({message: "Get category service failed"})
+    }
+  } catch (error) {
+    return res.json({message: `${error}`})
+  }
+}
