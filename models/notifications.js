@@ -9,7 +9,7 @@ const notificationSchema = new mongoose.Schema({
   },
   relates_id: { 
     type: mongoose.Schema.Types.ObjectId, 
-    required: true  // Liên kết với một bảng nào đó (ví dụ: review_id, barber_id, v.v.)
+    required: true
   },
   type: { 
     type: String, 
