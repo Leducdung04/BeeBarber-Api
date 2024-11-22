@@ -8,30 +8,15 @@ const reviewSchema = new mongoose.Schema({
     required: true 
   },
   services_id: { 
-    type: mongoose.Schema.Types.ObjectId, 
+    type: [mongoose.Schema.Types.ObjectId], 
     ref: "Service",  
     required: true 
   },
-  comment: { 
-    type: String, 
-    trim: true 
-  },
-  rating_barber: { 
+  rating: { 
     type: Number, 
     min: 1, 
     max: 5, 
     required: true 
-  },
-  rating_services: { 
-    type: Number, 
-    min: 1, 
-    max: 5, 
-    required: true 
-  },
-  status: { 
-    type: String, 
-    enum: ["pending", "approved", "rejected"], 
-    default: "pending" 
   },
   created_at: { 
     type: Date, 
