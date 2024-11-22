@@ -15,6 +15,7 @@ var apiRouter = require("./routes/api");
 const signInRouter = require("./routes/signIn");
 const homeRouter = require("./routes/home");
 const categoriesRouter = require("./routes/categories");
+const categoriesServiceRouter = require("./routes/categoriesService");
 const productRouter = require("./routes/products");
 var app = express();
 
@@ -35,6 +36,7 @@ app.use("/api", apiRouter);
 app.use("/", signInRouter);
 app.use("/", homeRouter);
 app.use("/", categoriesRouter);
+app.use("/", categoriesServiceRouter);
 app.use("/", productRouter);
 // zalo pay 
 const config = {
