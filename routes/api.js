@@ -11,15 +11,11 @@ const {getListService,addService,updateService,getListServiceByCategory,getGroup
 const {getListCategory,addCategory,updateCategory, } = require('../controllers/categoryController');
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
 const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
-const { createNotification, updateNotification } = require("../controllers/notificationController");
+const { createNotification, updateNotification, getNotifications } = require("../controllers/notificationController");
 const {get_list_product,add_product,update_product,get_list_product_by_category,get_product_detail,search_products_by_name} = require("../controllers/productController")
 const {get_list_cartItem,add_cartItem,delete_cartItem,update_cartItem} = require("../controllers/cartItemController");
 const {get_user_cart,add_cart,update_cart} = require("../controllers/cartController")
-
-// restful Api notifications
-router.post("/notifications/createNotification",createNotification)
 const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment, getAppointmentsByUserId, updateAppointmentStatusToCanceled, updateAppointmentStatusToCanceled_ByZaloPay } = require("../controllers/appointmentControllers");
-
 const { addPayment, updatePayment_Canceled_ById, updatePaymentStatus } = require("../controllers/paymentsController");
 
 // restful Api banner 
@@ -73,6 +69,7 @@ router.post('/add_Barbers',Upload.single("image"), createBarber);
 router.put('/Update_Barbers/:id',Upload.single("image"), updateBarber);
 
 // RESTful API cho Notifications
+router.get("/notifications/getNotifications", getNotifications);
 router.post('/notifications', createNotification);
 router.put('/notifications/:id', updateNotification);
 

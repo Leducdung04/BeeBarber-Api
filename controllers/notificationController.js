@@ -17,6 +17,39 @@ async function getBearerToken() {
   return tokenResponse.token;
 }
 
+exports.getNotifications = async (req, res) => {
+  try {
+    const { user_id, relates_id, type, status } = req.query;
+
+    const filter = { user_id }; 
+    
+    if (relates_id) {
+      filter.relates_id = relates_id;
+    }
+
+    if (type) {
+      filter.type = type;
+    }
+
+    if (status) {
+      filter.status = status;
+    }
+
+    const notifications = await Notification.find(filter).sort({ created_at: -1 });
+
+    res.status(200).json({
+      message: "Danh sách thông báo",
+      data: notifications,
+    });
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    res.status(500).json({ message: "Đã xảy ra lỗi", error });
+  }
+};
+
+
+
+
 exports.createNotification = async (req, res) => {
   try {
     const { user_id, relates_id, type, content } = req.body;
