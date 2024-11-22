@@ -4,11 +4,11 @@ const btnSearchCategoryService
 let dataCategoriesService = [];
 getData()
 function getData(){
-  fetch("/api/categorys/get_list_category",{ cache: "no-store" })
+  fetch("/api/categorys/get_list_category")
   .then((response) => response.json())
   .then((data) => {
     console.log(data)
-    displayCategories(data)
+    displayCategoriesService(data)
     dataCategoriesService = data
   })
   .catch((error) => console.error("Error fetching category:", error));
@@ -22,11 +22,11 @@ btnSearchCategoryService
     return category.name.toLowerCase().includes(result_search);
   });
 
-  displayCategories(filteredCategories);
+  displayCategoriesService(filteredCategories);
 });
 
-async function displayCategories(categories) {
-  const tableBody = document.getElementById("category-table-body");
+async function displayCategoriesService(categories) {
+  const tableBody = document.getElementById("category-service-table-body");
   tableBody.innerHTML = ""; // Xóa bảng hiện có để hiển thị kết quả tìm kiếm mới
 
  await categories.forEach((category) => {
@@ -45,26 +45,24 @@ async function displayCategories(categories) {
         tableBody.appendChild(newRow);
     });
 }
-document.getElementById("add-category-btn").addEventListener('click', function(){
-    window.location.href ="addcategory";
+document.getElementById("add-category-service-btn").addEventListener('click', function(){
+    window.location.href ="addcategoryService";
 })
-document.getElementById("category-table-body").addEventListener("click",async function (event) {
+document.getElementById("category-service-table-body").addEventListener("click",async function (event) {
   if (event.target.tagName === "A") {
     event.preventDefault(); 
     const productId = await event.target.getAttribute("href");
     $("#confirmModalProduct").modal('show')
     $("#confirmProductBtn").off('click').click(function(){
-      fetch(`/api/post/update_category_product/${productId}`)
+      fetch(`/api/categorys/update_status_category/${productId}`)
       .then(res => res.json())
       .then(data =>{
-      if(data.message==="update category success"){
+      if(data.message==="update status successfully"){
         $("#confirmModalProduct").modal('hide')
         alert("update thành công")
         getData()
-      }else if(data.message==="update category failed"){
-        alert("update thất bại")
       }else{
-        alert("Không tìm thấy sản phẩm")
+        alert(data.message)
       }
       })
       

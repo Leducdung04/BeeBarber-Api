@@ -7,8 +7,8 @@ const {get_list_banner,addBanner,updateBanner,updateBannerStatus,get_list_banner
 const {SigupUser,loginPhone,getUserDetailById}  = require('../controllers/userController');
 const {add_Category_Product,get_list_Category_Product} = require('../controllers/categoryProductController')
 const Upload = require("../config/upload");
-const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices} = require('../controllers/serviceController');
-const {getListCategory,addCategory,updateCategory, } = require('../controllers/categoryController');
+const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices, changeStatusService} = require('../controllers/serviceController');
+const {getListCategory,addCategory,updateCategory, changeStatusCategoryService, getCategoryService} = require('../controllers/categoryController');
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
 const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
 const { createNotification, updateNotification, getNotifications } = require("../controllers/notificationController");
@@ -48,16 +48,19 @@ router.post('/services/add_service',Upload.single("images"),addService)
 router.put('/services/update_service/:id',Upload.single("images"),updateService)
 router.get('/services/getListServiceByCategory/:id_category',getListServiceByCategory)
 router.get('/getGroupedServices',getGroupedServices)
+router.get('/services/update_status_service/:id',changeStatusService)
 
 //RESTful API cho Category
 router.get('/categorys/get_list_category',getListCategory)
 router.post('/categorys/add_category',Upload.single("image"),addCategory)
 router.put('/categorys/update_category/:id',Upload.single("image"),updateCategory)
+router.get('/categorys/update_status_category/:id',changeStatusCategoryService)
+router.get("/categorys/get_category/:id", getCategoryService)
 
 
 // RESTful API cho CategoryProduct
 router.get('/categoryProducts/get_list_Category_Product', get_list_Category_Product)
-router.post('/categoryProducts/add_category_product',Upload.array("image"),add_Category_Product)
+router.post('/categoryProducts/add_category_product',Upload.single("image"),add_Category_Product)
 
 // RESTful API cho Review 
 router.post('/reviews', createReview);

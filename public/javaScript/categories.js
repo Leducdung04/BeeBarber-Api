@@ -3,11 +3,11 @@ const btn_search = document.getElementById("btn-search");
 let dataCategory = [];
 getData()
 function getData(){
-  fetch("/api/get/categories_product",{ cache: "no-store" })
+  fetch("/api/categoryProducts/get_list_Category_Product")
   .then((response) => response.json())
   .then((data) => {
-    displayCategories(data.data)
-    dataCategory = data.data
+    displayCategories(data)
+    dataCategory = data
   })
   .catch((error) => console.error("Error fetching category:", error));
 }
@@ -34,7 +34,7 @@ async function displayCategories(categories) {
                 <td class="h5">${category.name}</td>
                 <td> <img src="${category.image}" style="max-width: 120px; max-height: 120px;" class="rounded mx-auto d-block";alt="Fstyle shop"></td>
                 <td class="h5">${category.description}</td>
-                <td class="h5">${category.status == true ?"Còn Hàng": "Hết Hàng"}</td>
+                <td class="h5">${category.status == true ?"Khả dụng": "Không khả dụng"}</td>
                 <td><a href="${category._id}"style="color:
        #007bff; font-size:15px; text-decoration: underline;"
        >Ngừng bán</a></td>`;
