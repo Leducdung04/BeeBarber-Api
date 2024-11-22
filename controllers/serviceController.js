@@ -115,7 +115,19 @@ exports.updateService = async (req, res, next) => {
 exports.changeStatusService = async (req,res)=>{
   try {
     const id = req.params.id
-    
+    const serviceAuth = await Service.findById(id)
+    if(serviceAuth){
+      const serviceUpdate = await Service.findByIdAndUpdate(serviceAuth._id,{
+        status:false
+      },{
+        new:true
+      })
+      if(serviceUpdate){
+        return res.json({message:"Update service successfully", data:serviceUpdate})
+      }else{
+        return res.json({message: "Update service failed"})
+      }
+    }
   } catch (error) {
     return res.status(500).json({message: `${error}`})
   }

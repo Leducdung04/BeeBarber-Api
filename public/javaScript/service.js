@@ -69,14 +69,14 @@ document.getElementById("products-list").addEventListener("click",async function
     const productId = await event.target.getAttribute("href");
     $("#confirmModalProduct").modal('show')
     $("#confirmProductBtn").click(function(){
-      fetch(`/api/products/update/quantity/${productId}`)
+      fetch(`/api/services/update_status_service/${productId}`)
       .then(res => res.json())
       .then(data =>{
-      if(data.message==="update product success"){
+      if(data.message==="Update service successfully"){
         $("#confirmModalProduct").modal('hide')
         alert("update thành công")
         getData()
-      }else if(data.message==="update product failed"){
+      }else if(data.message==="Update service failed"){
         alert("update thất bại")
       }else{
         alert("Không tìm thấy sản phẩm")
