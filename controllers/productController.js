@@ -1,5 +1,5 @@
 const Product = require('../models/product');
-
+const ProductModel = require('../models/product');
 exports.get_list_product = async (req, res, next) => {
   try {
     const products = await Product.find().sort({ createdAt: 1 }).populate("category_id");
@@ -78,6 +78,31 @@ exports.search_products_by_name = async (req, res, next) => {
     res.status(200).json({ products });
   } catch (error) {
     res.status(400).json({ msg: error.message });
+  }
+}
+exports.updateQuantityProduct = async (req,res)=>{
+  try {
+      const _id = req.params.id
+      const updateProduct = await Product.findByIdAndUpdate(_id,{
+          quantity: 0,
+          status: false
+           },{
+              new:true
+           })
+           if(updateProduct){
+              res.status(200).json({
+                  status:200,
+                  message:"update product successfully",
+                  data:updateProduct
+              })
+           }else{
+              res.status(401).json({
+                  status:401,
+                  message:"update product failed"
+              })
+           }
+  } catch (error) {
+      res.status(500).json({status:500, message: `${error}`})
   }
 }
 

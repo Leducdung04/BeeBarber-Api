@@ -4,7 +4,7 @@ const priceInput = document.getElementById("product-price");
 const fileInput = document.getElementById("product-file");
 const quantityInput = document.getElementById("product-quantity");
 const descriptionInput = document.getElementById("product-description");
-const categorySelect = document.getElementById("product-category-name"); 
+const categorySelectPro = document.getElementById("product-category-name"); 
 const addButtonPro = document.getElementById("btn-add-product");
 const nameErrorPro = document.querySelector("#productname-error");
 const brandError = document.querySelector("#import_price-error");
@@ -14,7 +14,7 @@ const fileError = document.querySelector("#file-error");
 const descErrorProduct = document.querySelector("#description-error");
 const imageErrorPro = document.querySelector("#productimage-error");
 
-let idCategory='';
+let idCategoryProduct='';
 
 // Check required fields
 function checkRequired(inputArr) {
@@ -49,50 +49,50 @@ function showSuccess(input) {
   small.innerText = ''
 }
 //phần liên quan category
-populateCategorySelect();
+populateCategorySelectPro();
 async function loadCategories() {
   try {
-    const response = await fetch("/api/get/categories_product");
+    const response = await fetch("/api/categoryProducts/get_list_Category_Product");
     const data = await response.json();
-    return data.data;
+    return data;
   } catch (error) {
     console.error("Error loading categories:", error);
     return [];
   }
 }
 
-async function populateCategorySelect() {
+async function populateCategorySelectPro() {
   const categories = await loadCategories();
   categories.forEach((category) => {
     const option = document.createElement("option");
     option.value = category._id;
     option.textContent = category.name;
-    categorySelect.appendChild(option);
+    categorySelectPro.appendChild(option);
   });
 }
-categorySelect.addEventListener("change", function() {
-  idCategory = categorySelect.options[categorySelect.selectedIndex].value;
+categorySelectPro.addEventListener("change", function() {
+  idCategoryProduct = categorySelectPro.options[categorySelectPro.selectedIndex].value;
 });
 
-function checkCategorySelected(){
-    if(!idCategory &&categorySelect.options.length >0){
-      idCategory = categorySelect.options[0].value;
-      console.log(idCategory)
+function checkCategorySelectedPro(){
+    if(!idCategoryProduct &&categorySelectPro.options.length >0){
+      idCategoryProduct = categorySelectPro.options[0].value;
+      console.log(idCategoryProduct)
     }
 }
 //end category
 //click
 addButtonPro.addEventListener("click", function (e) {
   e.preventDefault();
-  checkCategorySelected();
+  checkCategorySelectedPro();
   
   if (checkRequired([nameInputPro, importPriceInput, priceInput, quantityInput, descriptionInput])) {
     return;
   }
   const formData = new FormData();
   formData.append("name", nameInputPro.value)
-  formData.append("categoryId", idCategory)
-  formData.append("file", fileInput.files[0])
+  formData.append("categoryId", idCategoryProduct)
+  formData.append("image", fileInput.files[0])
   formData.append("import_price", importPriceInput.value)
   formData.append("price_selling", priceInput.value)
   formData.append("description", descriptionInput.value)
@@ -100,13 +100,13 @@ addButtonPro.addEventListener("click", function (e) {
   createProduct(formData)
 });
 async function createProduct(formData){
-  const newProduct = await fetch("/api/post/add_product", {
+  const newProduct = await fetch("/api/products/add_product", {
 
     method: "POST",
     body: formData
   })
     const data = await newProduct.json()
-      if (data.message === "add product success") {
+      if (data.message === "Create new product successfully") {
         alert(data.message)
         window.location.replace("/products");
       } else {

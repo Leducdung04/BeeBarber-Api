@@ -1,7 +1,6 @@
 
 var createError = require('http-errors');
-const expressLayout = require('express-ejs-layouts');
-const session = require('express-session');
+const cors = require('cors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
@@ -22,6 +21,8 @@ const signInRouter = require("./routes/signIn");
 const homeRouter = require("./routes/home");
 
 var app = express();
+
+app.use(cors());
 
 const database = require('./config/db')
 // view engine setup

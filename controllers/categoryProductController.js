@@ -48,3 +48,16 @@ exports.update_Category_Product = async (req, res, next) => {
     res.status(400).json({ msg: error.message });
   }
 };
+exports.getCategoryProduct = async (req,res)=>{
+  try {
+    const id = req.params.id
+    const category = await Category_Product.findById(id)
+    if(category){
+      return res.json({message: "Get category product successfully", data: category})
+    }else{
+      return res.json({message: "Get category product failed"})
+    }
+  } catch (error) {
+    return res.json({message: `${error}`})
+  }
+}
