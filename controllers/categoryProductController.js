@@ -12,7 +12,7 @@ exports.get_list_Category_Product = async (req, res, next) => {
 
 exports.add_Category_Product = async (req, res, next) => {
   try {
-    const { name, description, status } = req.body;
+    const { name, description} = req.body;
     const { file } = req;
     let image = null;
     if (req.file) {
@@ -22,13 +22,17 @@ exports.add_Category_Product = async (req, res, next) => {
       name,
       description,
       image,
-      status,
     });
     const result = await newCategory.save();
-    res.status(201).json(result);
+    if(result){
+      return res.status(201).json({message:"Create new category product successfully", data:result});
+    }else{
+      return res.json({message: "Create new category product failed"})
+    }
+    
   } catch (error) {
     console.error(error);
-    res.status(400).json({ message: "Server Error" });
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
@@ -44,3 +48,16 @@ exports.update_Category_Product = async (req, res, next) => {
     res.status(400).json({ msg: error.message });
   }
 };
+exports.getCategoryProduct = async (req,res)=>{
+  try {
+    const id = req.params.id
+    const category = await Category_Product.findById(id)
+    if(category){
+      return res.json({message: "Get category product successfully", data: category})
+    }else{
+      return res.json({message: "Get category product failed"})
+    }
+  } catch (error) {
+    return res.json({message: `${error}`})
+  }
+}

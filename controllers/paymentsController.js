@@ -1,5 +1,6 @@
 const { default: mongoose } = require('mongoose');
 const Payment = require('../models/payments');
+const Appointment = require('../models/appointments');
 exports.addPayment = async (req, res, next) => {
     try {
         const { related_id,pay_type, pay_method,user_id,user_voucher_id,time,date,status,price} = req.body;
@@ -34,8 +35,8 @@ exports.updatePayment_Canceled_ById = async (req, res, next) => {
     try {
         const { paymentId } = req.params;  
         const { bank_account } = req.body;  
-        
-        // Tìm và cập nhật thanh toán với trạng thái mới và tài khoản ngân hàng
+
+        // Tìm và cập nhật trạng thái Payment
         const updatedPayment = await Payment.findByIdAndUpdate(
             paymentId, 
             {
@@ -49,16 +50,33 @@ exports.updatePayment_Canceled_ById = async (req, res, next) => {
             return res.status(404).json({ message: 'Payment not found' });
         }
 
+        // Lấy `related_id` từ payment để tìm appointment liên quan
+        const appointmentId = updatedPayment.related_id;
+
+        // Tìm và cập nhật trạng thái của Appointment
+        const updatedAppointment = await Appointment.findByIdAndUpdate(
+            appointmentId,
+            { appointment_status: "canceled" },
+            { new: true } // Trả về dữ liệu đã cập nhật
+        );
+
+        if (!updatedAppointment) {
+            return res.status(404).json({ message: 'Appointment not found' });
+        }
+
         res.status(200).json({
             status: 200,
-            message: 'Payment status updated successfully',
-            data: updatedPayment
+            message: 'Payment and Appointment statuses updated successfully',
+            data: {
+                payment: updatedPayment,
+                appointment: updatedAppointment
+            }
         });
     } catch (err) {
         console.error(err);
         res.status(400).json({ message: 'Server Error' });
     }
-}
+};
 
 exports.updatePaymentStatus = async (req, res, next) => {
     try {

@@ -1,3 +1,4 @@
+const { default: mongoose } = require('mongoose');
 const Appointment = require('../models/appointments');
 const Payment = require('../models/payments');
 exports.addAppointment = async (req, res, next) => {
@@ -27,23 +28,44 @@ exports.addAppointment = async (req, res, next) => {
 
 exports.addAppointmentWithPayment = async (req, res) => {
     try {
-        // Lấy dữ liệu từ đối tượng `appointment` trong `req.body`
-        const appointment = req.body.appointment;
-        console.log('appointment: ' + appointment)
+        // Lấy dữ liệu từ `req.body`
+        const  appointment = req.body.appointment;
+        const  payment  = req.body.payment;
+
+        // Kiểm tra dữ liệu đầu vào
+        if (!appointment || !payment) {
+            return res.status(400).json({ message: 'Missing appointment or payment data' });
+        }
+
+        // Kiểm tra từng trường quan trọng trong `appointment`
+        const requiredFields = ['barber_id', 'user_id', 'service_id', 'appointment_time', 'appointment_date', 'price'];
+        for (const field of requiredFields) {
+            if (!appointment[field]) {
+                return res.status(400).json({ message: `Missing required field: ${field}` });
+            }
+        }
+        appointment.price = parseInt(appointment.price);
+        if (isNaN(appointment.price)) {
+            return res.status(400).json({ message: 'Invalid price format in appointment' });
+        }
+
         // Tạo một đối tượng Appointment mới
         const newAppointment = new Appointment(appointment);
 
         // Lưu Appointment và lấy `_id` của nó để dùng làm `related_id` cho Payment
         const appointmentResult = await newAppointment.save();
-        
-        // Lấy dữ liệu từ đối tượng `payment` trong `req.body`
-        let payment = req.body.payment;
 
-        // Tạo một đối tượng Payment mới với `related_id` là `_id` của Appointment đã lưu
+       
+
+        // Gắn `related_id` và tạo đối tượng Payment
         const newPayment = new Payment({
-            related_id: appointmentResult._id,  // Liên kết với Appointment đã tạo
-            ...payment
+            related_id: appointmentResult._id,
+            ...payment,
         });
+
+        if (isNaN(newPayment.price)) {
+            return res.status(400).json({ message: 'Invalid price format in payment' });
+        }
 
         const paymentResult = await newPayment.save();
 
@@ -51,13 +73,15 @@ exports.addAppointmentWithPayment = async (req, res) => {
             status: 201,
             message: 'Appointment and Payment added successfully',
             appointment: appointmentResult,
-            payment: paymentResult
+            payment: paymentResult,
         });
     } catch (err) {
-        console.error(err);
-        res.status(400).json({ message: 'Server Error' });
+        console.error('Error adding appointment with payment:', err);
+        res.status(500).json({ message: 'Server Error', error: err.message });
     }
-}
+};
+
+
 
 exports.updateAppointment = async (req, res, next) => {
     try {
@@ -96,6 +120,7 @@ exports.getAppointmentsByUserId = async (req, res, next) => {
             return res.status(400).json({ msg: "user_id is required" });
         }
 
+        // Tìm tất cả các lịch hẹn của người dùng
         const appointments = await Appointment.find({
             user_id,
             status: true,
@@ -104,9 +129,188 @@ exports.getAppointmentsByUserId = async (req, res, next) => {
             .populate('service_id') // Lấy thông tin từ bảng Service
             .sort({ createdAt: -1 }); // Sắp xếp theo thời gian tạo mới nhất
 
-        res.status(200).json(appointments);
+        // Tìm tất cả các thanh toán liên quan đến user_id
+        const payments = await Payment.find({ user_id, status: true });
+
+        // Gắn thông tin thanh toán tương ứng vào mỗi lịch hẹn
+        const result = appointments.map(appointment => {
+            const relatedPayment = payments.find(
+                payment => String(payment.related_id) === String(appointment._id)
+            );
+            return {
+                ...appointment._doc,
+                payment: relatedPayment || null,
+            };
+        });
+
+        // Trả về danh sách lịch hẹn kèm thanh toán
+        res.status(200).json(result);
     } catch (error) {
         console.error(error);
         res.status(400).json({ msg: error.message });
+    }
+};
+
+exports.updateAppointmentStatusToCanceled = async (req, res) => {
+    try {
+        const { appointmentId } = req.params; // Lấy ID từ URL
+
+        // Kiểm tra định dạng của appointmentId
+        if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
+            return res.status(400).json({ message: "Invalid appointment ID format" });
+        }
+
+        // Tìm và cập nhật trạng thái của Appointment
+        const updatedAppointment = await Appointment.findByIdAndUpdate(
+            appointmentId,
+            { appointment_status: "canceled" }, // Cập nhật trạng thái
+            { new: true } // Trả về dữ liệu đã cập nhật
+        );
+
+        // Nếu không tìm thấy Appointment
+        if (!updatedAppointment) {
+            return res.status(404).json({ message: 'Appointment not found' });
+        }
+
+        // Trả về phản hồi thành công
+        res.status(200).json({
+            status: 200,
+            message: 'Appointment status updated successfully',
+            data: updatedAppointment,
+        });
+    } catch (error) {
+        console.error("Error updating appointment status:", error);
+        res.status(500).json({ message: 'Server Error', error });
+    }
+};
+
+
+// exports.updateAppointmentStatusToCanceled_ByZaloPay = async (req, res) => {
+//     const session = await mongoose.startSession(); // Khởi tạo session để quản lý transaction
+//     session.startTransaction();
+
+//     try {
+//         const { appointmentId } = req.params; // Lấy ID từ URL
+
+//         // Kiểm tra định dạng của appointmentId
+//         if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
+//             return res.status(400).json({ message: "Invalid appointment ID format" });
+//         }
+
+//         // Tìm và cập nhật trạng thái của Appointment
+//         const updatedAppointment = await Appointment.findByIdAndUpdate(
+//             appointmentId,
+//             { appointment_status: "canceled" }, // Cập nhật trạng thái
+//             { new: true, session } // Trả về dữ liệu đã cập nhật, dùng session để đảm bảo transaction
+//         );
+
+//         // Nếu không tìm thấy Appointment
+//         if (!updatedAppointment) {
+//             await session.abortTransaction(); // Hủy transaction
+//             session.endSession();
+//             return res.status(404).json({ message: 'Appointment not found' });
+//         }
+
+//         // Tìm payment liên quan và cập nhật trạng thái pay_method_status
+//         const relatedPayment = await Payment.findOneAndUpdate(
+//             { related_id: appointmentId }, // Liên kết payment thông qua related_id
+//             { pay_method_status: "canceled" }, // Cập nhật trạng thái
+//             { new: true, session } // Trả về dữ liệu đã cập nhật, dùng session để đảm bảo transaction
+//         );
+
+//         // Nếu không tìm thấy Payment
+//         if (!relatedPayment) {
+//             await session.abortTransaction(); // Hủy transaction
+//             session.endSession();
+//             return res.status(404).json({ message: 'Payment not found' });
+//         }
+
+//         // Commit transaction khi mọi thứ hoàn tất
+//         await session.commitTransaction();
+//         session.endSession();
+
+//         // Trả về phản hồi thành công
+//         res.status(200).json({
+//             status: 200,
+//             message: 'Appointment and payment status updated successfully',
+//             data: {
+//                 appointment: updatedAppointment,
+//                 payment: relatedPayment,
+//             },
+//         });
+//     } catch (error) {
+//         // Rollback transaction nếu có lỗi
+//         await session.abortTransaction();
+//         session.endSession();
+
+//         console.error("Error updating appointment and payment status:", error);
+//         res.status(500).json({ message: 'Server Error', error });
+//     }
+// };
+
+exports.updateAppointmentStatusToCanceled_ByZaloPay = async (req, res) => {
+    const session = await mongoose.startSession(); // Khởi tạo session để quản lý transaction
+    session.startTransaction();
+
+    try {
+        const { appointmentId } = req.params; // Lấy ID từ URL
+        const { bank_account } = req.body; // Lấy bank_account từ body request
+
+        // Kiểm tra định dạng của appointmentId
+        if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
+            return res.status(400).json({ message: "Invalid appointment ID format" });
+        }
+
+        // Tìm và cập nhật trạng thái của Appointment
+        const updatedAppointment = await Appointment.findByIdAndUpdate(
+            appointmentId,
+            { appointment_status: "canceled" }, // Cập nhật trạng thái
+            { new: true, session } // Trả về dữ liệu đã cập nhật, dùng session để đảm bảo transaction
+        );
+
+        // Nếu không tìm thấy Appointment
+        if (!updatedAppointment) {
+            await session.abortTransaction(); // Hủy transaction
+            session.endSession();
+            return res.status(404).json({ message: 'Appointment not found' });
+        }
+
+        // Tìm payment liên quan và cập nhật trạng thái pay_method_status và bank_account
+        const relatedPayment = await Payment.findOneAndUpdate(
+            { related_id: appointmentId }, // Liên kết payment thông qua related_id
+            {
+                pay_method_status: "canceled", // Cập nhật trạng thái
+                bank_account: bank_account || null, // Cập nhật bank_account, mặc định null nếu không có giá trị
+            },
+            { new: true, session } // Trả về dữ liệu đã cập nhật, dùng session để đảm bảo transaction
+        );
+
+        // Nếu không tìm thấy Payment
+        if (!relatedPayment) {
+            await session.abortTransaction(); // Hủy transaction
+            session.endSession();
+            return res.status(404).json({ message: 'Payment not found' });
+        }
+
+        // Commit transaction khi mọi thứ hoàn tất
+        await session.commitTransaction();
+        session.endSession();
+
+        // Trả về phản hồi thành công
+        res.status(200).json({
+            status: 200,
+            message: 'Appointment and payment status updated successfully',
+            data: {
+                appointment: updatedAppointment,
+                payment: relatedPayment,
+            },
+        });
+    } catch (error) {
+        // Rollback transaction nếu có lỗi
+        await session.abortTransaction();
+        session.endSession();
+
+        console.error("Error updating appointment and payment status:", error);
+        res.status(500).json({ message: 'Server Error', error });
     }
 };

@@ -3,8 +3,9 @@ const Cart = require('../models/cart')
 
 exports.get_list_cartItem = async (req, res, next) => {
     try {
-
-        const cart = await Cart.findOne({ user_id: req.user._id });
+        // const cart = await Cart.findOne({ user_id: req.user._id });
+        
+        const cart = await Cart.findOne();
         if (!cart) {
             return res.status(404).json({ msg: "Người dùng không có giỏ hàng" });
         }
@@ -17,7 +18,8 @@ exports.get_list_cartItem = async (req, res, next) => {
 
 exports.add_cartItem = async (req, res, next) => {
     try {
-        const cart = await Cart.findOne({ user_id: req.user._id });
+        //const cart = await Cart.findOne({ user_id: req.user._id });
+        const cart = await Cart.findOne();
         if (!cart) {
             return res.status(404).json({ msg: "Người dùng không có giỏ hàng." });
         }
