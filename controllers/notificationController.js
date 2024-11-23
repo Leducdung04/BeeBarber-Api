@@ -47,9 +47,6 @@ exports.getNotifications = async (req, res) => {
   }
 };
 
-
-
-
 exports.createNotification = async (req, res) => {
   try {
     const { user_id, relates_id, type, content } = req.body;
