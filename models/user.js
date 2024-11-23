@@ -8,12 +8,6 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ["user", "admin"], default: "user" },
   loyaltyPoints: { type: Number, default: 0 },
   status: { type: Boolean, default: true },
-  location: {
-    province: { type: String, required: true, trim: true }, // Tỉnh/Thành phố
-    district: { type: String, required: true, trim: true }, // Quận/Huyện
-    commune: { type: String, required: true, trim: true },     // Xã/Thị trấn
-    street: { type: String, required: false, trim: true },  // Tòa nhà/Tên đường (không bắt buộc)
-  },
   deviceTokens: { type: String, default: null },
 });
 

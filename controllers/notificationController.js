@@ -91,7 +91,6 @@ exports.updateNotification = async (req, res) => {
     if (!notificationExists) {
       return res.status(404).json({ message: "Không tìm thấy thông báo" });
     }
-
     // Cập nhật các trường trong thông báo
     notificationExists.relates_id = relates_id || notificationExists.relates_id;
     notificationExists.type = type || notificationExists.type;
@@ -106,5 +105,25 @@ exports.updateNotification = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Đã xảy ra lỗi", error });
+  }
+};
+
+exports.getNotificationsByUserId = async (req, res, next) => {
+  try {
+      const { user_id } = req.params; // Lấy user_id từ params
+
+      // Tìm tất cả thông báo theo user_id
+      const notifications = await Notification.find({ user_id })
+          .sort({ created_at: -1 }); // Sắp xếp giảm dần theo thời gian tạo
+
+      // Kiểm tra nếu không có thông báo nào
+      if (!notifications || notifications.length === 0) {
+          return res.status(404).json({ message: 'No notifications found for this user.' });
+      }
+
+      res.status(200).json(notifications);
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server Error' });
   }
 };

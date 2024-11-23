@@ -61,3 +61,33 @@ exports.updateCategory = async (req, res, next) => {
       res.status(400).json({ message: 'Server Error' });
   }
 };
+exports.updateCategoryStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const {status} = req.body;
+   
+    const updatedCategory = await Category.findByIdAndUpdate(
+      id,
+      { status: status }, // Chỉ cập nhật trường status
+    );
+
+    // Kiểm tra xem Category có tồn tại không
+    if (!updatedCategory) {
+      return res.status(404).json({ message: 'Category không tồn tại.' });
+    }
+
+    // Trả về phản hồi thành công
+    return res.status(200).json({
+      message: 'Cập nhật trạng thái category thành công.',
+      category: updatedCategory,
+    });
+  } catch (error) {
+    console.error('Lỗi khi cập nhật status của category:', error);
+
+    // Trả về lỗi nếu có vấn đề trong quá trình xử lý
+    return res.status(500).json({
+      message: 'Đã xảy ra lỗi trong quá trình cập nhật.',
+      error: error.message,
+    });
+  }
+};

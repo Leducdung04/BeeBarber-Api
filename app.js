@@ -1,4 +1,5 @@
 var createError = require('http-errors');
+const cors = require('cors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
@@ -17,6 +18,8 @@ const homeRouter = require("./routes/home");
 const categoriesRouter = require("./routes/categories");
 const productRouter = require("./routes/products");
 var app = express();
+
+app.use(cors());
 
 const database = require('./config/db')
 // view engine setup

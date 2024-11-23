@@ -8,19 +8,20 @@ const {SigupUser,loginPhone,getUserDetailById}  = require('../controllers/userCo
 const {add_Category_Product,get_list_Category_Product} = require('../controllers/categoryProductController')
 const Upload = require("../config/upload");
 const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices} = require('../controllers/serviceController');
-const {getListCategory,addCategory,updateCategory, } = require('../controllers/categoryController');
+const {getListCategory,addCategory,updateCategory, updateCategoryStatus, } = require('../controllers/categoryController');
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
 const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
-const { createNotification, updateNotification } = require("../controllers/notificationController");
+const { createNotification, updateNotification, getNotificationsByUserId } = require("../controllers/notificationController");
 const {get_list_product,add_product,update_product,get_list_product_by_category,get_product_detail,search_products_by_name} = require("../controllers/productController")
 const {get_list_cartItem,add_cartItem,delete_cartItem,update_cartItem} = require("../controllers/cartItemController");
 const {get_user_cart,add_cart,update_cart} = require("../controllers/cartController")
 
 // restful Api notifications
 router.post("/notifications/createNotification",createNotification)
-const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment, getAppointmentsByUserId, updateAppointmentStatusToCanceled, updateAppointmentStatusToCanceled_ByZaloPay } = require("../controllers/appointmentControllers");
+const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment, getAppointmentsByUserId, updateAppointmentStatusToCanceled, updateAppointmentStatusToCanceled_ByZaloPay, updateAppointmentStatus, getAppointmentsAdmin, updateAppointmentStatusAdmin } = require("../controllers/appointmentControllers");
 
 const { addPayment, updatePayment_Canceled_ById, updatePaymentStatus } = require("../controllers/paymentsController");
+const { addOrderWithPayment, getOrdersByUserId, updateOderStatusToCanceled, updateOderStatusToCanceled_ByZaloPay, getAllOrdersAdmin } = require("../controllers/order_productController");
 
 // restful Api banner 
 router.get('/get_list_banner',get_list_banner)
@@ -57,6 +58,8 @@ router.get('/getGroupedServices',getGroupedServices)
 router.get('/categorys/get_list_category',getListCategory)
 router.post('/categorys/add_category',Upload.single("image"),addCategory)
 router.put('/categorys/update_category/:id',Upload.single("image"),updateCategory)
+router.put('/updateCategoryStatus/:id',updateCategoryStatus)
+  // admin 
 
 
 // RESTful API cho CategoryProduct
@@ -75,6 +78,7 @@ router.put('/Update_Barbers/:id',Upload.single("image"), updateBarber);
 // RESTful API cho Notifications
 router.post('/notifications', createNotification);
 router.put('/notifications/:id', updateNotification);
+router.get('/getnotifications/:user_id', getNotificationsByUserId);
 
 //Restful API cho Product
 router.get('/products/get_list_product', get_list_product)
@@ -100,6 +104,19 @@ router.post('/add_Appointment',addAppointment)
 router.post('/addAppointmentWithPayment',addAppointmentWithPayment)
 router.put('/updateAppointmentStatusToCanceled/:appointmentId',updateAppointmentStatusToCanceled)
 router.put('/updateAppointmentStatusToCanceled_ByZaloPay/:appointmentId',updateAppointmentStatusToCanceled_ByZaloPay)
+router.put('/updateAppointmentStatus/:id',updateAppointmentStatus)
+    // admin
+router.get('/getAppointmentsAdmin',getAppointmentsAdmin)
+router.put('/updateAppointmentStatusAdmin/:appointmentId',updateAppointmentStatusAdmin)
+
+
+// oder 
+router.post('/addOrderWithPayment',addOrderWithPayment)
+router.get('/getOrdersByUserId/:user_id',getOrdersByUserId);
+router.put('/updateOderStatusToCanceled/:oderId',updateOderStatusToCanceled)
+router.put('/updateOderStatusToCanceled_ByZaloPay/:oderId',updateOderStatusToCanceled_ByZaloPay)
+   // admin
+router.get('/getOrdersAdmin',getAllOrdersAdmin)
 
 // router.get('/getAppointmentsByIduser/:userId',getAppointmentsWithPayments)
 router.get('/getAppointmentsByIduser/:user_id',getAppointmentsByUserId)

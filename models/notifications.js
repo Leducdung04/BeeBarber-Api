@@ -13,7 +13,7 @@ const notificationSchema = new mongoose.Schema({
   },
   type: { 
     type: String, 
-    enum: ["review", "booking", "promotion", "general"],  // Các loại thông báo
+    enum: ["review", "booking", "oder"],
     required: true 
   },
   content: { 

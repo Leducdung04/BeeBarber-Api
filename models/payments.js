@@ -34,8 +34,8 @@ const paymentSchema = new mongoose.Schema({
     },
     pay_method_status: {
         type: String,
-        enum: ['Unpaid', 'Success', 'canceled','Refunded'], 
-        // chưa thanh toán,đã thanh toán, Đã hủy lịch, Đã hoàn tiền,
+        enum: ['Unpaid', 'Success', 'canceled','Norefundyet','Refunded'], 
+        // chưa thanh toán,đã thanh toán, Đã hủy lịch,chưa hoàn tiền, Đã hoàn tiền,
         default: 'Unpaid',
     },
     status: {
@@ -49,6 +49,7 @@ const paymentSchema = new mongoose.Schema({
     
     bank_account:{
         type: String,
+        required: false,
     },
     createdAt: {
         type: Date,

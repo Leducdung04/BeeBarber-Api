@@ -60,6 +60,7 @@ exports.loginPhone = async (req, res) => {
 };
 
 
+
 exports.SigupUser = async (req, res, next) => {
   try {
     const { phone, password, deviceTokens,name ,role} = req.body;
