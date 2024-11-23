@@ -34,7 +34,8 @@
   <link rel="stylesheet" href="fonts/flaticon/font/flaticon.css" />
 
   <!-- Theme style  -->
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="stylesheet/admin.css" />
+
 </head>
 
 <body>
@@ -45,20 +46,30 @@
           <a href="home">Fstyle</a>
         </div>
         <ul>
-          <li class="<%= isActiveRoute('/categories_product', locals.currentRoute)%>"><a href="categories_product">Thể loại</a></li>
-          <li class="<%= isActiveRoute('/categories_service', locals.currentRoute)%>"><a href="categories_service">Thể loại dịch vụ</a></li>
-          <li class="<%= isActiveRoute('/services', locals.currentRoute)%>"><a href="services">Dịch vụ</a></li>
-          <li class="<%= isActiveRoute('/products', locals.currentRoute)%>"><a href="products">Sản phẩm</a></li>
-          <li class="<%= isActiveRoute('/statistical', locals.currentRoute)%>"><a href="statistical">Thống kê</a></li>
-          <li class="<%= isActiveRoute('/user', locals.currentRoute)%>"><a href="user">Quản lý người dùng</a></li>
+          <li class="<%= isActiveRoute('/home', locals.currentRoute)%>"><a href="home">Home</a></li>
+          <li class="<%= isActiveRoute('/order', locals.currentRoute)%>"><a href="orders">Đơn Hàng</a></li>
+          <li class="<%= isActiveRoute('/category_service', locals.currentRoute)%>"><a href="categories_services">Thể
+              loại dịch vụ</a></li>
+          <li class="<%= isActiveRoute('/service', locals.currentRoute)%>"><a href="services">Dịch vụ</a></li>
+          <li class="<%= isActiveRoute('/category_product', locals.currentRoute)%>"><a href="categories_products">Thể
+              loại sản phẩm</a></li>
+          <li class="<%= isActiveRoute('/product', locals.currentRoute)%>"><a href="products">Sản phẩm</a></li>
+          <li class="<%= isActiveRoute('/banner', locals.currentRoute)%>"><a href="banners">Banner</a></li>
+          <li class="<%= isActiveRoute('/barber', locals.currentRoute)%>"><a href="barbers">Barber</a></li>
+          <li class="<%= isActiveRoute('/statistical', locals.currentRoute)%>"><a href="statisticals">Thống kê</a></li>
+          <li class="<%= isActiveRoute('/revenue', locals.currentRoute)%>"><a href="revenues">Doanh thu</a></li>
         </ul>
       </div>
     </nav>
   </div>
   <main>
-    <div class="container"><%- body %></div>
+    <div class="content">
+      <div id="screen">
+      <%- body %>
+      </div>
+
+    </div>
   </main>
-  <%- include('../footer') -%>
 </body>
 
 </html>

@@ -1,0 +1,206 @@
+<div class="container">
+  <!-- Form Container -->
+  <div class="form-container">
+      <h2>Thêm Mới Dịch Vụ</h2>
+      <form id="serviceForm">
+          <label for="name">Tên Dịch Vụ</label>
+          <input type="text" id="name" placeholder="Nhập tên dịch vụ" required>
+
+          <label for="id_category">Danh mục</label>
+          <select id="id_category" required>
+              <!-- Dynamic category options will be populated here -->
+          </select>
+
+          <label for="description">Mô tả</label>
+          <input type="text" id="description" placeholder="Nhập mô tả">
+
+          <label for="price">Giá</label>
+          <input type="number" id="price" placeholder="Nhập giá" min="0" required>
+
+          <label for="duration">Thời lượng (phút)</label>
+          <input type="number" id="duration" placeholder="Nhập thời lượng" min="0" required>
+
+          <label for="images">Ảnh</label>
+          <input type="file" id="images" required>
+
+          <button type="submit">Thêm Dịch Vụ</button>
+      </form>
+  </div>
+
+  <!-- List Container -->
+  <div class="list-container">
+      <h2>Danh Sách Dịch Vụ</h2>
+      <table id="serviceList">
+          <thead>
+              <tr>
+                  <th>Tên</th>
+                  <th>Danh mục</th>
+                  <th>Mô tả</th>
+                  <th>Giá</th>
+                  <th>Thời lượng</th>
+                  <th>Ảnh</th>
+                  <th>Trạng thái</th>
+                  <th>Hành động</th>
+              </tr>
+          </thead>
+          <tbody>
+              <!-- Services will be listed here -->
+          </tbody>
+      </table>
+  </div>
+
+  <!-- Modal for Editing Service -->
+  <div id="editModal" class="modal">
+      <div class="modal-content">
+          <span class="close" onclick="closeModal()">&times;</span>
+          <h2>Sửa Dịch Vụ</h2>
+          <form id="editForm">
+              <label for="editName">Tên Dịch Vụ</label>
+              <input type="text" id="editName" placeholder="Nhập tên dịch vụ" required>
+
+              <label for="editIdCategory">Danh mục</label>
+              <select id="editIdCategory" required>
+                  <!-- Dynamic category options will be populated here -->
+              </select>
+
+              <label for="editDescription">Mô tả</label>
+              <input type="text" id="editDescription" placeholder="Nhập mô tả">
+
+              <label for="editPrice">Giá</label>
+              <input type="number" id="editPrice" placeholder="Nhập giá" min="0" required>
+
+              <label for="editDuration">Thời lượng (phút)</label>
+              <input type="number" id="editDuration" placeholder="Nhập thời lượng" min="0" required>
+
+              <label for="editImages">Ảnh</label>
+              <input type="file" id="editImages">
+
+              <button type="submit">Cập nhật</button>
+          </form>
+      </div>
+  </div>
+</div>
+<script type="text/javascript">
+  const apiUrl = 'api/services/get_list_service';
+
+  // Fetch categories for dropdown
+  function fetchCategories() {
+      fetch('api/categoryProducts/get_list_Category_Product')
+          .then(response => response.json())
+          .then(data => {
+              const categorySelect = document.getElementById('id_category');
+              const editCategorySelect = document.getElementById('editIdCategory');
+              categorySelect.innerHTML = '';
+              editCategorySelect.innerHTML = '';
+
+              data.forEach(category => {
+                  const option = `<option value="${category._id}">${category.name}</option>`;
+                  categorySelect.innerHTML += option;
+                  editCategorySelect.innerHTML += option;
+              });
+          })
+          .catch(error => console.error('Error fetching categories:', error));
+  }
+
+  // Fetch services
+  function fetchServices() {
+      fetch(apiUrl)
+          .then(response => response.json())
+          .then(data => {
+              const serviceList = document.getElementById('serviceList').getElementsByTagName('tbody')[0];
+              serviceList.innerHTML = '';
+              data.forEach(service => {
+                  const row = document.createElement('tr');
+                  row.innerHTML = `
+              <td>${service.name}</td>
+              <td>${service.id_category.name}</td>
+              <td>${service.description}</td>
+              <td>${service.price}</td>
+              <td>${service.duration}</td>
+              <td><img src="${service.images}" alt="${service.name}" width="50"></td>
+              <td>${service.status ? 'Hiển thị' : 'Ẩn'}</td>
+              <td>
+                  <div style="display: flex;flex-direction: row">
+                      <button class="btn-edit" onclick="openEditModal('${service._id}', '${service.name}', '${service.id_category._id}', '${service.description}', ${service.price}, ${service.duration}, '${service.images}', ${service.status})">Sửa</button>
+                      <button class="btn-delete" onclick="deleteService('${service._id}')">Xóa</button>
+                  </div>
+              </td>
+          `;
+                  serviceList.appendChild(row);
+              });
+          })
+          .catch(error => console.error('Error fetching services:', error));
+  }
+
+  // Add new service
+  const serviceForm = document.getElementById('serviceForm');
+  serviceForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(serviceForm);
+      fetch('api/services/add_service', {
+          method: 'POST',
+          body: formData
+      })
+          .then(response => response.json())
+          .then(data => {
+              fetchServices();
+              serviceForm.reset();
+          })
+          .catch(error => console.error('Error adding service:', error));
+  });
+
+  // Edit service modal
+  function openEditModal(id, name, id_category, description, price, duration, images, status) {
+      document.getElementById('editName').value = name;
+      document.getElementById('editIdCategory').value = id_category;
+      document.getElementById('editDescription').value = description;
+      document.getElementById('editPrice').value = price;
+      document.getElementById('editDuration').value = duration;
+      document.getElementById('editImages').value = '';
+      document.getElementById('editStatus').value = status ? 'true' : 'false';
+
+      const modal = document.getElementById('editModal');
+      modal.style.display = "block";
+
+      const editForm = document.getElementById('editForm');
+      editForm.onsubmit = function (e) {
+          e.preventDefault();
+
+          const updatedData = new FormData(editForm);
+          fetch(`api/services/update_service/${id}`, {
+              method: 'PUT',
+              body: updatedData
+          })
+              .then(response => response.json())
+              .then(data => {
+                  fetchServices();
+                  modal.style.display = "none";
+              })
+              .catch(error => console.error('Error updating service:', error));
+      };
+  }
+
+
+  function closeModal() {
+      document.getElementById('editModal').style.display = "none";
+  }
+
+  function deleteService(id) {
+      fetch(`api/services/delete_service/${id}`, {
+          method: 'DELETE'
+      })
+          .then(response => response.json())
+          .then(data => {
+              fetchServices();
+          })
+          .catch(error => console.error('Error deleting service:', error));
+  }
+
+  // Initialize page
+  window.onload = function () {
+      fetchCategories();
+      fetchServices();
+  };
+
+</script>

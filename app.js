@@ -1,11 +1,12 @@
 
 var createError = require('http-errors');
-const cors = require('cors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const qs = require('qs')
+const expressLayout = require('express-ejs-layouts');
+
 
 // zaloPay 
 const axios = require('axios').default; // npm install axios

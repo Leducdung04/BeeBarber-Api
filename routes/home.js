@@ -1,86 +1,88 @@
 const express = require("express");
 const router = express.Router();
 
-const admin = "layouts/index"; 
+const admin = "layouts/index";
 
-router.get("/categories_product", (req, res) => {
+router.get("/home", (req, res) => {
   const locals = {
-    currentRoute: `/categories_product`,
+    currentRoute: `/home`,
     title: "Hello",
   }
-  res.render("admin/categories", { locals, layout: admin });
+  res.render("admin/home", { locals, layout: admin });
 });
 
-router.get("/addcategory", (req, res) => {
+router.get("/orders", (req, res) => {
   const locals = {
-    currentRoute: `/addcategory`,
+    currentRoute: `/order`,
     title: "Hello",
   }
-  res.render("admin/addCategory", { locals, layout: admin });
+  res.render("admin/order", { locals, layout: admin });
 });
 
-router.get("/products", (req, res) => {
+router.get("/categories_services", (req, res) => {
   const locals = {
-    currentRoute: `/products`,
+    currentRoute: `/category_service`,
     title: "Hello",
   }
-  res.render("admin/products", { locals, layout: admin });
-});
-
-router.get("/addproduct", (req, res) => {
-  const locals = {
-    currentRoute: `/addproduct`,
-    title: "Hello",
-  }
-  res.render("admin/addProduct", { locals, layout: admin });
+  res.render("admin/categoryService", { locals, layout: admin });
 });
 
 router.get("/services", (req, res) => {
   const locals = {
-    currentRoute: `/services`,
+    currentRoute: `/service`,
     title: "Hello",
   }
-  res.render("admin/services", { locals, layout: admin });
-});
-router.get("/add_service", (req, res) => {
-  const locals = {
-    currentRoute: `/add_service`,
-    title: "Hello",
-  }
-  res.render("admin/addService", { locals, layout: admin });
+  res.render("admin/service", { locals, layout: admin });
 });
 
-router.get("/categories_service", (req, res) => {
+router.get("/categories_products", (req, res) => {
   const locals = {
-    currentRoute: `/categories_service`,
+    currentRoute: `/category_product`,
     title: "Hello",
   }
-  res.render("admin/categoriesService", { locals, layout: admin });
+  res.render("admin/category", { locals, layout: admin });
 });
 
-router.get("/addcategoryService", (req, res) => {
+router.get("/products", (req, res) => {
   const locals = {
-    currentRoute: `/addcategoryService`,
+    currentRoute: `/product`,
     title: "Hello",
   }
-  res.render("admin/addCategoryService", { locals, layout: admin });
+  res.render("admin/product", { locals, layout: admin });
 });
 
-router.get("/statistical", (req, res) => {
+router.get("/banners", (req, res) => {
+  const locals = {
+    currentRoute: `/banner`,
+    title: "Hello",
+  }
+  res.render("admin/banner", { locals, layout: admin });
+});
+
+router.get("/barbers", (req, res) => {
+  const locals = {
+    currentRoute: `/barber`,
+    title: "Hello",
+  }
+  res.render("admin/barber", { locals, layout: admin });
+});
+
+
+router.get("/statisticals", (req, res) => {
   const locals = {
     currentRoute: `/statistical`,
     title: "Hello",
   }
-  res.render("admin/satistical", { locals, layout: admin });
+  res.render("admin/statistical", { locals, layout: admin });
 });
 
 
-router.get("/user", (req, res) => {
+router.get("/revenues", (req, res) => {
   const locals = {
-    currentRoute: `/user`,
+    currentRoute: `/revenue`,
     title: "Hello",
   }
-  res.render("admin/user", { locals, layout: admin });
+  res.render("admin/revenue", { locals, layout: admin });
 });
 
 
