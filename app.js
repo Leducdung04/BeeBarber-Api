@@ -16,7 +16,9 @@ var apiRouter = require("./routes/api");
 const signInRouter = require("./routes/signIn");
 const homeRouter = require("./routes/home");
 const categoriesRouter = require("./routes/categories");
+const categoriesServiceRouter = require("./routes/categoriesService");
 const productRouter = require("./routes/products");
+const serviceRouter = require("./routes/service")
 var app = express();
 
 app.use(cors());
@@ -38,7 +40,9 @@ app.use("/api", apiRouter);
 app.use("/", signInRouter);
 app.use("/", homeRouter);
 app.use("/", categoriesRouter);
+app.use("/", categoriesServiceRouter);
 app.use("/", productRouter);
+app.use("/", serviceRouter)
 // zalo pay 
 const config = {
   app_id: "2553",

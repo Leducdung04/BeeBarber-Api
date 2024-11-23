@@ -1,24 +1,23 @@
 const query_search_product = document.getElementById("query-search-product");
 const btn_search_product = document.getElementById("btn-search-product");
 let dataProducts = [];
-let nameCategory='';
 getData()
 //get name ccategory
 async function getNamecategory(idCategory) {
   try {
-    const response = await fetch(`/api/get/categories/${idCategory}`);
-    const data = await response.json(); 
-    return data.category.name;
+    const response = await fetch(`/api/categoryProducts/get_category_product/${idCategory}`);
+    const data = await response.json();
+    return data?.data?.name || "Không có tên danh mục";
   } catch (error) {
-    console.error("err_name_category:", error);
+    console.error(`err_name_category: ${error}`);
     return "Error";
   }
 }
 function getData(){
-  fetch("/api/get_all/product")
+  fetch("/api/products/get_list_product")
   .then((response) => response.json())
   .then((data) => {
-    dataProducts = data.data;
+    dataProducts = data;
     displayProducts(dataProducts);
   })
   .catch((error) => console.error("Error fetching products:", error));
@@ -51,7 +50,7 @@ async function displayProducts(products) {
       <td class="h5">${product.quantity}</td>
       <td class="h5">${product.quantity === 0 ?"Hết hàng": "Còn hàng"}</td>
       <td class="h5">${product.description}</td>
-      <td class="h5">${await getNamecategory(product.category_id)}</td>
+      <td class="h5">${await getNamecategory(product.category_id._id)}</td>
       <td><a href="${product._id}"style="color:
        #007bff; font-size:15px; text-decoration: underline;"
        >Ngừng bán</a></td>
@@ -69,10 +68,11 @@ document.getElementById("products-list").addEventListener("click",async function
     const productId = await event.target.getAttribute("href");
     $("#confirmModalProduct").modal('show')
     $("#confirmProductBtn").click(function(){
-      fetch(`/api/products/update/quantity/${productId}`)
+      fetch(`/api/products/update_status_product/${productId}`)
       .then(res => res.json())
       .then(data =>{
-      if(data.message==="update product success"){
+        console.log(data)
+      if(data.message==="update product successfully"){
         $("#confirmModalProduct").modal('hide')
         alert("update thành công")
         getData()

@@ -30,9 +30,7 @@ exports.loginPhone = async (req, res) => {
 
     // Tạo JWT token sau khi đăng nhập thành công
     const token = JWT.sign({ id: user._id }, SECRETKEY, { expiresIn: "1d" });
-    const refreshToken = JWT.sign({ id: user._id }, SECRETKEY, {
-      expiresIn: "7d",
-    });
+    const refreshToken = JWT.sign({ id: user._id }, SECRETKEY, { expiresIn: "7d" });
 
     // Không bao gồm mật khẩu trong phản hồi
     const userWithoutPassword = {
