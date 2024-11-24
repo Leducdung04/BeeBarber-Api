@@ -15,8 +15,9 @@ const categorySchema = new mongoose.Schema({
         required : true
     },
     status:{
-        type:Boolean,
-        default: true
+        type: Boolean,
+        default: true,
+        required: true
     }
 })
 
