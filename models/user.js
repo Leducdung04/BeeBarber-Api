@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema({
     street: { type: String, required: false, trim: true },  // Tòa nhà/Tên đường (không bắt buộc)
   },
   deviceTokens: { type: String, default: null },
+  isLocked: {
+    type: Boolean,
+    default: false
+  }
 });
 
 // Tạo model từ schema

@@ -4,7 +4,7 @@ const router = express.Router();
 const { createVoucher, updateVoucher, getVouchers, getValidVouchers, getVoucherByCode } = require('../controllers/voucherController');
 const { getUserVouchers, useVoucher } = require('../controllers/uservoucherController');
 const {get_list_banner,addBanner,updateBanner,updateBannerStatus,get_list_banner_ByStatus} = require('../controllers/bannerController');
-const {SigupUser,loginPhone,getUserDetailById}  = require('../controllers/userController');
+const {SigupUser,loginPhone,getUserDetailById, getAllUser, lockupUser}  = require('../controllers/userController');
 const {add_Category_Product,get_list_Category_Product, getCategoryProduct} = require('../controllers/categoryProductController')
 const Upload = require("../config/upload");
 const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices, changeStatusService} = require('../controllers/serviceController');
@@ -34,6 +34,8 @@ router.put('/updateBannerStatus/:id',updateBannerStatus)
 router.post('/Singup',SigupUser)
 router.post('/loginPhone',loginPhone)
 router.get('/users/getUserDetailById/:id',getUserDetailById)
+router.get('/user/get_all_user', getAllUser)
+router.get('/user/lock_user/:id', lockupUser)
 
 // RESTful API cho Voucher
 router.post('/vouchers', createVoucher);  // Tạo voucher mới
