@@ -5,7 +5,7 @@ const { createVoucher, updateVoucher, getVouchers, getValidVouchers, getVoucherB
 const { getUserVouchers, useVoucher } = require('../controllers/uservoucherController');
 const {get_list_banner,addBanner,updateBanner,updateBannerStatus,get_list_banner_ByStatus} = require('../controllers/bannerController');
 const {SigupUser,loginPhone,getUserDetailById, getAllUser, lockupUser}  = require('../controllers/userController');
-const {add_Category_Product,get_list_Category_Product, getCategoryProduct, changeStatusCategoryProduct} = require('../controllers/categoryProductController')
+const {add_Category_Product,get_list_Category_Product, getCategoryProduct, changeStatusCategoryProduct, deleteCategoryProduct, update_Category_Product} = require('../controllers/categoryProductController')
 const Upload = require("../config/upload");
 const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices, changeStatusService, deleteService} = require('../controllers/serviceController');
 const {getListCategory,addCategory,updateCategory, changeStatusCategoryService, getCategoryService, deleteCategory} = require('../controllers/categoryController');
