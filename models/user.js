@@ -10,6 +10,10 @@ const userSchema = new mongoose.Schema({
   loyaltyPoints: { type: Number, default: 0 },
   status: { type: Boolean, default: true },
   deviceTokens: { type: String, default: null },
+  isLocked: {
+    type: Boolean,
+    default: false
+  }
 });
 
 // Tạo model từ schema

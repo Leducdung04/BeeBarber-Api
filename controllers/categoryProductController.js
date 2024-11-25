@@ -62,6 +62,29 @@ exports.getCategoryProduct = async (req,res)=>{
     return res.json({message: `${error}`})
   }
 }
+exports.changeStatusCategoryProduct = async (req,res)=>{
+  try {
+    const id = req.params.id
+    console.log(id)
+    const category = await Category_Product.findById({_id:id})
+    if(category){
+     const updateCategoryService = await  Category_Product.findByIdAndUpdate(category._id,{
+      status: false
+    },{
+      new: true
+    })
+    if(updateCategoryService){
+         return res.json({message:"update status successfully", data: updateCategoryService})
+    }else{
+         return res.json({message: "Update category product failed"})
+    }
+    }else{
+      return res.json({message: "Not found category product"})
+    }
+    } catch (error) {
+     return res.status(500).json({status:500, message: `${error}`})
+  }
+}
 
 exports.deleteCategoryProduct = async (req,res)=>{
   try {
