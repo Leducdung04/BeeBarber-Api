@@ -8,7 +8,7 @@ const {SigupUser,loginPhone,getUserDetailById}  = require('../controllers/userCo
 const {add_Category_Product,get_list_Category_Product, getCategoryProduct, deleteCategoryProduct, update_Category_Product} = require('../controllers/categoryProductController')
 const Upload = require("../config/upload");
 const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices, changeStatusService, deleteService} = require('../controllers/serviceController');
-const {getListCategory,addCategory,updateCategory, changeStatusCategoryService, getCategoryService} = require('../controllers/categoryController');
+const {getListCategory,addCategory,updateCategory, changeStatusCategoryService, getCategoryService, deleteCategory} = require('../controllers/categoryController');
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
 const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
 const { createNotification, updateNotification, getNotificationsByUserId } = require("../controllers/notificationController");
@@ -60,6 +60,7 @@ router.delete('/services/delete_service/:id',deleteService)
 router.get('/categorys/get_list_category',getListCategory)
 router.post('/categorys/add_category',Upload.single("image"),addCategory)
 router.put('/categorys/update_category/:id',Upload.single("image"),updateCategory)
+router.delete('/categorys/delete_category/:id',deleteCategory)
 
 
 // RESTful API cho CategoryProduct
