@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title></title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Rokkitt:100,300,400,700" rel="stylesheet" />
+
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="css/animate.css" />
+  <!-- Icomoon Icon Fonts-->
+  <link rel="stylesheet" href="css/icomoon.css" />
+  <!-- Ion Icon Fonts-->
+  <link rel="stylesheet" href="css/ionicons.min.css" />
+  <!-- Bootstrap  -->
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+
+  <!-- Magnific Popup -->
+  <link rel="stylesheet" href="css/magnific-popup.css" />
+
+  <!-- Flexslider  -->
+  <link rel="stylesheet" href="css/flexslider.css" />
+
+  <!-- Owl Carousel -->
+  <link rel="stylesheet" href="css/owl.carousel.min.css" />
+  <link rel="stylesheet" href="css/owl.theme.default.min.css" />
+
+  <!-- Date Picker -->
+  <link rel="stylesheet" href="css/bootstrap-datepicker.css" />
+  <!-- Flaticons  -->
+  <link rel="stylesheet" href="fonts/flaticon/font/flaticon.css" />
+
+  <!-- Theme style  -->
+  <link rel="stylesheet" href="stylesheet/admin.css" />
+
+</head>
+
+<body>
+  <div id="page">
+    <nav class="colorlib-sidebar" role="navigation">
+      <div class="sidebar-menu">
+        <div id="colorlib-logo">
+          <a href="home">Fstyle</a>
+        </div>
+        <ul>
+          <li class="<%= isActiveRoute('/home', locals.currentRoute)%>"><a href="home">Home</a></li>
+          <li class="<%= isActiveRoute('/order', locals.currentRoute)%>"><a href="orders">Đơn Hàng</a></li>
+          <li class="<%= isActiveRoute('/category_service', locals.currentRoute)%>"><a href="categories_services">Thể
+              loại dịch vụ</a></li>
+          <li class="<%= isActiveRoute('/service', locals.currentRoute)%>"><a href="services">Dịch vụ</a></li>
+          <li class="<%= isActiveRoute('/category_product', locals.currentRoute)%>"><a href="categories_products">Thể
+              loại sản phẩm</a></li>
+          <li class="<%= isActiveRoute('/product', locals.currentRoute)%>"><a href="products">Sản phẩm</a></li>
+          <li class="<%= isActiveRoute('/banner', locals.currentRoute)%>"><a href="banners">Banner</a></li>
+          <li class="<%= isActiveRoute('/barber', locals.currentRoute)%>"><a href="barbers">Barber</a></li>
+          <li class="<%= isActiveRoute('/statistical', locals.currentRoute)%>"><a href="statisticals">Thống kê</a></li>
+          <li class="<%= isActiveRoute('/revenue', locals.currentRoute)%>"><a href="revenues">Doanh thu</a></li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+  <main>
+    <div class="content">
+      <div id="screen">
+      <%- body %>
+      </div>
+
+    </div>
+  </main>
+</body>
+
+</html>

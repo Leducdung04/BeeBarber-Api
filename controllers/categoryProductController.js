@@ -48,6 +48,7 @@ exports.update_Category_Product = async (req, res, next) => {
     res.status(400).json({ msg: error.message });
   }
 };
+
 exports.getCategoryProduct = async (req,res)=>{
   try {
     const id = req.params.id
@@ -84,3 +85,19 @@ exports.changeStatusCategoryProduct = async (req,res)=>{
      return res.status(500).json({status:500, message: `${error}`})
   }
 }
+
+exports.deleteCategoryProduct = async (req,res)=>{
+  try {
+    const { id } = req.params;
+    const result = await Category_Product.findByIdAndDelete(id);
+    if (result) {
+      res.json({ success: true, message: 'Category Product deleted successfully' });
+    } else {
+      res.status(404).json({ success: false, message: 'Category Product not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error', error });
+  }
+}
+
+
