@@ -1,0 +1,183 @@
+<div class="container">
+    <!-- Form Container -->
+    <div class="form-container">
+        <h2>Thêm Mới Category</h2>
+        <form id="categoryForm">
+            <label for="name">Tên Category</label>
+            <input type="text" id="name" placeholder="Nhập tên category" required>
+
+            <label for="description">Mô tả</label>
+            <input type="text" id="description" placeholder="Nhập mô tả" required>
+
+            <label for="image">Ảnh</label>
+            <input type="file" id="image" required>
+
+            <button type="submit">Thêm Category</button>
+        </form>
+    </div>
+
+    <!-- List Container -->
+    <div class="list-container">
+        <h2>Danh Sách Category</h2>
+        <table id="categoryList">
+            <thead>
+                <tr>
+                    <th>Tên</th>
+                    <th>Mô tả</th>
+                    <th>Ảnh</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Categories will be listed here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal for Editing Category -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Sửa Category</h2>
+        <form id="editForm">
+            <label for="editName">Tên Category</label>
+            <input type="text" id="editName" placeholder="Nhập tên category" required>
+
+            <label for="editDescription">Mô tả</label>
+            <input type="text" id="editDescription" placeholder="Nhập mô tả" required>
+
+            <label for="editImage">Ảnh</label>
+            <input type="file" id="editImage">
+
+            <button type="submit">Cập nhật</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const apiUrl = 'api/categorys/get_list_category';
+
+    function fetchCategories() {
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                const categoryList = document.getElementById('categoryList').getElementsByTagName('tbody')[0];
+                categoryList.innerHTML = ''; // Clear the list before adding new data
+                data.forEach(category => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${category.name}</td>
+                        <td>${category.description}</td>
+                        <td><img src="${category.image}" alt="${category.name}" width="50"></td>
+                        <td>
+                            <div style="display: flex;flex-direction: row">
+                            <button class="btn-edit" onclick="openEditModal('${category._id}', '${category.name}', '${category.description}', '${category.image}')">Sửa</button>
+                            <button class="btn-delete" onclick="deleteCategory('${category._id}')">Ẩn</button>
+                            </div>
+                        </td>
+                    `;
+                    categoryList.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching categories:', error));
+    }
+
+    // Handle adding new category
+    const categoryForm = document.getElementById('categoryForm');
+    categoryForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const description = document.getElementById('description').value;
+        const image = document.getElementById('image').files[0];
+
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('description', description);
+        formData.append('image', image);
+
+        fetch('api/categorys/add_category', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    fetchCategories(); // Reload category list
+                    categoryForm.reset(); // Reset form
+                } else {
+                    alert('Có lỗi xảy ra khi thêm category');
+                }
+            })
+            .catch(error => console.error('Error adding category:', error));
+    });
+
+    // Handle edit category modal
+    function openEditModal(id, name, description, image) {
+        document.getElementById('editName').value = name;
+        document.getElementById('editDescription').value = description;
+        document.getElementById('editImage').value = ''; // Clear file input
+
+        const modal = document.getElementById('editModal');
+        modal.style.display = "block";
+
+        const editForm = document.getElementById('editForm');
+        editForm.onsubmit = function (e) {
+            e.preventDefault();
+
+            const editName = document.getElementById('editName').value;
+            const editDescription = document.getElementById('editDescription').value;
+            const editImage = document.getElementById('editImage').files[0];
+
+            const editData = new FormData();
+            editData.append('id', id);
+            
+            editData.append('name', editName);
+            editData.append('description', editDescription);
+            if (editImage) {
+                editData.append('image', editImage);
+            }
+
+            fetch(`api/categorys/update_category/${id}`, {
+                method: 'POST',
+                body: editData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        fetchCategories();
+                        closeModal(); // Close the modal
+                    } else {
+                        alert('Có lỗi xảy ra khi cập nhật category');
+                    }
+                })
+                .catch(error => console.error('Error updating category:', error));
+        };
+    }
+
+    // Close the edit modal
+    function closeModal() {
+        const modal = document.getElementById('editModal');
+        modal.style.display = "none";
+    }
+
+    // Handle delete category
+    function deleteCategory(id) {
+        fetch(`api/categorys/delete_category/${id}`, {
+            method: 'delete'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    fetchCategories();
+                } else {
+                    alert('Có lỗi xảy ra khi xóa category');
+                }
+            })
+            .catch(error => console.error('Error deleting category:', error));
+    }
+
+    // Initial fetch categories
+    fetchCategories();
+</script>

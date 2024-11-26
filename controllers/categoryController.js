@@ -127,3 +127,17 @@ exports.getCategoryService = async (req,res)=>{
     return res.json({message: `${error}`})
   }
 }
+
+exports.deleteCategory= async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await Category.findByIdAndDelete(id);
+    if (result) {
+      res.json({ success: true, message: 'Category deleted successfully' });
+    } else {
+      res.status(404).json({ success: false, message: 'Category not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error', error });
+  }
+}
