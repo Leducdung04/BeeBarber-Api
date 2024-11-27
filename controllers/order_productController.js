@@ -248,8 +248,7 @@ exports.getOrdersByUserId = async (req, res, next) => {
 exports.getAllOrdersAdmin = async (req, res, next) => {
     try {
         // Lấy tất cả các đơn hàng
-        const orders = await Order_Product.find()
-            .populate('product_id') // Lấy thông tin sản phẩm
+        const orders = await Order_Product.find()// Lấy thông tin sản phẩm
             .populate('user_voucher_id') // Lấy thông tin từ bảng UserVoucher nếu có
             .sort({ createdAt: -1 }); // Sắp xếp theo thời gian tạo mới nhất
 
