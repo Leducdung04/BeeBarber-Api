@@ -6,9 +6,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
-  <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css?family=Rokkitt:100,300,400,700" rel="stylesheet" />
-
   <!-- Animate.css -->
   <link rel="stylesheet" href="css/animate.css" />
   <!-- Icomoon Icon Fonts-->
@@ -28,14 +25,15 @@
   <link rel="stylesheet" href="css/owl.carousel.min.css" />
   <link rel="stylesheet" href="css/owl.theme.default.min.css" />
 
-  <!-- Date Picker -->
-  <link rel="stylesheet" href="css/bootstrap-datepicker.css" />
-  <!-- Flaticons  -->
-  <link rel="stylesheet" href="fonts/flaticon/font/flaticon.css" />
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Rokkitt:100,300,400,700" rel="stylesheet" />
 
-  <!-- Theme style  -->
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" />
+  <!-- Your other stylesheets -->
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
   <link rel="stylesheet" href="stylesheet/admin.css" />
-
 </head>
 
 <body>
@@ -46,18 +44,39 @@
           <a href="home">Fstyle</a>
         </div>
         <ul>
-          <li class="<%= isActiveRoute('/home', locals.currentRoute)%>"><a href="home">Home</a></li>
-          <li class="<%= isActiveRoute('/order', locals.currentRoute)%>"><a href="orders">Đơn Hàng</a></li>
-          <li class="<%= isActiveRoute('/category_service', locals.currentRoute)%>"><a href="categories_services">Thể
-              loại dịch vụ</a></li>
-          <li class="<%= isActiveRoute('/service', locals.currentRoute)%>"><a href="services">Dịch vụ</a></li>
-          <li class="<%= isActiveRoute('/category_product', locals.currentRoute)%>"><a href="categories_products">Thể
-              loại sản phẩm</a></li>
-          <li class="<%= isActiveRoute('/product', locals.currentRoute)%>"><a href="products">Sản phẩm</a></li>
-          <li class="<%= isActiveRoute('/banner', locals.currentRoute)%>"><a href="banners">Banner</a></li>
-          <li class="<%= isActiveRoute('/barber', locals.currentRoute)%>"><a href="barbers">Barber</a></li>
-          <li class="<%= isActiveRoute('/statistical', locals.currentRoute)%>"><a href="statisticals">Thống kê</a></li>
-          <li class="<%= isActiveRoute('/revenue', locals.currentRoute)%>"><a href="revenues">Doanh thu</a></li>
+          <ul>
+            <li class="<%= isActiveRoute('/statistical', locals.currentRoute)%>">
+              <a href="statisticals"><i class="material-icons">bar_chart</i> Thống kê</a>
+            </li>
+            <li class="<%= isActiveRoute('/home', locals.currentRoute)%>">
+              <a href="home"><i class="material-icons">home</i> Home</a>
+            </li>
+            <li class="<%= isActiveRoute('/order', locals.currentRoute)%>">
+              <a href="orders"><i class="material-icons">receipt</i> Đơn Hàng</a>
+            </li>
+            <li class="<%= isActiveRoute('/category_service', locals.currentRoute)%>">
+              <a href="categories_services"><i class="material-symbols-outlined">health_and_beauty</i>
+                Thể loại dịch vụ</a>
+            </li>
+            <li class="<%= isActiveRoute('/service', locals.currentRoute)%>">
+              <a href="services"><i class="material-icons">build</i> Dịch vụ</a>
+            </li>
+            <li class="<%= isActiveRoute('/category_product', locals.currentRoute)%>">
+              <a href="categories_products"><i class="material-icons">category</i> Thể loại sản phẩm</a>
+            </li>
+            <li class="<%= isActiveRoute('/product', locals.currentRoute)%>">
+              <a href="products"><i class="material-icons">inventory</i> Sản phẩm</a>
+            </li>
+            <li class="<%= isActiveRoute('/banner', locals.currentRoute)%>">
+              <a href="banners"><i class="material-icons">image</i> Banner</a>
+            </li>
+            <li class="<%= isActiveRoute('/barber', locals.currentRoute)%>">
+              <a href="barbers"><i class="material-icons">content_cut</i> Barber</a>
+            </li>
+            <li class="<%= isActiveRoute('/revenue', locals.currentRoute)%>">
+              <a href="revenues"><i class="material-icons">attach_money</i> Doanh thu</a>
+            </li>
+          </ul>
         </ul>
       </div>
     </nav>
@@ -65,9 +84,8 @@
   <main>
     <div class="content">
       <div id="screen">
-      <%- body %>
+        <%- body %>
       </div>
-
     </div>
   </main>
 </body>

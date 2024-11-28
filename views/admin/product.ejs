@@ -90,8 +90,8 @@
                 data.forEach(product => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                      <td>${product.name}</td>
-                      <td>${product.description}</td> 
+                      <td>${truncateText(product.name, 50)}</td>
+                      <td>${truncateText(product.description, 50)}</td> 
                       <td>${product.category_id.name}</td> 
                       <td>${product.import_price}</td>
                       <td>${product.price_selling}</td>
@@ -216,6 +216,13 @@
                 })
                 .catch(error => console.error('Error updating product:', error));
         };
+    }
+
+    function truncateText(text, maxLength) {
+        if (text.length > maxLength) {
+            return text.substring(0, maxLength) + '...';
+        }
+        return text;
     }
 
     function closeModal() {
