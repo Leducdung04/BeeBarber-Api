@@ -21,7 +21,7 @@ router.post("/notifications/createNotification",createNotification)
 const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment, getAppointmentsByUserId, updateAppointmentStatusToCanceled, updateAppointmentStatusToCanceled_ByZaloPay, updateAppointmentStatus, getAppointmentsAdmin, updateAppointmentStatusAdmin } = require("../controllers/appointmentControllers");
 
 const { addPayment, updatePayment_Canceled_ById, updatePaymentStatus } = require("../controllers/paymentsController");
-const { addOrderWithPayment, getOrdersByUserId, updateOderStatusToCanceled, updateOderStatusToCanceled_ByZaloPay, getAllOrdersAdmin } = require("../controllers/order_productController");
+const { addOrderWithPayment, getOrdersByUserId, updateOderStatusToCanceled, updateOderStatusToCanceled_ByZaloPay, getAllOrdersAdmin, addOrderProduct, updateOrderStatus, totalAmount } = require("../controllers/order_productController");
 
 // restful Api banner 
 router.get('/get_list_banner',get_list_banner)
@@ -32,7 +32,7 @@ router.put('/updateBanner/:id',Upload.single("image"),updateBanner)
 router.put('/updateBannerStatus/:id',updateBannerStatus)
 
 // restful Api user
-router.post('/Singup',SigupUser)
+router.post('/SignUp',SigupUser)
 router.post('/loginPhone',loginPhone)
 router.get('/users/getUserDetailById/:id',getUserDetailById)
 router.get('/user/get_all_user', getAllUser)
@@ -98,13 +98,13 @@ router.put("/products/update_status_product/:id", updateQuantityProduct)
 router.delete("/products/delete_product/:id",deleteProduct)
 
 //Restful API cho cart
-router.get('/carts/get_user_cart',get_user_cart);
-router.post('/carts/add_cart',add_cart)
+router.get('/carts/get_user_cart/:user_id',get_user_cart);
+router.post('/carts/add_cart/:user_id',add_cart)
 router.put("/carts/update_cart",update_cart);
 
 //Restful API cho cartItem
-router.get('/cartItems/get_list_cartItem',get_list_cartItem);
-router.post('/cartItems/add_cartItem',add_cartItem);
+router.get('/cartItems/get_list_cartItem/:cart_id',get_list_cartItem);
+router.post('/cartItems/add_cartItem/:cart_id',add_cartItem);
 router.delete('/cartItems/delete_cartItem/:id',delete_cartItem);
 router.put('/cartItems/update_cart',update_cartItem)
 
@@ -120,6 +120,9 @@ router.put('/updateAppointmentStatusAdmin/:appointmentId',updateAppointmentStatu
 
 
 // oder 
+router.post('/add_order/:id', addOrderProduct)
+router.post('/updateOrderStatus/:id', updateOrderStatus)
+router.get('/revenue', totalAmount)
 router.post('/addOrderWithPayment',addOrderWithPayment)
 router.get('/getOrdersByUserId/:user_id',getOrdersByUserId);
 router.put('/updateOderStatusToCanceled/:oderId',updateOderStatusToCanceled)

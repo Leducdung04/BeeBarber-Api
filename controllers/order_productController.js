@@ -1,27 +1,169 @@
 const { default: mongoose } = require('mongoose');
 const Order_Product = require('../models/oder_product');
 const Payment = require('../models/payments');
+const Product = require('../models/product');
 
+exports.updateOrderStatus = async (req, res) => {
+    try {
+      const orderId = req.params.id;
+      const { status } = req.body;
+      const order = await Order_Product.findById(orderId);
+  
+      if (!order) {
+        return res.status(404).json({
+          status: 404,
+          message: "Order not found",
+        });
+      }
+  
+      order.status = status;
+      switch (status) {
+        case "active":
+          order.timeConfirm = new Date();
+          break;
+        case "trading":
+          order.timeDelivery = new Date();
+          break;
+        case "deactive":
+          order.timeCancel = new Date();
+          break;
+        case "delivered":
+          order.timeSuccess = new Date();
+          for (const product of order.listProduct) {
+            await Product.findByIdAndUpdate(product.idProduct, {
+              $inc: {
+                quantity: -product.quantity,
+                soldQuantity: +product.quantity,
+              },
+            });
+          }
+          break;
+      }
+  
+      await order.save();
+      res.status(200).json({
+        status: 200,
+        message: "Order status updated successfully",
+        order: order,
+      });
+    } catch (error) {
+      res.status(500).json({ status: 500, message: error.message });
+    }
+};
+exports.totalAmount = async (req, res) => {
+    try {
+      const { startDate, endDate } = req.query;
+
+      console.log(`${startDate}#${endDate}`)
+
+      const startTime = new Date(startDate);
+      const endTime = new Date(endDate);
+  
+      const orders = await Order_Product.find({
+        status: "delivered",
+        timeSuccess: {$gte: startTime, $lte: endTime }
+      });
+  
+      let uniqueProduct = [];
+      let totalAmount = 0;
+      const dailyTotalPrices = {};
+      const dailySoldQuantity = {};
+  
+      orders.forEach(order => {
+        const date = order.timeSuccess.toISOString().slice(0, 10);
+        if (!dailyTotalPrices[date]) {
+          dailyTotalPrices[date] = 0;
+        }
+
+        if (!dailySoldQuantity[date]) {
+            dailySoldQuantity[date] = 0;
+        }
+
+        const revenue = order.total_price_sold - order.total_price_import
+        dailyTotalPrices[date] += parseFloat(revenue);
+
+        let totalSoldProduct = 0
+        order.listProduct.map(product =>{
+            totalSoldProduct += product.quantity
+        })
+        dailySoldQuantity[date] = totalSoldProduct
+
+      });
+      console.log(dailyTotalPrices)
+      const sortedDates = Object.keys(dailyTotalPrices).sort();
+      const labels = sortedDates;
+      const prices = sortedDates.map(date => dailyTotalPrices[date]);
+      const products = sortedDates.map(date  => dailySoldQuantity[date]);
+  
+      for (const order of orders) {
+        const revenue = order.total_price_sold - order.total_price_import
+        totalAmount += parseFloat(revenue);
+  
+        for (const product of order.listProduct) {
+          const existingProduct = uniqueProduct.find(item => item.idProduct.toString() === product.idProduct.toString());
+         
+          if (!existingProduct) {
+             const foundProduct = await Product.findOne({ _id: product.idProduct });
+            uniqueProduct.push({
+              idProduct: product.idProduct,
+              name: product.name,
+              quantity: product.quantity,
+              price: product.price_selling,
+              image: product.image,
+              soldQuantity: foundProduct ? foundProduct.soldQuantity : 0
+            });
+          }
+        }
+      }
+      for(let i = 0 ; i < uniqueProduct.length - 1; i++){
+        for(let j = 0; j< uniqueProduct.length - 1 - i; j++){
+            if(uniqueProduct[j].soldQuantity < uniqueProduct[j+1].soldQuantity){
+                const temp  = uniqueProduct[j]
+                uniqueProduct[j] = uniqueProduct[j+1]
+                uniqueProduct[j+1] = temp
+            }
+        }
+      }
+      console.log(uniqueProduct)
+      console.log(totalAmount)
+      
+      res.status(200).json({ status: 200, message: "successfully", total: totalAmount, uniqueProduct:uniqueProduct, labels,prices, products });
+    } catch (error) {
+      res.status(404).json({ status: 404, message: error.message });
+    }
+  };
 exports.addOrderProduct = async (req, res, next) => {
     try {
-        const { product_id, user_id, number, appoint_date, status, price, user_voucher_id } = req.body;
+        const idUser = req.params.id
+        const {listProduct, location, status, user_voucher_id} = req.body
+
+        let total_price_import = 0
+        let total_price_sold = 0
+
+        listProduct.map((item)=>{
+            total_price_import += item.price_import * item.quantity
+            total_price_sold += item.price_selling * item.quantity
+        })
 
         const newOrderProduct = new Order_Product({
-            product_id,
-            user_id,
-            number,
-            appoint_date,
+            listProduct: listProduct,
+            user_id: idUser,
+            location: location,
             status,
-            price,
-            user_voucher_id
+            total_price_import: total_price_import,
+            total_price_sold: total_price_sold,
+            user_voucher_id: user_voucher_id
         });
 
         const result = await newOrderProduct.save();
-
-        res.status(201).json(result);
+        if(result){
+            return res.status(201).json({messsage:"Create a new order successfully", data:result});
+        }else{
+            return res.json({messsage:"Create a new order failed", data:{}});
+        }
     } catch (err) {
         console.error(err);
-        res.status(400).json({ message: 'Server Error' });
+        res.status(500).json({ message: 'Server Error' });
     }
 }
 
@@ -106,8 +248,7 @@ exports.getOrdersByUserId = async (req, res, next) => {
 exports.getAllOrdersAdmin = async (req, res, next) => {
     try {
         // Lấy tất cả các đơn hàng
-        const orders = await Order_Product.find()
-            .populate('product_id') // Lấy thông tin sản phẩm
+        const orders = await Order_Product.find()// Lấy thông tin sản phẩm
             .populate('user_voucher_id') // Lấy thông tin từ bảng UserVoucher nếu có
             .sort({ createdAt: -1 }); // Sắp xếp theo thời gian tạo mới nhất
 
