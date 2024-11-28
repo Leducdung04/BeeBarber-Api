@@ -81,7 +81,7 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${categoryProduct.name}</td>
-                        <td>${categoryProduct.description}</td>
+                        <td>${truncateText(categoryProduct.description, 50)}</td>
                         <td><img src="${categoryProduct.image}" alt="${categoryProduct.name}" width="50"></td>
                         <td>${categoryProduct.status ? 'Hiển thị' : 'Ẩn'}</td>
                         <td>
@@ -124,6 +124,14 @@
             })
             .catch(error => console.error('Error adding category product:', error));
     });
+
+    function truncateText(text, maxLength) {
+        if (text.length > maxLength) {
+            return text.substring(0, maxLength) + '...';
+        }
+        return text;
+    }
+
 
     // Handle edit category product modal
     function openEditModal(id, name, description, status, image) {

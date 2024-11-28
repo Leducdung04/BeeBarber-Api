@@ -3,28 +3,22 @@ const Cart = require('../models/cart')
 
 exports.get_list_cartItem = async (req, res, next) => {
     try {
-        // const cart = await Cart.findOne({ user_id: req.user._id });
-        
-        const cart = await Cart.findOne();
-        if (!cart) {
-            return res.status(404).json({ msg: "Người dùng không có giỏ hàng" });
-        }
-        const cartItems = await CartItem.find({ cart_id: cart._id });
+        const {cart_id} = req.params;
+        const cartItems = await CartItem.find({ cart_id });
         res.status(200).json(cartItems);
     } catch (error) {
         res.status(400).json({ msg: error.message });
     }
 };
 
+
 exports.add_cartItem = async (req, res, next) => {
     try {
-        //const cart = await Cart.findOne({ user_id: req.user._id });
-        const cart = await Cart.findOne();
+        const {cart_id} = req.params;
+        const cart = await Cart.findById({ _id: cart_id});
         if (!cart) {
             return res.status(404).json({ msg: "Người dùng không có giỏ hàng." });
         }
-
-        // Kiểm tra sản phẩm có tồn tại không
         let cartItem = await CartItem.findOne({
             cart_id: cart._id,
             product_id: req.body.product_id
@@ -42,7 +36,8 @@ exports.add_cartItem = async (req, res, next) => {
                 total: req.body.total
             });
         }
-
+        console.log('Incoming cart_id:', cart_id);
+        console.log('Request body:', req.body);        
         res.status(201).json(cartItem);
     } catch (error) {
         res.status(400).json({ msg: error.message });
