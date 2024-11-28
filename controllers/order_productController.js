@@ -402,3 +402,22 @@ exports.getListOrderProducts = async (req, res, next) => {
         res.status(400).json({ msg: error.message });
     }
 }
+exports.getOrderByOrderId = async (req, res) => {
+    try {
+      const orderId = req.params.orderId;
+      const order = await Order_Product.findById(orderId);
+      if (!order) {
+        return res.status(404).json({
+          status: 404,
+          message: "Order not found",
+        });
+      }
+      res.status(200).json({
+        status: 200,
+        message: "Order retrieved successfully",
+        order: order,
+      });
+    } catch (error) {
+      res.status(500).json({ status: 500, message: error.message });
+    }
+  };

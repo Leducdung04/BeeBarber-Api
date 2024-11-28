@@ -1,4 +1,6 @@
 const express = require("express");
+const Order_Product = require("../models/oder_product");
+const User = require("../models/user");
 const router = express.Router();
 
 const admin = "layouts/index";
@@ -73,7 +75,7 @@ router.get("/statisticals", (req, res) => {
     currentRoute: `/statistical`,
     title: "Hello",
   }
-  res.render("admin/statistical", { locals, layout: admin });
+  res.render("admin/statistical", { locals, layout: admin,  });
 });
 
 
@@ -85,5 +87,28 @@ router.get("/revenues", (req, res) => {
   res.render("admin/revenue", { locals, layout: admin });
 });
 
+router.get("/showDetailOrder/:orderId", async (req, res) => {
+  const locals = {
+    currentRoute: `/showDetailOrder`,
+    title: "Hello",
+  }
+  try {
+    const orderId = req.params.orderId;
+    console.log(orderId)
+    const order = await Order_Product.findById(orderId);
+    if (!order) {
+      return res.status(404).send("Order not found");
+    }
 
+    const user = await User.findById(order.user_id);
+    if (!user) {
+      return res.status(404).send("User not found"); 
+    }
+
+    res.render("admin/showDetailOrder", { locals, layout: admin, order, user, title:"Detail Order" });
+  } catch (err) {
+    console.error("Error retrieving order details:", err);
+    res.status(500).send("Error retrieving order details");
+  }
+});
 module.exports = router;
