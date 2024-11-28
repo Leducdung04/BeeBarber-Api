@@ -154,14 +154,13 @@ exports.getAppointmentsAdmin = async (req, res, next) => {
     try {
         // Lấy tất cả các lịch hẹn với status true
         const appointments = await Appointment.find({
-            status: true,
         })  .populate('user_id') 
             .populate('barber_id') // Lấy thông tin từ bảng Barber
             .populate('service_id') // Lấy thông tin từ bảng Service
             .sort({ createdAt: -1 }); // Sắp xếp theo thời gian tạo mới nhất
 
         // Tìm tất cả các thanh toán có status true
-        const payments = await Payment.find({ status: true });
+        const payments = await Payment.find();
 
         // Gắn thông tin thanh toán tương ứng vào mỗi lịch hẹn
         const result = appointments.map(appointment => {
