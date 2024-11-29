@@ -58,6 +58,7 @@ exports.loginPhone = async (req, res) => {
 };
 
 
+
 exports.SigupUser = async (req, res, next) => {
   try {
     const { phone, password, deviceTokens,name ,role} = req.body;
@@ -216,5 +217,28 @@ exports.getUserDetailById = async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Lỗi máy chủ" });
+  }
+};
+exports.getAllUser = async(req,res)=>{
+  const users = await User.find()
+  if(users){
+    return res.json({message:"Get all user success", data: users})
+  }else{
+    return res.json({message: "Get all user failed"})
+  }
+}
+exports.lockupUser = async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.isLocked = !user.isLocked;
+    await user.save();
+    res.status(200).json({ message: "User locked status updated", user });
+  } catch (error) {
+    console.error("Error updating user locked status:", error);
+    res.status(500).json({ message: `Internal server error: ${error}` });
   }
 };

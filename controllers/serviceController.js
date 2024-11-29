@@ -3,7 +3,7 @@ const mongoose = require("mongoose")
 
 exports.getListService = async (req, res, next) => {
   try {
-    const service = await Service.find().sort({ createdAt: -1 });
+    const service = await Service.find().sort({ createdAt: -1 }).populate("id_category");
 
     res.status(200).json(service);
   } catch (error) {
@@ -112,6 +112,7 @@ exports.updateService = async (req, res, next) => {
     res.status(400).json({ message: "Server Error" });
   }
 };
+
 exports.changeStatusService = async (req,res)=>{
   try {
     const id = req.params.id
@@ -132,3 +133,18 @@ exports.changeStatusService = async (req,res)=>{
     return res.status(500).json({message: `${error}`})
   }
 }
+
+exports.deleteService = async (req,res)=>{
+  try {
+    const { id } = req.params;
+    const result = await Service.findByIdAndDelete(id);
+    if (result) {
+      res.json({ success: true, message: 'Service deleted successfully' });
+    } else {
+      res.status(404).json({ success: false, message: 'Service not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error', error });
+  }
+}
+

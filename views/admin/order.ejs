@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders</title>
+<style>
+    .list-group-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.list-group-item img {
+    max-width: 100px;
+
+}
+
+.list-group-item h5 {
+    font-size: 18px;
+    font-weight: bold;
+}
+.list-group-item .btn {
+    min-width: 120px;
+}
+
+@media (min-width: 768px) {
+    .list-group-item {
+        flex-wrap: nowrap;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="col">
+            <h2 class="mb-4 text-center ">Danh Sách Đơn Hàng</h2>
+            <div id="orderList" class="list-group"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Fetch order data from API
+        fetch('api/getOrdersAdmin')
+        .then(response => response.json())
+        .then(data => {
+            const orderList = document.getElementById('orderList');
+    
+            data.forEach(order => {
+                const orderDate = new Date(order.createdAt).toLocaleDateString();
+                const statusBadge = getStatusBadge(order.status);
+    
+                const item = document.createElement('div');
+                item.classList.add('list-group-item', 'py-3', 'd-flex', 'align-items-center', 'justify-content-between', 'flex-wrap', 'shadow-sm');
+
+                item.onclick = ()=> viewOrderDetails(order._id)
+                
+                item.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <img src="${order.listProduct[0].image}" class="img-fluid rounded me-3" style="width: 120px; height: 120px; object-fit: cover;" alt="${order.listProduct[0].name}">
+                        <div style="margin-left:10px">
+                            <h5 class="mb-2">${order.listProduct[0].name}</h5>
+                            <p class="mb-1"><strong>Giá:</strong> ${order.total_price_sold.toLocaleString()} VND</p>
+                            <p class="mb-1"><strong>Ngày đặt:</strong> ${orderDate}</p>
+                            <p class="mb-1"><strong>Địa điểm:</strong> ${order.location}</p>
+                            <div>${statusBadge}</div>
+                        </div>
+                    </div>
+                `;
+    
+                orderList.appendChild(item);
+            });
+        })
+        .catch(error => console.error('Error fetching orders:', error));
+    
+        function getStatusBadge(status) {
+        switch (status) {
+            case "pending":
+                return '<span class="badge bg-warning text-dark">Chờ xác nhận</span>';
+            case "active":
+                return '<span class="badge bg-info text-dark">Xác nhận</span>';
+            case "trading":
+                return '<span class="badge bg-info text-dark">Đang giao</span>';
+            case "delivered":
+                return '<span class="badge bg-success">Đã giao</span>';
+            case "deactive":
+                return '<span class="badge bg-success">Đã hủy</span>';
+        }
+    }
+    function viewOrderDetails(orderId){
+        location.href=`showDetailOrder/${orderId}`
+    }
+    </script>
+</body>
+</html>

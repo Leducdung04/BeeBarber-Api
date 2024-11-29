@@ -48,17 +48,17 @@ document.getElementById("add-category-btn").addEventListener('click', function()
 document.getElementById("category-table-body").addEventListener("click",async function (event) {
   if (event.target.tagName === "A") {
     event.preventDefault(); 
-    const productId = await event.target.getAttribute("href");
+    const categoryId = await event.target.getAttribute("href");
     $("#confirmModalProduct").modal('show')
     $("#confirmProductBtn").off('click').click(function(){
-      fetch(`/api/post/update_category_product/${productId}`)
+      fetch(`/api/categoryProducts/update_status_category_product/${categoryId}`)
       .then(res => res.json())
       .then(data =>{
-      if(data.message==="update category success"){
+      if(data.message==="update status successfully"){
         $("#confirmModalProduct").modal('hide')
         alert("update thành công")
         getData()
-      }else if(data.message==="update category failed"){
+      }else if(data.message==="Update category product failed"){
         alert("update thất bại")
       }else{
         alert("Không tìm thấy sản phẩm")

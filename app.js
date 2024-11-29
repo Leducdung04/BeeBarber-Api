@@ -1,45 +1,52 @@
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const qs = require('qs')
+const expressLayout = require('express-ejs-layouts');
+
 
 // zaloPay 
 const axios = require('axios').default; // npm install axios
 const CryptoJS = require('crypto-js'); // npm install crypto-js
 const moment = require('moment'); // npm install moment
+const cors = require('cors');
+
+const {isActiveRoute} = require('../BeeBarber-Api/helpers/routeHelpers')
 
 
 var apiRouter = require("./routes/api");
 const signInRouter = require("./routes/signIn");
 const homeRouter = require("./routes/home");
-const categoriesRouter = require("./routes/categories");
-const categoriesServiceRouter = require("./routes/categoriesService");
-const productRouter = require("./routes/products");
-const serviceRouter = require("./routes/service")
+
 var app = express();
+
+app.use(cors());
 
 const database = require('./config/db')
 // view engine setup
-app.set("views", __dirname + "/views");
+app.set('layout','./layouts/signIn')
 app.set("view engine", "ejs");
 
+app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.locals.isActiveRoute = isActiveRoute;
 
 //app.use('/', indexRouter);
+app.use(expressLayout);
 app.use("/api", apiRouter);
 app.use("/", signInRouter);
 app.use("/", homeRouter);
-app.use("/", categoriesRouter);
-app.use("/", categoriesServiceRouter);
-app.use("/", productRouter);
-app.use("/", serviceRouter)
+app.use(cors({
+  origin: 'http://127.0.0.1:5500/' 
+}));
+
 // zalo pay 
 const config = {
   app_id: "2553",

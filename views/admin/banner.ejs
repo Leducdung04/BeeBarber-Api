@@ -1,0 +1,128 @@
+<h1 style="margin: 24px;">Quản lý Banner</h1>
+<div  class="container">
+    <!-- Form to Add or Edit Banner -->
+    
+    <div class="form-container">
+        <h2 id="form-title">Add Banner</h2>
+        <div class="form-group">
+            <label for="imageFile">Select Image:</label>
+            <input type="file" id="imageFile" class="input-field">
+        </div>
+        <div class="form-group">
+            <label for="status">Status:</label>
+            <select id="status" class="input-field">
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="target_screen">Target Screen:</label>
+            <select id="target_screen" class="input-field">
+                <option value="mobile">Mobile</option>
+                <option value="barber">Barber</option>
+                <option value="product">Product</option>
+                <option value="hairstyle">Hairstyle</option>
+            </select>
+        </div>
+        <button class="btn-add" id="submit-btn" onclick="addBanner()">Add Banner</button>
+        <button class="btn-cancel" id="cancel-btn" onclick="cancelEdit()" style="display: none;">Cancel</button>
+    </div>
+
+    <!-- Banner List -->
+    <div class="banner-list-container" id="banner-list">
+        <!-- Banner items will be dynamically added here -->
+    </div>
+</div>
+
+<script>
+    const apiUrl = '/api/get_list_banner';
+    let editBannerId = null;
+
+    // Fetch and display banners
+    async function fetchBanners() {
+        try {
+            const response = await fetch(apiUrl);
+            const banners = await response.json();
+            const bannerListContainer = document.getElementById('banner-list');
+            bannerListContainer.innerHTML = '';  // Clear existing banners
+
+            banners.forEach(banner => {
+                const bannerItem = document.createElement('div');
+                bannerItem.classList.add('banner-item');
+                bannerItem.innerHTML = `
+                    <img src="${banner.image}" alt="Banner Image">
+                    <p>Status: ${banner.status ? 'Active' : 'Inactive'}</p>
+                    <p>Target Screen: ${banner.target_screen}</p>
+                    <button class="btn-update" onclick="editBanner('${banner._id}', '${banner.image}', ${banner.status}, '${banner.target_screen}')">Edit</button>
+                `;
+                bannerListContainer.appendChild(bannerItem);
+            });
+        } catch (error) {
+            console.error('Error fetching banners:', error);
+        }
+    }
+
+    // Add new banner
+    async function addBanner() {
+        const imageFile = document.getElementById('imageFile').files[0];
+        const status = document.getElementById('status').value === 'true';
+        const targetScreen = document.getElementById('target_screen').value;
+
+        if (!imageFile) {
+            alert('Please select an image file.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', imageFile);
+        formData.append('status', status);
+        formData.append('target_screen', targetScreen);
+
+        try {
+            if (editBannerId) {
+                await fetch(`http://localhost:3000/api/updateBanner/${editBannerId}`, {
+                    method: 'PUT',
+                    body: formData,
+                });
+                editBannerId = null; // Reset ID after update
+                document.getElementById('form-title').innerText = 'Add Banner';
+                document.getElementById('submit-btn').innerText = 'Add Banner';
+                document.getElementById('cancel-btn').style.display = 'none';  // Hide cancel button
+            } else {
+                await fetch('http://localhost:3000/api/addBanner', {
+                    method: 'POST',
+                    body: formData,
+                });
+            }
+            fetchBanners();  // Refresh banner list after adding or updating
+        } catch (error) {
+            console.error('Error adding or updating banner:', error);
+        }
+    }
+
+    // Edit banner
+    function editBanner(id, image, status, targetScreen) {
+        // Prefill the form with the existing banner data for editing
+        document.getElementById('imageFile').value = '';  // Optional: reset image input
+        document.getElementById('status').value = status.toString();
+        document.getElementById('target_screen').value = targetScreen;
+        document.getElementById('form-title').innerText = 'Edit Banner';
+        document.getElementById('submit-btn').innerText = 'Update Banner';
+        document.getElementById('cancel-btn').style.display = 'inline-block';  // Show cancel button
+        editBannerId = id;  // Store the banner ID for updating
+    }
+
+    // Cancel the edit action and reset form
+    function cancelEdit() {
+        document.getElementById('form-title').innerText = 'Add Banner';
+        document.getElementById('submit-btn').innerText = 'Add Banner';
+        document.getElementById('cancel-btn').style.display = 'none';  // Hide cancel button
+        document.getElementById('imageFile').value = '';
+        document.getElementById('status').value = 'true';
+        document.getElementById('target_screen').value = 'mobile';
+        editBannerId = null;  // Reset ID
+    }
+
+    // Initial fetch and render of banners
+    fetchBanners();
+</script>

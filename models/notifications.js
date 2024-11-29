@@ -13,7 +13,7 @@ const notificationSchema = new mongoose.Schema({
   },
   type: { 
     type: String, 
-    enum: ["review", "booking", "promotion", "general"],  // Các loại thông báo
+    enum: ["review", "booking", "order"],
     required: true 
   },
   content: { 
@@ -31,7 +31,7 @@ const notificationSchema = new mongoose.Schema({
   },
   updated_at: { 
     type: Date 
-  }
+  },
 });
 
 // Tạo model từ schema

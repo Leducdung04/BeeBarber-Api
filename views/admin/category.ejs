@@ -1,0 +1,191 @@
+<div class="container">
+    <!-- Form Container -->
+    <div class="form-container">
+        <h2>Thêm Mới Category Product</h2>
+        <form id="categoryProductForm">
+            <label for="name">Tên Category Product</label>
+            <input type="text" id="name" placeholder="Nhập tên category product" required>
+
+            <label for="description">Mô tả</label>
+            <input type="text" id="description" placeholder="Nhập mô tả" required>
+
+            <label for="status">Trạng thái</label>
+            <select id="status" required>
+                <option value="true">Hiển thị</option>
+                <option value="false">Ẩn</option>
+            </select>
+
+            <label for="image">Ảnh</label>
+            <input type="file" id="image" required>
+
+            <button type="submit">Thêm Category Product</button>
+        </form>
+    </div>
+
+    <!-- List Container -->
+    <div class="list-container">
+        <h2>Danh Sách Category Product</h2>
+        <table id="categoryProductList">
+            <thead>
+                <tr>
+                    <th>Tên</th>
+                    <th>Mô tả</th>
+                    <th>Ảnh</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Categories will be listed here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal for Editing Category Product -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Sửa Category Product</h2>
+        <form id="editForm">
+            <label for="editName">Tên Category Product</label>
+            <input type="text" id="editName" placeholder="Nhập tên category product" required>
+
+            <label for="editDescription">Mô tả</label>
+            <input type="text" id="editDescription" placeholder="Nhập mô tả" required>
+
+            <label for="editStatus">Trạng thái</label>
+            <select id="editStatus" required>
+                <option value="true">Hiển thị</option>
+                <option value="false">Ẩn</option>
+            </select>
+
+            <label for="editImage">Ảnh</label>
+            <input type="file" id="editImage">
+
+            <button type="submit">Cập nhật</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const apiUrl = 'api/categoryProducts/get_list_Category_Product';
+
+    function fetchCategoryProducts() {
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                const categoryProductList = document.getElementById('categoryProductList').getElementsByTagName('tbody')[0];
+                categoryProductList.innerHTML = '';
+                data.forEach(categoryProduct => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${categoryProduct.name}</td>
+                        <td>${truncateText(categoryProduct.description, 50)}</td>
+                        <td><img src="${categoryProduct.image}" alt="${categoryProduct.name}" width="50"></td>
+                        <td>${categoryProduct.status ? 'Hiển thị' : 'Ẩn'}</td>
+                        <td>
+                            <div style="display: flex;flex-direction: row">
+                                <button class="btn-edit" onclick="openEditModal('${categoryProduct._id}', '${categoryProduct.name}', '${categoryProduct.description}', '${categoryProduct.status}', '${categoryProduct.image}')">Sửa</button>
+                                <button class="btn-delete" onclick="deleteCategoryProduct('${categoryProduct._id}')">Ẩn</button>
+                            </div>
+                        </td>
+                    `;
+                    categoryProductList.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching category products:', error));
+    }
+
+    // Handle adding new category product
+    const categoryProductForm = document.getElementById('categoryProductForm');
+    categoryProductForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const description = document.getElementById('description').value;
+        const status = document.getElementById('status').value === 'true';
+        const image = document.getElementById('image').files[0];
+
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('description', description);
+        formData.append('status', status);
+        formData.append('image', image);
+
+        fetch('api/categoryProducts/add_category_product', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                fetchCategoryProducts();
+                categoryProductForm.reset();
+            })
+            .catch(error => console.error('Error adding category product:', error));
+    });
+
+    function truncateText(text, maxLength) {
+        if (text.length > maxLength) {
+            return text.substring(0, maxLength) + '...';
+        }
+        return text;
+    }
+
+
+    // Handle edit category product modal
+    function openEditModal(id, name, description, status, image) {
+        document.getElementById('editName').value = name;
+        document.getElementById('editDescription').value = description;
+        document.getElementById('editStatus').value = status ? 'true' : 'false';
+        document.getElementById('editImage').value = '';
+
+        const modal = document.getElementById('editModal');
+        modal.style.display = "block";
+
+        const editForm = document.getElementById('editForm');
+        editForm.onsubmit = function (e) {
+            e.preventDefault();
+
+            const updatedName = document.getElementById('editName').value;
+            const updatedDescription = document.getElementById('editDescription').value;
+            const updatedStatus = document.getElementById('editStatus').value === 'true';
+            const updatedImage = document.getElementById('editImage').files[0];
+
+            const formData = new FormData();
+            formData.append('name', updatedName);
+            formData.append('description', updatedDescription);
+            formData.append('status', updatedStatus);
+            if (updatedImage) formData.append('image', updatedImage);
+
+            fetch(`api/categoryProducts/update_category_product/${id}`, {
+                method: 'PUT',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    fetchCategoryProducts();
+                    modal.style.display = "none";
+                })
+                .catch(error => console.error('Error updating category product:', error));
+        };
+    }
+
+    // Close modal
+    function closeModal() {
+        document.getElementById('editModal').style.display = "none";
+    }
+
+    function deleteCategoryProduct(id) {
+        fetch(`api/categoryProducts/delete_category_product/${id}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(data => {
+                fetchCategoryProducts();
+            })
+            .catch(error => console.error('Error deleting category product:', error));
+    }
+
+    window.onload = fetchCategoryProducts;
+</script>

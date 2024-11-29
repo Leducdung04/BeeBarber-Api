@@ -34,6 +34,9 @@ const productShema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  soldQuantity:{
+    type:Number
+  }
 });
 
 const Product = mongoose.model("Product", productShema);

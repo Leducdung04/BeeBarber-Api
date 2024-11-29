@@ -1,0 +1,162 @@
+<header>
+    <h1>Quản lý lịch cắt tóc</h1>
+</header>
+
+<!-- Bộ lọc -->
+<div class="filter-container">
+    <div>
+        <label for="status-filter">Trạng thái:</label>
+        <select id="status-filter">
+            <option value="">Tất cả trạng thái</option>
+            <option value="pending">Đang chờ</option>
+            <option value="completed">Hoàn thành</option>
+            <option value="canceled">Đã hủy</option>
+        </select>
+    </div>
+    <div>
+        <button onclick="filterByToday()">Hôm nay</button>
+        <button onclick="showAllAppointments()">Tất cả</button>
+    </div>
+</div>
+
+<!-- Danh sách lịch hẹn -->
+<div class="appointments-section">
+    <h2>Danh sách lịch hẹn</h2>
+    <div id="appointments-list" class="appointments-list"></div>
+</div>
+
+<script>
+    let appointmentsData = [];
+
+    async function fetchAppointments() {
+        const response = await fetch('api/getAppointmentsAdmin');
+        const data = await response.json();
+        appointmentsData = data;
+        displayAppointments(data);
+    }
+
+    function displayAppointments(appointments) {
+        const appointmentsList = document.getElementById('appointments-list');
+        appointmentsList.innerHTML = '';
+
+        appointments.forEach(appointment => {
+            const appointmentDiv = document.createElement('div');
+            appointmentDiv.classList.add('appointment');
+
+            // Appointment header with Barber's image
+            const appointmentHeader = document.createElement('div');
+            appointmentHeader.classList.add('appointment-header');
+            appointmentHeader.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <img src="${appointment.barber_id.image || 'img/barberBackgroug.png'}" alt="${appointment.barber_id.name}">
+                    <h3>Barber ${appointment.barber_id.name}</h3>
+                </div>
+                <span style="margin-left:24px">Time ${new Date(appointment.appointment_date).toLocaleDateString()} - ${appointment.appointment_time}</span>
+            `;
+            appointmentDiv.appendChild(appointmentHeader);
+
+            // Appointment details
+            const appointmentDetails = document.createElement('div');
+            appointmentDetails.classList.add('appointment-details');
+            const serviceNames = appointment.service_id.map(service => service.name).join(', ');
+            appointmentDetails.innerHTML = `
+                <div style="display: flex;flex-direction: column; "><strong>Người đặt: ${appointment.user_id.name}</strong><strong>${appointment.user_id.phone}</strong></div>
+                <div><strong>Dịch vụ:</strong> ${serviceNames}</div>
+                <div style="color:orange;"><strong style="color: gray;">Tổng tiền:</strong> ${appointment.price.toLocaleString()} VND</div>
+                <div><strong>Phương thức:</strong> ${appointment.payment.pay_method}</div>
+            `;
+            appointmentDiv.appendChild(appointmentDetails);
+
+            // Appointment footer (action buttons)
+            const appointmentFooter = document.createElement('div');
+            appointmentFooter.classList.add('appointment-footer');
+            
+            // Trạng thái và nút hành động
+             if (appointment.appointment_status === 'pending') {
+                appointmentFooter.innerHTML = `
+                    <span style="color: orange;">Đang chờ</span>
+                    <button class="btn btn-pending" onclick="markAsPending('${appointment._id}')">Đã cắt </button>
+                `;
+            } else if(appointment.appointment_status === 'completed'){
+                appointmentFooter.innerHTML = `
+                    <span style="color: green;"> Hoàn thành</span> `;
+            }else if(appointment.appointment_status === 'canceled'){
+                appointmentFooter.innerHTML = `
+                    <span style="color: red;"> Đã hủy</span> `;
+            } else if ( appointment.payment.pay_method_status === 'Norefundyet') {
+                appointmentFooter.innerHTML = `
+                    <span style="color: red;">Đã hủy hoàn tiền<strong>${appointment.payment.bank_account}</strong></span>
+                    <button class="btn btn-refund" onclick="processRefund('${appointment._id}', '${appointment.user_id}')">Hoàn tiền</button>
+                `;
+            }else if (appointment.appointment_status === 'Evaluate' ) {
+                appointmentFooter.innerHTML = `
+                    <span style="color: blue;">Khách hàng đã đánh giá </span>
+                `;
+            }
+            if ( appointment.payment.pay_method_status === 'Norefundyet') {
+                appointmentFooter.innerHTML = `
+                    <span style="color: red;">Đã hủy hoàn tiền</span>
+                    <button class="btn btn-refund" onclick="processRefund('${appointment._id}', '${appointment.user_id}')">Hoàn tiền</button>
+                `;
+            }else if( appointment.payment.pay_method_status === 'Refunded'){
+                appointmentFooter.innerHTML = `
+                    <span style="color: orange;">Đã hoàn tiền</span>`;
+            }
+            
+            appointmentDiv.appendChild(appointmentFooter);
+
+            // Append the appointment to the list
+            appointmentsList.appendChild(appointmentDiv);
+        });
+    }
+
+    function markAsComplete(appointmentId) {
+        alert(`Đã đánh dấu lịch hẹn ${appointmentId} là đã cắt xong.`);
+    }
+
+    function markAsPending(appointmentId) {
+        alert(`Vui lòng kiểm đúng số tiền thu trước khi hoàn thành.`);
+        fetch(`/api/updateAppointmentStatusAdmin/${appointmentId}`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ appointment_status: 'completed',pay_method_status:'Success' }),
+            }
+        ).then(()=>{
+            fetchAppointments();
+        })
+    }
+
+    function processRefund(paymentId, userId) {
+        const userConfirmed = window.confirm(`Xác nhận hoàn tiền vui lòng kiểm tra kỹ`);
+        if (userConfirmed) {
+            fetch(`/api/updateAppointmentStatusAdmin/${paymentId}`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ appointment_status: 'canceled',pay_method_status:'Refunded' }),
+            }
+        ).then(()=>{
+            fetchAppointments();
+        })
+        }
+    }
+
+    function filterByToday() {
+        const today = new Date().toLocaleDateString();
+        const todayAppointments = appointmentsData.filter(appointment => {
+            return new Date(appointment.appointment_date).toLocaleDateString() === today;
+        });
+        displayAppointments(todayAppointments);
+    }
+
+    function showAllAppointments() {
+        displayAppointments(appointmentsData);
+    }
+
+    window.onload = fetchAppointments;
+</script>

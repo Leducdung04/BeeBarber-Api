@@ -4,7 +4,7 @@
  * Copyright 2011-2018 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
-:root {
+ :root {
   --blue: #007bff;
   --indigo: #6610f2;
   --purple: #6f42c1;
@@ -7290,33 +7290,71 @@ body {
   color: #595959;
   background: #fff; }
 
-#page {
-  position: relative;
-  overflow-x: hidden;
-  width: 100%;
-  height: 100%;
-  -moz-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  -webkit-transition: all 0.5s ease;
-  -ms-transition: all 0.5s ease;
-  transition: all 0.5s ease; }
-  .offcanvas #page {
-    overflow: hidden;
-    position: absolute; }
-    .offcanvas #page:after {
-      -moz-transition: all 2s ease;
-      -o-transition: all 2s ease;
-      -webkit-transition: all 2s ease;
-      -ms-transition: all 2s ease;
-      transition: all 2s ease;
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      z-index: 101;
-      background: rgba(0, 0, 0, 0.7);
-      content: ""; }
+  .colorlib-sidebar {
+    width: 250px; /* Chiều rộng sidebar */
+    background: #2c3e50; /* Màu nền */
+    color: #ffffff; /* Màu chữ */
+    position: fixed;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding-top: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .colorlib-sidebar #colorlib-logo a {
+    font-size: 24px;
+    color: #ffffff;
+    text-transform: uppercase;
+    text-align: center;
+    display: block;
+    margin-bottom: 30px;
+    font-weight: bold;
+  }
+  
+  .colorlib-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .colorlib-sidebar ul li {
+    padding: 15px 20px;
+  }
+  
+  .colorlib-sidebar ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    display: block;
+    font-size: 16px;
+    transition: all 0.3s;
+  }
+  
+  .colorlib-sidebar ul li a:hover,
+  .colorlib-sidebar ul li.active a {
+    background: #3498db; /* Màu nền khi hover */
+    color: #ffffff; /* Màu chữ khi hover */
+    border-radius: 5px;
+  }
+  
+  .colorlib-sidebar ul li.cart a {
+    color: #e74c3c; /* Màu đỏ cho giỏ hàng */
+  }
+  
+  body {
+    margin-left: 250px; /* Dời nội dung chính sang bên phải để tránh bị che */
+  }
+  
+  @media (max-width: 768px) {
+    .colorlib-sidebar {
+      width: 200px; /* Giảm chiều rộng cho màn hình nhỏ */
+    }
+  
+    body {
+      margin-left: 200px;
+    }
+  }
+  
 
 a {
   color: #616161;

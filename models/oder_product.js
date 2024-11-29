@@ -1,28 +1,50 @@
 const mongoose = require('mongoose');
 
 const orderProductSchema = new mongoose.Schema({
-    product_id: {
-        type: mongoose.Schema.Types.ObjectId, // Giả sử product_id là một ObjectId từ model khác
-        required: true,
-    },
+    listProduct: [
+        {
+          idProduct: {
+            type: mongoose.Schema.Types.ObjectId,
+          },
+          name: {
+            type: String,
+            default: "Name Product",
+          },
+          quantity: {
+            type: Number,
+            default: 1,
+          },
+          price_import: {
+            type: Number,
+            default: 0.0,
+          },
+          price_selling: {
+            type: Number,
+            default: 0.0,
+          },
+          image: {
+            type: String,
+          },
+        },
+      ],
     user_id: {
         type: mongoose.Schema.Types.ObjectId, // Giả sử user_id cũng là một ObjectId
         required: true,
     },
-    number: {
-        type: Number,
-        required: true,
-    },
-    appointment_date: {
-        type: Date,
+    location:{
+        type: String,
         required: true,
     },
     status: {
         type: String,
-        enum: ['pending', 'confirmed', 'completed', 'canceled'], // Trạng thái của đơn hàng
-        default: 'pending',
+        enum: ["active", "deactive", "pending", "trading", "delivered"],
+        default: "pending",
+      },
+    total_price_import: {
+        type: Number,
+        required: true,
     },
-    price: {
+    total_price_sold: {
         type: Number,
         required: true,
     },
@@ -34,6 +56,18 @@ const orderProductSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now,
+    },
+    timeConfirm: {
+        type: Date,
+    },
+    timeDelivery: {
+        type: Date,
+    },
+    timeCancel: {
+        type: Date,
+    },
+    timeSuccess: {
+        type: Date,
     },
 });
 

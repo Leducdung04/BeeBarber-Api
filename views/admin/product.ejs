@@ -1,0 +1,268 @@
+<!-- Form Container -->
+<div class="form-container">
+    <h2>Thêm Mới Sản Phẩm</h2>
+    <form id="productForm">
+        <label for="productName">Tên Sản Phẩm</label>
+        <input type="text" id="productName" placeholder="Nhập tên sản phẩm" required>
+
+        <label for="productDescription">Mô tả</label>
+        <input type="text" id="productDescription" placeholder="Nhập mô tả" required>
+
+        <label for="importPrice">Giá Nhập</label>
+        <input type="number" id="importPrice" placeholder="Nhập giá nhập" required>
+
+        <label for="productCategory">Thể Loại</label>
+        <select id="productCategory" required>
+            <!-- Options will be dynamically loaded -->
+        </select>
+
+        <label for="sellingPrice">Giá Bán</label>
+        <input type="number" id="sellingPrice" placeholder="Nhập giá bán" required>
+
+        <label for="productImage">Ảnh</label>
+        <input type="file" id="productImage" required>
+
+        <button type="submit">Thêm Sản Phẩm</button>
+    </form>
+</div>
+
+<!-- List Container -->
+<div class="list-container">
+    <h2>Danh Sách Sản Phẩm</h2>
+    <table id="productList">
+        <thead>
+            <tr>
+                <th>Tên</th>
+                <th>Mô tả</th>
+                <th>Thể Loại</th>
+                <th>Giá Nhập</th>
+                <th>Giá Bán</th>
+                <th>Ảnh</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Products will be listed here -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal for Editing Product -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Sửa Sản Phẩm</h2>
+        <form id="editForm">
+            <label for="editProductName">Tên Sản Phẩm</label>
+            <input type="text" id="editProductName" placeholder="Nhập tên sản phẩm" required>
+
+            <label for="editProductDescription">Mô tả</label>
+            <input type="text" id="editProductDescription" placeholder="Nhập mô tả" required>
+
+            <label for="editImportPrice">Giá Nhập</label>
+            <input type="number" id="editImportPrice" placeholder="Nhập giá nhập" required>
+
+            <label for="editSellingPrice">Giá Bán</label>
+            <input type="number" id="editSellingPrice" placeholder="Nhập giá bán" required>
+
+            <label for="category_id">Thể Loại</label>
+            <select id="editProductCategory" required>
+            </select>
+
+            <label for="editProductImage">Ảnh</label>
+            <input type="file" id="editProductImage">
+
+            <button type="submit">Cập nhật</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const apiUrl = 'api/products/get_list_product';
+
+    function fetchProducts() {
+        fetch(apiUrl)
+            .then(response =>
+                response.json())
+            .then(data => {
+                const productList = document.getElementById('productList').getElementsByTagName('tbody')[0];
+                productList.innerHTML = ''; // Clear the list before adding new data
+                data.forEach(product => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                      <td>${truncateText(product.name, 50)}</td>
+                      <td>${truncateText(product.description, 50)}</td> 
+                      <td>${product.category_id.name}</td> 
+                      <td>${product.import_price}</td>
+                      <td>${product.price_selling}</td>
+
+                      <td><img src="${product.image}" alt="${product.name}" width="50"></td>
+                  <td>
+                  <div style="display: flex;flex-direction: row">
+                      <button class="btn-edit" onclick="openEditModal('${product._id}', '${product.name}', '${product.description}', '${product.import_price}', '${product.price_selling}', '${product.category_id}', '${product.image}')">Sửa</button>
+                      <button class="btn-delete" onclick="deleteProduct('${product._id}')">Ẩn</button>
+                  </div>
+                  </td>
+      `;
+                    productList.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching products:', error));
+
+    }
+
+    // Handle adding new product
+    const productForm = document.getElementById('productForm');
+    productForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const name = document.getElementById('productName').value;
+        const description = document.getElementById('productDescription').value;
+        const import_price = document.getElementById('importPrice').value;
+        const price_selling = document.getElementById('sellingPrice').value;
+        const image = document.getElementById('productImage').files[0];
+        const category_id = document.getElementById('productCategory').value;
+
+
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('description', description);
+        formData.append('import_price', import_price);
+        formData.append('price_selling', price_selling);
+        formData.append('image', image);
+        formData.append('category_id', category_id);
+
+        fetch('/products/add_product', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                fetchProducts();
+                productForm.reset();
+
+            })
+            .catch(error => console.error('Error adding product:', error));
+    });
+
+    // Handle edit product modal
+    function openEditModal(id, name, description, import_price, price_selling, category_id, image) {
+        // Populate form fields with current product data
+        document.getElementById('editProductName').value = name;
+        document.getElementById('editProductDescription').value = description;
+        document.getElementById('editImportPrice').value = import_price;
+        document.getElementById('editSellingPrice').value = price_selling;
+        document.getElementById('editProductImage').value = ''; // Clear file input
+
+        // Fetch categories for the dropdown
+        const categoryDropdown = document.getElementById('editProductCategory');
+        fetch('api/categoryProducts/get_list_Category_Product')
+            .then(response => response.json())
+            .then(categories => {
+                // Clear existing options
+                categoryDropdown.innerHTML = '<option value="">Chọn Thể Loại</option>';
+
+                // Populate dropdown with categories
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category._id;
+                    option.textContent = category.name;
+                    if (category._id === category_id) {
+                        option.selected = true; // Set selected category
+                    }
+                    categoryDropdown.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching categories:', error));
+
+        // Show the modal
+        const modal = document.getElementById('editModal');
+        modal.style.display = "block";
+
+        // Handle form submission
+        const editForm = document.getElementById('editForm');
+        editForm.onsubmit = function (e) {
+            e.preventDefault();
+
+            const editName = document.getElementById('editProductName').value;
+            const editDescription = document.getElementById('editProductDescription').value;
+            const editImportPrice = document.getElementById('editImportPrice').value;
+            const editSellingPrice = document.getElementById('editSellingPrice').value;
+            const editImage = document.getElementById('editProductImage').files[0];
+            const editCategory = categoryDropdown.value; // Get selected category
+
+            const editData = new FormData();
+            editData.append('id', id);
+            editData.append('name', editName);
+            editData.append('description', editDescription);
+            editData.append('import_price', editImportPrice);
+            editData.append('price_selling', editSellingPrice);
+            editData.append('category_id', editCategory);
+            if (editImage) {
+                editData.append('image', editImage);
+            }
+
+            fetch(`api/products/update_product/${id}`, {
+                method: 'PUT',
+                body: editData
+            })
+                .then(response => response.json())
+                .then(data => {
+
+                    fetchProducts();
+                    closeModal(); // Close the modal
+
+                })
+                .catch(error => console.error('Error updating product:', error));
+        };
+    }
+
+    function truncateText(text, maxLength) {
+        if (text.length > maxLength) {
+            return text.substring(0, maxLength) + '...';
+        }
+        return text;
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('editModal');
+        modal.style.display = "none";
+    }
+
+    function fetchCategoriesForDropdown() {
+        const categoryDropdown = document.getElementById('productCategory');
+        fetch('api/categoryProducts/get_list_Category_Product')
+            .then(response => response.json())
+            .then(data => {
+                categoryDropdown.innerHTML = '<option value="">Chọn Thể Loại</option>';
+                data.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category._id;
+                    option.textContent = category.name;
+                    categoryDropdown.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching categories:', error));
+    }
+
+
+    // Handle delete product
+    function deleteProduct(id) {
+        fetch(`api/products/delete_product/${id}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    fetchProducts();
+                } else {
+                    alert('Có lỗi xảy ra khi xóa sản phẩm');
+                }
+            })
+            .catch(error => console.error('Error deleting product:', error));
+    }
+    fetchCategoriesForDropdown();
+
+    fetchProducts();
+</script>
