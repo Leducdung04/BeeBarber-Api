@@ -10,14 +10,14 @@ const userSchema = new mongoose.Schema({
   loyaltyPoints: { type: Number, default: 0 },
   status: { type: Boolean, default: true },
   location: {
-    province: { type: String, required: true, trim: true }, // Tỉnh/Thành phố
-    district: { type: String, required: true, trim: true }, // Quận/Huyện
-    commune: { type: String, required: true, trim: true },     // Xã/Thị trấn
-    street: { type: String, required: false, trim: true },  // Tòa nhà/Tên đường (không bắt buộc)
+    province: { type: String, trim: true }, // Tỉnh/Thành phố
+    district: { type: String, trim: true }, // Quận/Huyện
+    commune: { type: String, trim: true },     // Xã/Thị trấn
+    street: { type: String, trim: true },  // Tòa nhà/Tên đường (không bắt buộc)
   },
   deviceTokens: { type: String, default: null },
 });
-
+  
 // Tạo model từ schema
 const User = mongoose.model("User", userSchema);
 
