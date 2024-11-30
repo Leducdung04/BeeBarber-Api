@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 // Định nghĩa schema cho Barber
 const barberSchema = new mongoose.Schema({
+  phone:{
+    type:String,
+    require:true
+  },
   name: {
     type: String, 
     required: true, 
@@ -14,10 +18,24 @@ const barberSchema = new mongoose.Schema({
     type: String, 
     default: null 
   },
-  status: { 
-    type: Boolean, 
-    default: true  
-  }
+  workingHours: {
+    monday: { start: String, end: String },
+    tuesday: { start: String, end: String },
+    wednesday: { start: String, end: String },
+    thursday: { start: String, end: String },
+    friday: { start: String, end: String },
+    saturday: { start: String, end: String },
+    sunday: { start: String, end: String },
+},
+  status: {
+    type: String,
+    enum: ["Active", "Inactive"],
+    default: "Active",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+},
 });
 
 // Tạo model từ schema
