@@ -75,7 +75,7 @@ router.post('/categoryProducts/add_category_product',Upload.single("image"),add_
 router.get('/categoryProducts/get_category_product/:id', getCategoryProduct)
 router.get('/categoryProducts/update_status_category_product/:id', changeStatusCategoryProduct)
 router.delete('/categoryProducts/delete_category_product/:id',deleteCategoryProduct)
-router.put("/categoryProducts/update_category_product/:id",update_Category_Product)
+router.put("/categoryProducts/update_category_product/:id",Upload.single("image"),update_Category_Product)
 
 // RESTful API cho Review 
 router.post('/reviews', createReview);

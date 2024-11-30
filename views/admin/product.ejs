@@ -29,7 +29,7 @@
         <div class="modal-content">
             <span class="close" onclick="closeEditModal()">&times;</span>
             <h2>Sửa Sản Phẩm</h2>
-            <form id="editForm">
+            <form id="editForm" enctype="multipart/form-data">
                 <label for="editProductName">Tên Sản Phẩm</label>
                 <input type="text" id="editProductName" placeholder="Nhập tên sản phẩm" required>
 
@@ -46,8 +46,9 @@
                 <select id="editProductCategory" class="input-field" required>
                 </select>
 
-                <label for="editProductImage">Ảnh</label>
-                <input type="file" id="editProductImage">
+                <label for="editImage">Ảnh</label>
+                <input type="file" id="editImage">
+                <img id="currentImagePreview" src="" alt="Current Image" width="50" style="display:none;">
 
                 <button type="submit">Cập nhật</button>
             </form>
@@ -59,7 +60,7 @@
         <div class="modal-content">
             <span class="close" onclick="closeAddModal()">&times;</span>
             <h2>Thêm Mới Sản Phẩm</h2>
-            <form id="productForm">
+            <form id="productForm" enctype="multipart/form-data">
                 <label for="productName">Tên Sản Phẩm</label>
                 <input type="text" id="productName" placeholder="Nhập tên sản phẩm" required>
 
@@ -156,7 +157,7 @@
                       <td><img src="${product.image}" alt="${product.name}" width="100"></td>
                   <td>
                   <div style="button-group">
-                      <button class="btn-edit" onclick="openEditModal('${product._id}', '${product.name}', '${product.description}', '${product.import_price}', '${product.price_selling}', '${product.category_id}', '${product.image}')">Sửa</button>
+                      <button class="btn-edit" onclick="openEditModal('${product._id}', '${product.name}', '${product.description}', '${product.import_price}', '${product.price_selling}', '${product.category_id._id}', '${product.image}')">Sửa</button>
                       <button class="btn-delete" onclick="deleteProduct('${product._id}')">Ẩn</button>
                   </div>
                   </td>
@@ -198,73 +199,74 @@
             .catch(error => console.error('Error adding product:', error));
     });
 
-    // Handle edit product modal
     function openEditModal(id, name, description, import_price, price_selling, category_id, image) {
-        // Populate form fields with current product data
         document.getElementById('editProductName').value = name;
         document.getElementById('editProductDescription').value = description;
         document.getElementById('editImportPrice').value = import_price;
         document.getElementById('editSellingPrice').value = price_selling;
-        document.getElementById('editProductImage').value = ''; // Clear file input
+        console.log(category_id,"is");
+        const imagePreview = document.getElementById('currentImagePreview');
+        if (image) {
+            imagePreview.src = image; 
+            imagePreview.style.display = 'block'; 
+        } else {
+            imagePreview.style.display = 'none'; 
+        }
 
-        // Fetch categories for the dropdown
         const categoryDropdown = document.getElementById('editProductCategory');
         fetch('api/categoryProducts/get_list_Category_Product')
             .then(response => response.json())
             .then(categories => {
-                // Clear existing options
                 categoryDropdown.innerHTML = '<option value="">Chọn Thể Loại</option>';
 
-                // Populate dropdown with categories
                 categories.forEach(category => {
+                    console.log(category,"is");
+                    
                     const option = document.createElement('option');
                     option.value = category._id;
                     option.textContent = category.name;
+
                     if (category._id === category_id) {
-                        option.selected = true; // Set selected category
+                        option.selected = true;
                     }
+
                     categoryDropdown.appendChild(option);
                 });
             })
             .catch(error => console.error('Error fetching categories:', error));
-
-        // Show the modal
         const modal = document.getElementById('editModal');
         modal.style.display = "flex";
-
-        // Handle form submission
+        
         const editForm = document.getElementById('editForm');
         editForm.onsubmit = function (e) {
             e.preventDefault();
 
-            const editName = document.getElementById('editProductName').value;
-            const editDescription = document.getElementById('editProductDescription').value;
-            const editImportPrice = document.getElementById('editImportPrice').value;
-            const editSellingPrice = document.getElementById('editSellingPrice').value;
-            const editImage = document.getElementById('editProductImage').files[0];
-            const editCategory = categoryDropdown.value; // Get selected category
+            const updatedName = document.getElementById('editProductName').value;
+            const updatedDescription = document.getElementById('editProductDescription').value;
+            const updatedImportPrice = document.getElementById('editImportPrice').value;
+            const updatedSellingPrice = document.getElementById('editSellingPrice').value;
+            const updatedImage = document.getElementById('editImage').files[0];
+            const updatedCategoryId = categoryDropdown.value;
 
-            const editData = new FormData();
-            editData.append('id', id);
-            editData.append('name', editName);
-            editData.append('description', editDescription);
-            editData.append('import_price', editImportPrice);
-            editData.append('price_selling', editSellingPrice);
-            editData.append('category_id', editCategory);
-            if (editImage) {
-                editData.append('image', editImage);
+            const formData = new FormData();
+            formData.append('name', updatedName);
+            formData.append('description', updatedDescription);
+            formData.append('import_price', updatedImportPrice);
+            formData.append('price_selling', updatedSellingPrice);
+            formData.append('category_id', updatedCategoryId);
+            if (updatedImage) {
+                formData.append('image', updatedImage);
             }
 
             fetch(`api/products/update_product/${id}`, {
                 method: 'PUT',
-                body: editData
+                body: formData
             })
                 .then(response => response.json())
                 .then(data => {
-
-                    fetchProducts();
-                    modal.style.display = "none";
-
+                    console.log('Product updated:', data);
+                    fetchProducts(); 
+                    modal.style.display = "none"; 
                 })
                 .catch(error => console.error('Error updating product:', error));
         };
