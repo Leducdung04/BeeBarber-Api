@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
     default: false
   }
 });
-
+  
 // Tạo model từ schema
 const User = mongoose.model("User", userSchema);
 
