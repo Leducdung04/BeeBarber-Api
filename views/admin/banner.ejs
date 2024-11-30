@@ -1,36 +1,35 @@
-<h1 style="margin: 24px;">Quản lý Banner</h1>
-<div  class="container">
-    <!-- Form to Add or Edit Banner -->
-    
-    <div class="form-container">
-        <h2 id="form-title">Add Banner</h2>
-        <div class="form-group">
-            <label for="imageFile">Select Image:</label>
-            <input type="file" id="imageFile" class="input-field">
+<div class="container">
+    <h2>Danh Sách Banner</h2>
+    <div class="grid-container">
+        <div class="form-container">
+            <h2 id="form-title">Thêm Banner</h2>
+            <div class="form-group">
+                <label for="imageFile">Chọn ảnh:</label>
+                <input type="file" id="imageFile" class="input-field">
+            </div>
+            <div class="form-group">
+                <label for="status">Trạng thái:</label>
+                <select id="status" class="input-field">
+                    <option value="true">Hoạt động</option>
+                    <option value="false">Không hoạt động</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="target_screen">Màn hình mục tiêu:</label>
+                <select id="target_screen" class="input-field">
+                    <option value="mobile">Di động</option>
+                    <option value="barber">Barber</option>
+                    <option value="product">Sản phẩm</option>
+                    <option value="hairstyle">Kiểu tóc</option>
+                </select>
+            </div>
+            <button class="btn-add" id="submit-btn" onclick="addBanner()">Thêm Banner</button>
+            <button class="btn-cancel" id="cancel-btn" onclick="cancelEdit()">Hủy</button>
         </div>
-        <div class="form-group">
-            <label for="status">Status:</label>
-            <select id="status" class="input-field">
-                <option value="true">Active</option>
-                <option value="false">Inactive</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="target_screen">Target Screen:</label>
-            <select id="target_screen" class="input-field">
-                <option value="mobile">Mobile</option>
-                <option value="barber">Barber</option>
-                <option value="product">Product</option>
-                <option value="hairstyle">Hairstyle</option>
-            </select>
-        </div>
-        <button class="btn-add" id="submit-btn" onclick="addBanner()">Add Banner</button>
-        <button class="btn-cancel" id="cancel-btn" onclick="cancelEdit()" style="display: none;">Cancel</button>
-    </div>
 
-    <!-- Banner List -->
-    <div class="banner-list-container" id="banner-list">
-        <!-- Banner items will be dynamically added here -->
+        <div class="banner-list-container" id="banner-list">
+            <!-- Banner items will be dynamically added here -->
+        </div>
     </div>
 </div>
 

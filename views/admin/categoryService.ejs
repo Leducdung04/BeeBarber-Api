@@ -1,25 +1,10 @@
 <div class="container">
-    <!-- Form Container -->
-    <div class="form-container">
-        <h2>Thêm Mới Category</h2>
-        <form id="categoryForm">
-            <label for="name">Tên Category</label>
-            <input type="text" id="name" placeholder="Nhập tên category" required>
-
-            <label for="description">Mô tả</label>
-            <input type="text" id="description" placeholder="Nhập mô tả" required>
-
-            <label for="image">Ảnh</label>
-            <input type="file" id="image" required>
-
-            <button type="submit">Thêm Category</button>
-        </form>
-    </div>
-
-    <!-- List Container -->
     <div class="list-container">
-        <h2>Danh Sách Category</h2>
-        <table id="categoryList">
+        <div class="list-header">
+            <h2>Danh Sách Thể Loại Dịch Vụ </h2>
+            <button onclick="openAddModal()">Thêm Thể Loại Dịch Vụ </button>
+        </div>
+        <table id="categoryServiceList">
             <thead>
                 <tr>
                     <th>Tên</th>
@@ -32,59 +17,120 @@
                 <!-- Categories will be listed here -->
             </tbody>
         </table>
+        <div id="pagination" class="pagination"></div>
+    </div>
+    <!-- Modal for Editing Category -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2>Sửa Category</h2>
+            <form id="editForm">
+                <label for="editName">Tên Category</label>
+                <input type="text" id="editName" placeholder="Nhập tên category" required>
+
+                <label for="editDescription">Mô tả</label>
+                <input type="text" id="editDescription" placeholder="Nhập mô tả" required>
+
+                <label for="editImage">Ảnh</label>
+                <input type="file" id="editImage">
+
+                <button type="submit">Cập nhật</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="categoryServiceModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddModal()">&times;</span>
+            <h2>Thêm Mới Thể Loại Dịch Vụ</h2>
+            <form id="categoryServiceForm">
+                <label for="name">Tên Category</label>
+                <input type="text" id="name" placeholder="Nhập tên category" required>
+
+                <label for="description">Mô tả</label>
+                <input type="text" id="description" placeholder="Nhập mô tả" required>
+
+                <label for="image">Ảnh</label>
+                <input type="file" id="image" required>
+
+                <button type="submit">Thêm Category</button>
+            </form>
+        </div>
     </div>
 </div>
-
-<!-- Modal for Editing Category -->
-<div id="editModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h2>Sửa Category</h2>
-        <form id="editForm">
-            <label for="editName">Tên Category</label>
-            <input type="text" id="editName" placeholder="Nhập tên category" required>
-
-            <label for="editDescription">Mô tả</label>
-            <input type="text" id="editDescription" placeholder="Nhập mô tả" required>
-
-            <label for="editImage">Ảnh</label>
-            <input type="file" id="editImage">
-
-            <button type="submit">Cập nhật</button>
-        </form>
-    </div>
-</div>
-
 <script>
     const apiUrl = 'api/categorys/get_list_category';
+    let categoryServices = [];
+    let currentPage = 1;
+    const limit = 5;
+    var addModal = document.getElementById("categoryServiceModal");
+    var editModal = document.getElementById("editModal");
+    var closeBtn = document.getElementById("closeModal")
+
+
+    function openAddModal() {
+        editModal.style.display = "none";
+        addModal.style.display = "flex";
+    }
+
+
+    function closeAddModal() {
+        const modal = document.getElementById('categoryServiceModal');
+        console.log(modal);
+        if (modal) {
+            modal.style.display = "none";
+        } else {
+            console.error("Add Modal not found!");
+        }
+    }
+
+    function closeEditModal() {
+        const modal = document.getElementById('editModal');
+        console.log(modal);
+
+        if (modal) {
+            modal.style.display = "none";
+        } else {
+            console.error("Edit Modal not found!");
+        }
+    }
 
     function fetchCategories() {
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
-                const categoryList = document.getElementById('categoryList').getElementsByTagName('tbody')[0];
-                categoryList.innerHTML = ''; // Clear the list before adding new data
-                data.forEach(category => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
+                categoryServices = data
+                renderCategoryService()
+                renderPagination()
+            })
+            .catch(error => console.error('Error fetching categories:', error));
+    }
+
+    function renderCategoryService() {
+        const categoryList = document.getElementById('categoryServiceList').getElementsByTagName('tbody')[0];
+        categoryList.innerHTML = '';
+        const startIndex = (currentPage - 1) * limit;
+        const endIndex = startIndex + limit;
+        const paginatedCategoryService = categoryServices.slice(startIndex, endIndex);
+        paginatedCategoryService.forEach(category => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
                         <td>${category.name}</td>
                         <td>${category.description}</td>
-                        <td><img src="${category.image}" alt="${category.name}" width="50"></td>
+                        <td><img src="${category.image}" alt="${category.name}" width="100"></td>
                         <td>
-                            <div style="display: flex;flex-direction: row">
+                            <div class="button-group">
                             <button class="btn-edit" onclick="openEditModal('${category._id}', '${category.name}', '${category.description}', '${category.image}')">Sửa</button>
                             <button class="btn-delete" onclick="deleteCategory('${category._id}')">Ẩn</button>
                             </div>
                         </td>
                     `;
-                    categoryList.appendChild(row);
-                });
-            })
-            .catch(error => console.error('Error fetching categories:', error));
+            categoryList.appendChild(row);
+        });
     }
 
     // Handle adding new category
-    const categoryForm = document.getElementById('categoryForm');
+    const categoryForm = document.getElementById('categoryServiceForm');
     categoryForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
@@ -103,15 +149,30 @@
         })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    fetchCategories(); // Reload category list
-                    categoryForm.reset(); // Reset form
-                } else {
-                    alert('Có lỗi xảy ra khi thêm category');
-                }
+                fetchCategories();
+                categoryForm.reset();
             })
             .catch(error => console.error('Error adding category:', error));
     });
+
+
+    function renderPagination() {
+        const paginationContainer = document.getElementById('pagination');
+        paginationContainer.innerHTML = '';
+
+        const totalPages = Math.ceil(categoryServices.length / limit);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.innerText = i;
+            pageButton.className = i === currentPage ? 'active' : '';
+            pageButton.onclick = () => {
+                currentPage = i;
+                renderCategoryService(); // Render selected page
+            };
+            paginationContainer.appendChild(pageButton);
+        }
+    }
 
     // Handle edit category modal
     function openEditModal(id, name, description, image) {
@@ -120,7 +181,7 @@
         document.getElementById('editImage').value = ''; // Clear file input
 
         const modal = document.getElementById('editModal');
-        modal.style.display = "block";
+        modal.style.display = "flex";
 
         const editForm = document.getElementById('editForm');
         editForm.onsubmit = function (e) {
@@ -132,7 +193,7 @@
 
             const editData = new FormData();
             editData.append('id', id);
-            
+
             editData.append('name', editName);
             editData.append('description', editDescription);
             if (editImage) {
@@ -140,14 +201,14 @@
             }
 
             fetch(`api/categorys/update_category/${id}`, {
-                method: 'POST',
+                method: 'PUT',
                 body: editData
             })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         fetchCategories();
-                        closeModal(); // Close the modal
+                        editModal.style.display = "none";
                     } else {
                         alert('Có lỗi xảy ra khi cập nhật category');
                     }
@@ -156,11 +217,6 @@
         };
     }
 
-    // Close the edit modal
-    function closeModal() {
-        const modal = document.getElementById('editModal');
-        modal.style.display = "none";
-    }
 
     // Handle delete category
     function deleteCategory(id) {
