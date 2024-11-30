@@ -27,7 +27,7 @@
         <div class="modal-content">
             <span class="close" onclick="closeEditModal()">&times;</span>
             <h2>Sửa Thể Loại Sản Phẩm</h2>
-            <form id="editForm">
+            <form id="editForm" enctype="multipart/form-data">
                 <label for="editName">Tên Thể Loại Sản Phẩm</label>
                 <input type="text" id="editName" placeholder="Nhập tên category product" required>
 
@@ -42,6 +42,7 @@
 
                 <label for="editImage">Ảnh</label>
                 <input type="file" id="editImage">
+                <img id="currentImagePreview" src="" alt="Current Image" width="50" style="display:none;">
 
                 <button type="submit">Cập nhật</button>
             </form>
@@ -53,7 +54,7 @@
         <div class="modal-content">
             <span class="close" onclick="closeAddModal()">&times;</span>
             <h2>Thêm Mới Category Product</h2>
-            <form id="categoryProductForm">
+            <form id="categoryProductForm" enctype="multipart/form-data">
                 <label for="name">Tên Category Product</label>
                 <input type="text" id="name" placeholder="Nhập tên category product" required>
 
@@ -196,43 +197,59 @@
     }
 
 
-    // Handle edit category product modal
     function openEditModal(id, name, description, status, image) {
         document.getElementById('editName').value = name;
         document.getElementById('editDescription').value = description;
         document.getElementById('editStatus').value = status ? 'true' : 'false';
-        document.getElementById('editImage').value = '';
 
+        const imagePreview = document.getElementById('currentImagePreview');
+        if (image) {
+            imagePreview.src = image; // Set the source of the image preview
+            imagePreview.style.display = 'block'; // Show the preview
+        } else {
+            imagePreview.style.display = 'none'; // Hide the preview if no image is provided
+        }
+
+        // Show the modal
         const modal = document.getElementById('editModal');
         modal.style.display = "flex";
 
+        // Handle form submission
         const editForm = document.getElementById('editForm');
         editForm.onsubmit = function (e) {
             e.preventDefault();
 
+            // Gather updated data from the form fields
             const updatedName = document.getElementById('editName').value;
             const updatedDescription = document.getElementById('editDescription').value;
             const updatedStatus = document.getElementById('editStatus').value === 'true';
             const updatedImage = document.getElementById('editImage').files[0];
 
+            // Create a FormData object for the updated data
             const formData = new FormData();
             formData.append('name', updatedName);
             formData.append('description', updatedDescription);
             formData.append('status', updatedStatus);
-            if (updatedImage) formData.append('image', updatedImage);
+            if (updatedImage) {
+                formData.append('image', updatedImage);
+            }
 
+            // Send the PUT request to update the category product
             fetch(`api/categoryProducts/update_category_product/${id}`, {
                 method: 'PUT',
                 body: formData
             })
                 .then(response => response.json())
                 .then(data => {
-                    fetchCategoryProducts();
-                    modal.style.display = "none";
+                    console.log('Category product updated:', data);
+                    fetchCategoryProducts(); // Refresh the category product list
+                    modal.style.display = "none"; // Close the modal
                 })
                 .catch(error => console.error('Error updating category product:', error));
         };
     }
+
+
     function deleteCategoryProduct(id) {
         fetch(`api/categoryProducts/delete_category_product/${id}`, {
             method: 'DELETE'
@@ -244,5 +261,5 @@
             .catch(error => console.error('Error deleting category product:', error));
     }
 
-    window.onload = fetchCategoryProducts;
+    fetchCategoryProducts();
 </script>

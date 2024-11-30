@@ -26,16 +26,16 @@
     </div>
 
     <!-- Modal for Editing Service -->
-    <div id="editModal" class="modal">
+    <div id="editModal" class="modal" >
         <div class="modal-content">
             <span class="close" onclick="closeEditModal()">&times;</span>
             <h2>Sửa Dịch Vụ</h2>
-            <form id="editForm">
+            <form id="editForm" enctype="multipart/form-data">
                 <label for="editName">Tên Dịch Vụ</label>
                 <input type="text" id="editName" placeholder="Nhập tên dịch vụ" required>
 
                 <label for="editIdCategory">Danh mục</label>
-                <select id="editIdCategory" class="input-field"  required>
+                <select id="editIdCategory" class="input-field" required>
                     <!-- Dynamic category options will be populated here -->
                 </select>
 
@@ -48,24 +48,19 @@
                 <label for="editDuration">Thời lượng (phút)</label>
                 <input type="number" id="editDuration" placeholder="Nhập thời lượng" min="0" required>
 
-                <label for="editImages">Ảnh</label>
-                <div class="image-container">
-                    <input type="file" accept="image/png, image/jpeg, image/jpg" id="editFileInput" name="anhSanPham"
-                        style="display:none" />
-                    <input type="text" id="editFileChosen" placeholder="Chọn Ảnh Sản Phẩm" readonly />
-                    <button type="button" class="imageButton" onclick="triggerFileInput()">Chọn Ảnh</button>
-                </div>
+                <label for="editImage">Ảnh</label>
+                <input type="file" id="editImage">
+                <img id="currentImagePreview" src="" alt="Current Image" width="50" style="display:none;">
                 <button type="submit">Cập nhật</button>
             </form>
         </div>
     </div>
 
     <div id="serviceModal" class="modal">
-        <div class="modal-content">
-
+        <div class="modal-content" >
             <span class="close" onclick="closeAddModal()">&times;</span>
             <h2>Thêm Mới Dịch Vụ</h2>
-            <form id="serviceForm">
+            <form id="serviceForm" enctype="multipart/form-data">
                 <label for="name">Tên Dịch Vụ</label>
                 <input type="text" id="name" placeholder="Nhập tên dịch vụ" required>
 
@@ -93,7 +88,7 @@
 </div>
 <script type="text/javascript">
     const apiUrl = 'api/services/get_list_service';
-    let services = []; 
+    let services = [];
     let currentPage = 1;
     const limit = 5;
     var addModal = document.getElementById("serviceModal");
@@ -104,7 +99,6 @@
         editModal.style.display = "none";
         addModal.style.display = "flex";
     }
-
 
     function closeAddModal() {
         const modal = document.getElementById('serviceModal');
@@ -119,7 +113,7 @@
     function closeEditModal() {
         const modal = document.getElementById('editModal');
         console.log(modal);
-        
+
         if (modal) {
             modal.style.display = "none";
         } else {
@@ -148,14 +142,13 @@
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
-                services = data; // Store fetched data
-                renderServices(); // Render the first page
+                services = data;
+                renderServices();
                 renderPagination();
             })
             .catch(error => console.error('Error fetching services:', error));
     }
 
-    // Render services for the current page
     function renderServices() {
         const serviceList = document.getElementById('serviceList').getElementsByTagName('tbody')[0];
         serviceList.innerHTML = '';
@@ -179,8 +172,8 @@
                     <button class="btn-edit" onclick="openEditModal('${service._id}', '${service.name}', '${service.id_category._id}', '${service.description}', ${service.price}, ${service.duration}, '${service.images}', ${service.status})">Sửa</button>
                     <button class="btn-delete" onclick="deleteService('${service._id}')">Xóa</button>
                 </div>
-            </td>
-        `;
+            </td>`
+                ;
             serviceList.appendChild(row);
         });
     }
@@ -204,23 +197,38 @@
         }
     }
 
-    // Add new service
     const serviceForm = document.getElementById('serviceForm');
     serviceForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        const formData = new FormData(serviceForm);
+        const name = document.getElementById('name').value;
+        const id_category = document.getElementById('id_category').value;
+        const description = document.getElementById('description').value;
+        const price = document.getElementById('price').value;
+        const duration = document.getElementById('duration').value;
+        const image = document.getElementById('images').files[0];
+
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('id_category', id_category);
+        formData.append('description', description);
+        formData.append('price', price);
+        formData.append('duration', duration);
+        formData.append('images', image);
+
         fetch('api/services/add_service', {
             method: 'POST',
-            body: formData
+            body: formData,
         })
             .then(response => response.json())
             .then(data => {
                 fetchServices();
+                closeAddModal();
                 serviceForm.reset();
             })
             .catch(error => console.error('Error adding service:', error));
     });
+
 
     function truncateText(text, maxLength) {
         if (text.length > maxLength) {
@@ -229,55 +237,61 @@
         return text;
     }
 
-    // Edit service modal
-    function openEditModal(id, name, id_category, description, price, duration, images, status) {
+    function openEditModal(id, name, id_category, description, price, duration, images) {
         document.getElementById('editName').value = name;
-        document.getElementById('editIdCategory').value = id_category;
         document.getElementById('editDescription').value = description;
         document.getElementById('editPrice').value = price;
         document.getElementById('editDuration').value = duration;
+        document.getElementById('editIdCategory').value = id_category;
 
-        // Display current image file name in the visible input
-        document.getElementById('editFileChosen').value = images.split('/').pop(); // Extract file name from path
-        document.getElementById('editFileInput').value = null; // Clear file input for new selection
+        const imagePreview = document.getElementById('currentImagePreview');
+        if (images) {
+            imagePreview.src = images;
+            imagePreview.style.display = 'block';
+        } else {
+            imagePreview.style.display = 'none';
+        }
 
-        // Open the modal
         const modal = document.getElementById('editModal');
-        modal.style.display = "flex"; // Ensure modal is visible and styled properly
+        modal.style.display = "flex";
 
-        // Attach submission handler for the edit form
         const editForm = document.getElementById('editForm');
         editForm.onsubmit = function (e) {
             e.preventDefault();
+            const updatedName = document.getElementById('editName').value;
+            const updatedDescription = document.getElementById('editDescription').value;
+            const updatedPrice = document.getElementById('editPrice').value;
+            const updatedDuration = document.getElementById('editDuration').value;
+            const updatedIdCategory = document.getElementById('editIdCategory').value;
+            const updatedImage = document.getElementById('editImage').files[0];
 
-            // Collect updated data
-            const updatedData = new FormData(editForm);
 
-            // Perform the update request
+            const formData = new FormData();
+            formData.append('name', updatedName);
+            formData.append('description', updatedDescription);
+            formData.append('price', updatedPrice);
+            formData.append('duration', updatedDuration);
+            formData.append('id_category', updatedIdCategory);
+            if (updatedImage) {
+                formData.append('images', updatedImage);
+            }
             fetch(`api/services/update_service/${id}`, {
                 method: 'PUT',
-                body: updatedData,
+                body: formData
             })
-                .then(response => response.json())
+                .then(
+                    response => response.json()
+                )
                 .then(data => {
-                    fetchServices(); // Refresh the service list
-                    modal.style.display = "none"; // Close modal on success
+                    console.log('Update response:', data);
+                    fetchServices();
+                    modal.style.display = "none";
                 })
-                .catch(error => console.error('Error updating service:', error));
+                .catch(error => {
+                    console.error('Error updating service:', error);
+                });
         };
     }
-
-    function triggerFileInput() {
-        const fileInput = document.getElementById('editFileInput');
-        fileInput.click();
-
-        // Update visible text input with the selected file name
-        fileInput.onchange = () => {
-            const fileName = fileInput.files[0]?.name || "Chưa chọn tệp";
-            document.getElementById('editFileChosen').value = fileName;
-        };
-    }
-
 
 
     function deleteService(id) {
@@ -290,12 +304,7 @@
             })
             .catch(error => console.error('Error deleting service:', error));
     }
-
     // Initialize page
-    window.onload = function () {
-        fetchCategories();
-        fetchServices();
-    };
-
-
+    fetchCategories();
+    fetchServices();
 </script>

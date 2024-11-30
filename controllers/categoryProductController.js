@@ -1,4 +1,5 @@
 const Category_Product = require("../models/categoryProduct");
+const mongoose = require("mongoose");
 
 exports.get_list_Category_Product = async (req, res, next) => {
   try {
@@ -38,16 +39,40 @@ exports.add_Category_Product = async (req, res, next) => {
 
 exports.update_Category_Product = async (req, res, next) => {
   try {
-    const result = await Category_Product.findOneAndUpdate(
-      { _id: req.params.id },
-      req.body,
+    const { id } = req.params;
+    const { name, description, status } = req.body;
+
+    // Check if ID is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID không hợp lệ!" });
+    }
+
+    // Check if the category product exists
+    const currentCategoryProduct = await Category_Product.findById(id);
+    if (!currentCategoryProduct) {
+      return res.status(404).json({ message: "Thể loại sản phẩm không tồn tại" });
+    }
+
+    // Handle image upload if a new file is provided
+    let image = currentCategoryProduct.image;
+    if (req.file) {
+      image = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+    }
+
+    // Update the category product with new data
+    const updatedCategoryProduct = await Category_Product.findByIdAndUpdate(
+      id,
+      { name, description, status, image },
       { new: true }
     );
-    res.status(201).json(result);
+
+    res.status(200).json(updatedCategoryProduct);
   } catch (error) {
-    res.status(400).json({ msg: error.message });
+    console.error(error);
+    res.status(500).json({ message: "Lỗi server, vui lòng thử lại sau" });
   }
 };
+
 
 exports.getCategoryProduct = async (req,res)=>{
   try {
