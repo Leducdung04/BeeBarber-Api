@@ -1,118 +1,170 @@
-<!-- Form Container -->
-<div class="form-container">
-    <h2>Thêm Mới Sản Phẩm</h2>
-    <form id="productForm">
-        <label for="productName">Tên Sản Phẩm</label>
-        <input type="text" id="productName" placeholder="Nhập tên sản phẩm" required>
+<div class="container">
+    <!-- List Container -->
+    <div class="list-container">
+        <div class="list-header">
+            <h2>Danh Sách Sản Phẩm</h2>
+            <button onclick="openAddModal()">Thêm Sản Phẩm</button>
+        </div>
+        <table id="productList">
+            <thead>
+                <tr>
+                    <th>Tên</th>
+                    <th>Mô tả</th>
+                    <th>Thể Loại</th>
+                    <th>Giá Nhập</th>
+                    <th>Giá Bán</th>
+                    <th>Ảnh</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Products will be listed here -->
+            </tbody>
+        </table>
+        <div id="pagination" class="pagination"></div>
+    </div>
 
-        <label for="productDescription">Mô tả</label>
-        <input type="text" id="productDescription" placeholder="Nhập mô tả" required>
+    <!-- Modal for Editing Product -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2>Sửa Sản Phẩm</h2>
+            <form id="editForm">
+                <label for="editProductName">Tên Sản Phẩm</label>
+                <input type="text" id="editProductName" placeholder="Nhập tên sản phẩm" required>
 
-        <label for="importPrice">Giá Nhập</label>
-        <input type="number" id="importPrice" placeholder="Nhập giá nhập" required>
+                <label for="editProductDescription">Mô tả</label>
+                <input type="text" id="editProductDescription" placeholder="Nhập mô tả" required>
 
-        <label for="productCategory">Thể Loại</label>
-        <select id="productCategory" required>
-            <!-- Options will be dynamically loaded -->
-        </select>
+                <label for="editImportPrice">Giá Nhập</label>
+                <input type="number" id="editImportPrice" placeholder="Nhập giá nhập" required>
 
-        <label for="sellingPrice">Giá Bán</label>
-        <input type="number" id="sellingPrice" placeholder="Nhập giá bán" required>
+                <label for="editSellingPrice">Giá Bán</label>
+                <input type="number" id="editSellingPrice" placeholder="Nhập giá bán" required>
 
-        <label for="productImage">Ảnh</label>
-        <input type="file" id="productImage" required>
+                <label for="category_id">Thể Loại</label>
+                <select id="editProductCategory" class="input-field" required>
+                </select>
 
-        <button type="submit">Thêm Sản Phẩm</button>
-    </form>
-</div>
+                <label for="editProductImage">Ảnh</label>
+                <input type="file" id="editProductImage">
 
-<!-- List Container -->
-<div class="list-container">
-    <h2>Danh Sách Sản Phẩm</h2>
-    <table id="productList">
-        <thead>
-            <tr>
-                <th>Tên</th>
-                <th>Mô tả</th>
-                <th>Thể Loại</th>
-                <th>Giá Nhập</th>
-                <th>Giá Bán</th>
-                <th>Ảnh</th>
-                <th>Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Products will be listed here -->
-        </tbody>
-    </table>
-</div>
+                <button type="submit">Cập nhật</button>
+            </form>
+        </div>
+    </div>
 
-<!-- Modal for Editing Product -->
-<div id="editModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h2>Sửa Sản Phẩm</h2>
-        <form id="editForm">
-            <label for="editProductName">Tên Sản Phẩm</label>
-            <input type="text" id="editProductName" placeholder="Nhập tên sản phẩm" required>
+    <!--Modal for Adding Product-->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddModal()">&times;</span>
+            <h2>Thêm Mới Sản Phẩm</h2>
+            <form id="productForm">
+                <label for="productName">Tên Sản Phẩm</label>
+                <input type="text" id="productName" placeholder="Nhập tên sản phẩm" required>
 
-            <label for="editProductDescription">Mô tả</label>
-            <input type="text" id="editProductDescription" placeholder="Nhập mô tả" required>
+                <label for="productDescription">Mô tả</label>
+                <input type="text" id="productDescription" placeholder="Nhập mô tả" required>
 
-            <label for="editImportPrice">Giá Nhập</label>
-            <input type="number" id="editImportPrice" placeholder="Nhập giá nhập" required>
+                <label for="importPrice">Giá Nhập</label>
+                <input type="number" id="importPrice" placeholder="Nhập giá nhập" required>
 
-            <label for="editSellingPrice">Giá Bán</label>
-            <input type="number" id="editSellingPrice" placeholder="Nhập giá bán" required>
+                <label for="productCategory">Thể Loại</label>
+                <select id="productCategory" class="input-field" required>
+                    <!-- Options will be dynamically loaded -->
+                </select>
 
-            <label for="category_id">Thể Loại</label>
-            <select id="editProductCategory" required>
-            </select>
+                <label for="sellingPrice">Giá Bán</label>
+                <input type="number" id="sellingPrice" placeholder="Nhập giá bán" required>
 
-            <label for="editProductImage">Ảnh</label>
-            <input type="file" id="editProductImage">
+                <label for="productImage">Ảnh</label>
+                <input type="file" id="productImage" required>
 
-            <button type="submit">Cập nhật</button>
-        </form>
+                <button type="submit">Thêm Sản Phẩm</button>
+            </form>
+        </div>
     </div>
 </div>
-
 <script>
     const apiUrl = 'api/products/get_list_product';
+    let products = [];
+    let currentPage = 1;
+    const limit = 5;
+    const productForm = document.getElementById('productForm');
+    var addModal = document.getElementById("productModal");
+    var editModal = document.getElementById("editModal");
+    var closeBtn = document.getElementById("closeModal")
+
+    function openAddModal() {
+        editModal.style.display = "none";
+        addModal.style.display = "flex";
+    }
+
+
+    function closeAddModal() {
+        const modal = document.getElementById('productModal');
+        console.log(modal);
+        if (modal) {
+            modal.style.display = "none";
+        } else {
+            console.error("Add Modal not found!");
+        }
+    }
+
+    function closeEditModal() {
+        const modal = document.getElementById('editModal');
+        console.log(modal);
+
+        if (modal) {
+            modal.style.display = "none";
+        } else {
+            console.error("Edit Modal not found!");
+        }
+    }
+
 
     function fetchProducts() {
         fetch(apiUrl)
             .then(response =>
                 response.json())
             .then(data => {
-                const productList = document.getElementById('productList').getElementsByTagName('tbody')[0];
-                productList.innerHTML = ''; // Clear the list before adding new data
-                data.forEach(product => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
+                products = data
+                renderProducts();
+                renderPagination()
+            })
+            .catch(error => console.error('Error fetching products:', error));
+
+    }
+
+    function renderProducts() {
+        const productList = document.getElementById('productList').getElementsByTagName('tbody')[0];
+        productList.innerHTML = '';
+
+        const startIndex = (currentPage - 1) * limit;
+        const endIndex = startIndex + limit;
+        const paginatedProducts = products.slice(startIndex, endIndex);
+
+        paginatedProducts.forEach(product => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
                       <td>${truncateText(product.name, 50)}</td>
                       <td>${truncateText(product.description, 50)}</td> 
                       <td>${product.category_id.name}</td> 
                       <td>${product.import_price}</td>
                       <td>${product.price_selling}</td>
 
-                      <td><img src="${product.image}" alt="${product.name}" width="50"></td>
+                      <td><img src="${product.image}" alt="${product.name}" width="100"></td>
                   <td>
-                  <div style="display: flex;flex-direction: row">
+                  <div style="button-group">
                       <button class="btn-edit" onclick="openEditModal('${product._id}', '${product.name}', '${product.description}', '${product.import_price}', '${product.price_selling}', '${product.category_id}', '${product.image}')">Sửa</button>
                       <button class="btn-delete" onclick="deleteProduct('${product._id}')">Ẩn</button>
                   </div>
                   </td>
       `;
-                    productList.appendChild(row);
-                });
-            })
-            .catch(error => console.error('Error fetching products:', error));
-
+            productList.appendChild(row);
+        });
     }
 
-    // Handle adding new product
-    const productForm = document.getElementById('productForm');
     productForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
@@ -178,7 +230,7 @@
 
         // Show the modal
         const modal = document.getElementById('editModal');
-        modal.style.display = "block";
+        modal.style.display = "flex";
 
         // Handle form submission
         const editForm = document.getElementById('editForm');
@@ -211,7 +263,7 @@
                 .then(data => {
 
                     fetchProducts();
-                    closeModal(); // Close the modal
+                    modal.style.display = "none";
 
                 })
                 .catch(error => console.error('Error updating product:', error));
@@ -225,9 +277,22 @@
         return text;
     }
 
-    function closeModal() {
-        const modal = document.getElementById('editModal');
-        modal.style.display = "none";
+    function renderPagination() {
+        const paginationContainer = document.getElementById('pagination');
+        paginationContainer.innerHTML = '';
+
+        const totalPages = Math.ceil(products.length / limit);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.innerText = i;
+            pageButton.className = i === currentPage ? 'active' : '';
+            pageButton.onclick = () => {
+                currentPage = i;
+                renderProducts()
+            };
+            paginationContainer.appendChild(pageButton);
+        }
     }
 
     function fetchCategoriesForDropdown() {
@@ -262,7 +327,12 @@
             })
             .catch(error => console.error('Error deleting product:', error));
     }
-    fetchCategoriesForDropdown();
 
-    fetchProducts();
+    // Initialize page
+    window.onload = function () {
+        fetchProducts();
+        fetchCategoriesForDropdown();
+    };
+
+
 </script>

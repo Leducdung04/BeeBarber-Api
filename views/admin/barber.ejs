@@ -1,37 +1,37 @@
-<h1 style="margin: 24px;">Quản lý Thợ Cắt Tóc</h1>
 <div class="container">
-    <!-- Form to Add or Edit Barber -->
-    <div class="form-container">
-        <h2 id="form-title">Add Barber</h2>
-        <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" id="name" class="input-field">
+    <h2>Danh Sách Barber</h2>
+    <div class="grid-container">
+        <div class="form-container">
+            <h2 id="form-title">Thêm Barber</h2>
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" class="input-field">
+            </div>
+            <div class="form-group">
+                <label for="experience">Experience:</label>
+                <input type="number" id="experience" class="input-field">
+            </div>
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select id="status" class="input-field">
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="image">Barber Image:</label>
+                <input type="file" id="image" class="input-field" accept="image/*">
+            </div>
+            <button class="btn-add" id="submit-btn" onclick="addBarber()">Add Barber</button>
+            <button class="btn-cancel" id="cancel-btn" onclick="cancelEdit()" style="display: none;">Cancel</button>
         </div>
-        <div class="form-group">
-            <label for="experience">Experience:</label>
-            <input type="number" id="experience" class="input-field">
-        </div>
-        <div class="form-group">
-            <label for="status">Status:</label>
-            <select id="status" class="input-field">
-                <option value="true">Active</option>
-                <option value="false">Inactive</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="image">Barber Image:</label>
-            <input type="file" id="image" class="input-field" accept="image/*">
-        </div>
-        <button class="btn-add" id="submit-btn" onclick="addBarber()">Add Barber</button>
-        <button class="btn-cancel" id="cancel-btn" onclick="cancelEdit()" style="display: none;">Cancel</button>
-    </div>
 
-    <!-- Barber List -->
-    <div class="barber-list-container" id="barber-list">
-        <!-- Barber items will be dynamically added here -->
+        <!-- Barber List -->
+        <div class="barber-list-container" id="barber-list">
+            <!-- Barber items will be dynamically added here -->
+        </div>
     </div>
 </div>
-
 <script>
     const apiUrl = 'api/get_list_barber';
     let editBarberId = null;
