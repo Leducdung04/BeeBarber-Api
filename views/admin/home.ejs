@@ -48,7 +48,7 @@
             appointmentHeader.classList.add('appointment-header');
             appointmentHeader.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <img src="${appointment.barber_id.image || 'img/barberBackgroug.png'}" alt="${appointment.barber_id.name}">
+                    <img style=" border-radius: 50%; width: 80px; height: 80px; margin-right: 15px;" src="${appointment.barber_id.image || './img/barberBackgroug.png'}" alt="${appointment.barber_id.name}">
                     <h3>Barber ${appointment.barber_id.name}</h3>
                 </div>
                 <span style="margin-left:24px">Time ${new Date(appointment.appointment_date).toLocaleDateString()} - ${appointment.appointment_time}</span>

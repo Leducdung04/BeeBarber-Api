@@ -159,7 +159,7 @@ exports.getAppointmentsAdmin = async (req, res, next) => {
             .sort({ createdAt: -1 }); // Sắp xếp theo thời gian tạo mới nhất
 
         // Tìm tất cả các thanh toán có status true
-        const payments = await Payment.find({ status: true });
+        const payments = await Payment.find();
 
         // Gắn thông tin thanh toán tương ứng vào mỗi lịch hẹn
         const result = appointments.map(appointment => {

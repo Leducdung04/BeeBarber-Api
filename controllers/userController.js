@@ -41,6 +41,7 @@ exports.sendOtpToEmail = async (req, res) => {
 
       res.json({
           status: 200,
+          code: randomCode,
           messenger: "Mã xác thực đã được gửi đến email của bạn.",
       });
   } catch (error) {
@@ -108,76 +109,46 @@ exports.updatePassword = async (req, res) => {
     }
 };
 
+exports.updateUserById = async (req, res) => {
+  try {
+      const { id } = req.params; // Lấy ID từ params
+      const { name, phone, email } = req.body; // Lấy thông tin từ request body
 
-// // Hàm đổi mật khẩu
-// exports.updatePassword = async (req, res) => {
-//   try {
-//       const { email } = req.params; // Lấy email từ tham số URL
-//       const { oldPassword, newPassword } = req.body; // Lấy mật khẩu cũ và mới từ request body
+      // Tìm người dùng theo ID
+      const user = await User.findById(id);
+      if (!user) {
+          return res.status(404).json({
+              status: 404,
+              messenger: "Người dùng không tồn tại."
+          });
+      }
 
-//       // Tìm người dùng theo email
-//       const user = await User.findOne({ email });
-//       if (!user) {
-//           return res.status(404).json({ status: 404, messenger: "Người dùng không tồn tại!" });
-//       }
+      // Cập nhật thông tin người dùng
+      if (name) user.name = name;
+      if (phone) user.phone = phone;
+      if (email) user.email = email;
 
-//       // Kiểm tra mật khẩu cũ
-//       const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
-//       if (!isOldPasswordValid) {
-//           return res.status(400).json({ status: 400, messenger: "Mật khẩu cũ không chính xác!" });
-//       }
+      await user.save(); // Lưu thay đổi vào cơ sở dữ liệu
 
-//       // Mã hóa mật khẩu mới
-//       const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-//       user.password = hashedNewPassword; // Cập nhật mật khẩu mới
-
-//       // Lưu thay đổi vào cơ sở dữ liệu
-//       await user.save();
-
-//       res.status(200).json({
-//           status: 200,
-//           messenger: "Mật khẩu đã được cập nhật thành công!",
-//       });
-//   } catch (error) {
-//       console.error(error);
-//       res.status(500).json({ status: 500, messenger: "Lỗi máy chủ", error: error.message });
-//   }
-// };
-
-// exports.sendOtpToEmail = async (req, res) => {
-//   try {
-//       const { email } = req.body;
-//       const randomCode = generateRandomCode();
-
-//       const mailOptions = {
-//           from: "beebarber4@gmail.com",
-//           to: email,
-//           subject: "Mã xác thực của bạn",
-//           text: `Mã xác thực của bạn là: ${randomCode}`,
-//       };
-
-//       await Transporter.sendMail(mailOptions);
-
-//       const user = await User.findOne({ email });
-//       if (user) {
-//           user.otp = randomCode; // Lưu mã OTP
-//           user.otpExpiration = Date.now() + 1 * 60 * 1000; // Hết hạn sau 1 phút
-//           await user.save();
-//       }
-
-//       res.json({
-//           "status": 200,
-//           "messenger": "Mã xác thực đã được gửi đến email của bạn",
-//       });
-//   } catch (error) {
-//       console.log(error);
-//       res.json({
-//           "status": 500,
-//           "messenger": "Đã xảy ra lỗi khi gửi mã xác thực",
-//           "error": error.message
-//       });
-//   }
-// };
+      res.json({
+          status: 200,
+          messenger: "Thông tin người dùng đã được cập nhật.",
+          user: {
+              id: user._id,
+              name: user.name,
+              phone: user.phone,
+              email: user.email
+          }
+      });
+  } catch (error) {
+      console.log(error);
+      res.status(500).json({
+          status: 500,
+          messenger: "Đã xảy ra lỗi khi cập nhật thông tin.",
+          error: error.message
+      });
+  }
+};
 
 exports.loginPhone = async (req, res) => {
   try {

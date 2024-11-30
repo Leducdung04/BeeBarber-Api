@@ -4,7 +4,7 @@ const router = express.Router();
 const { createVoucher, updateVoucher, getVouchers, getValidVouchers, getVoucherByCode } = require('../controllers/voucherController');
 const { getUserVouchers, useVoucher } = require('../controllers/uservoucherController');
 const {get_list_banner,addBanner,updateBanner,updateBannerStatus,get_list_banner_ByStatus} = require('../controllers/bannerController');
-const {SigupUser,loginPhone,getUserDetailById, getAllUser, lockupUser, sendOtpToEmail, verifyOtp, updatePassword }  = require('../controllers/userController');
+const {SigupUser,loginPhone,getUserDetailById, getAllUser, lockupUser, sendOtpToEmail, verifyOtp, updatePassword, updateUserById }  = require('../controllers/userController');
 const {add_Category_Product,get_list_Category_Product, getCategoryProduct, changeStatusCategoryProduct, deleteCategoryProduct, update_Category_Product} = require('../controllers/categoryProductController')
 const Upload = require("../config/upload");
 const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices, changeStatusService, deleteService} = require('../controllers/serviceController');
@@ -37,7 +37,7 @@ router.post('/loginPhone',loginPhone)
 router.get('/users/getUserDetailById/:id',getUserDetailById)
 router.get('/user/get_all_user', getAllUser)
 router.get('/user/lock_user/:id', lockupUser)
-
+router.put('/updateUser/:id', updateUserById);
 router.post('/sendOtp', sendOtpToEmail); 
 router.post('/verifyOtp', verifyOtp);
 router.put('/updatePassword/:email', updatePassword);

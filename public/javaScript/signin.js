@@ -61,8 +61,8 @@ email.addEventListener("input", function(){
 
 // Check length input user name
 username.addEventListener("input", function(){
-    if (username.value.length < 8) {
-        usernameError.textContent = "*Username phải lớn hơn 8  kí tự"
+    if (username.value.length < 6) {
+        usernameError.textContent = "*Username phải lớn hơn 6  kí tự"
     }else if(username.value.length > 20){
         usernameError.textContent = "*Username phải nhỏ hơn 20 kí tự";
     }else {
@@ -91,8 +91,8 @@ function checkPhoneNumber(phone) {
 password.addEventListener("input", function(){
     const uppercaseRegex = /[A-Z]/;
     const specialCharRegex = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
-    if (password.value.length < 8) {
-        passwordError.textContent = "*Mật khẩu phải lớn hơn 8 kí tự"
+    if (password.value.length < 6) {
+        passwordError.textContent = "*Mật khẩu phải lớn hơn 6 kí tự"
     }else if(password.value.length > 20){
         passwordError.textContent = "*Mật khẩu phải nhỏ hơn 20 kí tự."
     }else if (!uppercaseRegex.test(password.value)) {
@@ -106,7 +106,7 @@ password.addEventListener("input", function(){
 function checkPassword(password){
     const uppercaseRegex = /[A-Z]/;
     const specialCharRegex = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
-    return password.value.length >=8 && password.value.length <=20 && uppercaseRegex.test(password.value) && specialCharRegex.test(password.value);
+    return password.value.length >=6 && password.value.length <=20 && uppercaseRegex.test(password.value) && specialCharRegex.test(password.value);
 }
 repassword.addEventListener("input", function(){
     if(repassword.value.length<8){
@@ -235,7 +235,7 @@ function checkPhone2(lgPhone) {
     return phoneRegex.test(lgPhone);
 }
 function checkPassword(lgPassword){
-    return lgPassword.value.length>=8 && lgPassword.value.length <=20;
+    return lgPassword.value.length>=6 && lgPassword.value.length <=20;
 }
 lgEmail.addEventListener("input", function(){
     if (!checkPhone2(lgEmail.value)) {
@@ -247,8 +247,8 @@ lgEmail.addEventListener("input", function(){
 
 // Check length input passwrod
 lgPassword.addEventListener("input", function(){
-    if (lgPassword.value.length < 8) {
-        lgPasswordError.textContent = "*Mật khẩu phải lớn hơn 8 kí tự."
+    if (lgPassword.value.length < 6) {
+        lgPasswordError.textContent = "*Mật khẩu phải lớn hơn 6 kí tự."
     }else if (lgPassword.value.length > 20){
         lgPasswordError.textContent = "*Mật khẩu phải nhỏ hơn 20 kí tự."
     }else {
@@ -285,7 +285,7 @@ lgForm.addEventListener('submit', function (e){
         return;
     }
     if (!checkPassword(lgPassword)) {
-        showError2(lgPassword, "*Mật khẩu phải từ 8 đến 20 kí tự");
+        showError2(lgPassword, "*Mật khẩu phải từ 6 đến 20 kí tự");
         return; 
     }
     fetch("/api/loginPhone", {
