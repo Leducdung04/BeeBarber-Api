@@ -35,7 +35,7 @@
                 <input type="text" id="editName" placeholder="Nhập tên dịch vụ" required>
 
                 <label for="editIdCategory">Danh mục</label>
-                <select id="editIdCategory" class="input-field"  required>
+                <select id="editIdCategory" class="input-field" required>
                     <!-- Dynamic category options will be populated here -->
                 </select>
 
@@ -93,7 +93,7 @@
 </div>
 <script type="text/javascript">
     const apiUrl = 'api/services/get_list_service';
-    let services = []; 
+    let services = [];
     let currentPage = 1;
     const limit = 5;
     var addModal = document.getElementById("serviceModal");
@@ -119,7 +119,7 @@
     function closeEditModal() {
         const modal = document.getElementById('editModal');
         console.log(modal);
-        
+
         if (modal) {
             modal.style.display = "none";
         } else {
@@ -292,10 +292,9 @@
     }
 
     // Initialize page
-    window.onload = function () {
-        fetchCategories();
-        fetchServices();
-    };
+    fetchCategories();
+    fetchServices();
+
 
 
 </script>

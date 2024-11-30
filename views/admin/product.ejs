@@ -328,11 +328,9 @@
             .catch(error => console.error('Error deleting product:', error));
     }
 
-    // Initialize page
-    window.onload = function () {
-        fetchProducts();
-        fetchCategoriesForDropdown();
-    };
+    fetchProducts();
+    fetchCategoriesForDropdown();
+
 
 
 </script>
