@@ -153,9 +153,7 @@ exports.getAppointmentsByUserId = async (req, res, next) => {
 exports.getAppointmentsAdmin = async (req, res, next) => {
     try {
         // Lấy tất cả các lịch hẹn với status true
-        const appointments = await Appointment.find({
-            status: true,
-        })  .populate('user_id') 
+        const appointments = await Appointment.find().populate('user_id') 
             .populate('barber_id') // Lấy thông tin từ bảng Barber
             .populate('service_id') // Lấy thông tin từ bảng Service
             .sort({ createdAt: -1 }); // Sắp xếp theo thời gian tạo mới nhất
@@ -175,6 +173,8 @@ exports.getAppointmentsAdmin = async (req, res, next) => {
         });
 
         // Trả về danh sách lịch hẹn kèm thanh toán
+        console.log(result);
+        
         res.status(200).json(result);
     } catch (error) {
         console.error(error);
