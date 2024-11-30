@@ -32,6 +32,9 @@ const notificationSchema = new mongoose.Schema({
   updated_at: { 
     type: Date 
   },
+  schedule :{
+    type: Date,
+  }
 });
 
 // Tạo model từ schema

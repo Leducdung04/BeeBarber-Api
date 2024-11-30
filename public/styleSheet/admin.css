@@ -114,8 +114,6 @@ body {
     padding: 20px;
 }
 
-
-
 /*List Headers*/
 .list-header {
     display: flex;
@@ -244,6 +242,12 @@ body {
 }
 
 /* Buttons Styling */
+.list-container table .button-group {
+    display: flex;
+    flex-direction: row;
+    gap: 7px;
+}
+
 .list-container table button {
     padding: 8px 16px;
     /* Larger buttons for a more professional feel */
@@ -307,21 +311,23 @@ body {
 }
 
 
-/* Modal Styling */
 .modal {
     display: none;
+    /* Hidden by default */
     position: fixed;
     z-index: 1000;
-    left: 0;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent background */
     justify-content: center;
+    /* Center horizontally */
     align-items: center;
+    /* Center vertically */
 }
 
-/* Ensure modal content is centered */
 .modal-content {
     background-color: #fff;
     padding: 20px;
@@ -331,10 +337,8 @@ body {
     max-height: 80%;
     overflow-y: auto;
     position: relative;
-    display: flex;
-    flex-direction: column;
-    align-self: start;
 }
+
 
 /* Close button */
 .modal-content .close {
@@ -415,41 +419,63 @@ body {
 }
 
 /*Banner Styling*/
-.banner-list-container {
-    width: 50%;
-    padding-left: 20px;
-    display: flex;
-    flex-direction: column;
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
-.banner-item {
-    background-color: #fff;
-    border-radius: 8px;
+.banner-list-container,
+.barber-list-container {
+    width: 80%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.banner-item,
+.barber-item {
+    background-color: #ffffff;
+    border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 15px;
-    margin-bottom: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.banner-item img {
+.banner-item:hover,
+.barber-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.banner-item img,
+.barber-item img {
     max-width: 100%;
     height: auto;
-    border-radius: 5px;
-    margin-bottom: 10px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    object-fit: cover;
 }
 
-.banner-item p {
-    color: #555;
-    font-size: 14px;
-    margin: 5px 0;
+.banner-item p,
+.barber-item p {
+    color: #6c757d;
+    font-size: 16px;
+    margin: 10px 0;
 }
 
-.banner-item .btn-update {
-    background-color: #007bff;
-    color: white;
+.banner-item .btn-update,
+.barber-item .btn-update {
+    background-color: #17a2b8;
+    color: #ffffff;
     border: none;
     padding: 10px 20px;
     margin: 5px;
@@ -458,8 +484,83 @@ body {
     transition: background-color 0.3s;
 }
 
-.banner-item .btn-update:hover {
-    background-color: #0056b3;
+.banner-item .btn-update:hover,
+.barber-item .btn-update:hover {
+    background-color: #138496;
+}
+
+.form-container {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 30px;
+    width: 500px;
+    height: 600px;
+    max-width: 900px;
+    margin: 20px auto;
+}
+
+.form-container h2 {
+    color: #495057;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #495057;
+    font-weight: bold;
+}
+
+.input-field {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.input-field:focus {
+    border-color: #80bdff;
+    outline: none;
+}
+
+.btn-add,
+.btn-cancel {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-add {
+    background-color: #28a745;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+.btn-add:hover {
+    background-color: #218838;
+}
+
+.btn-cancel {
+    background-color: #dc3545;
+    color: white;
+    display: none;
+    transition: background-color 0.3s;
+}
+
+.btn-cancel:hover {
+    background-color: #c82333;
 }
 
 @media (max-width: 768px) {
@@ -472,5 +573,221 @@ body {
     .banner-list-container {
         width: 100%;
         padding: 10px;
+    }
+}
+
+.filter-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #fff;
+    margin: 20px auto;
+    max-width: 900px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-container div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-container label {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.filter-container select {
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s;
+}
+
+.filter-container select:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+.filter-container button {
+    padding: 10px 15px;
+    font-size: 14px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.filter-container button:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+}
+
+.appointments-section {
+    max-width: 900px;
+    margin: 20px auto;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.appointments-section h2 {
+    text-align: center;
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.appointments-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.appointment-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.appointment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.appointment-card h3 {
+    font-size: 16px;
+    color: #4CAF50;
+    margin: 10px 0;
+}
+
+.appointment-card p {
+    font-size: 14px;
+    color: #555;
+    margin: 5px 0;
+}
+
+.appointment-card .status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: white;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.status.pending {
+    background-color: #ffc107;
+}
+
+.status.completed {
+    background-color: #28a745;
+}
+
+.status.canceled {
+    background-color: #dc3545;
+}
+
+/* General container styling */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9; /* Light background */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.container h1 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333; /* Dark text */
+}
+
+/* Table styling */
+#orderTable {
+    width: 100%;
+    border-collapse: collapse; /* Removes extra spaces between table borders */
+    margin-bottom: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden; /* Ensures rounded corners apply to the entire table */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#orderTable thead {
+    background-color: #007bff; /* Header background color */
+    color: #fff;
+}
+
+#orderTable thead th {
+    padding: 12px 10px;
+    font-size: 16px;
+    text-align: left;
+    font-weight: bold;
+}
+
+#orderTable tbody td {
+    padding: 10px;
+    font-size: 14px;
+    text-align: left;
+    color: #555; /* Darker text for better readability */
+}
+
+#orderTable tbody tr:nth-child(even) {
+    background-color: #f2f2f2; /* Alternating row background */
+}
+
+#orderTable tbody tr:hover {
+    background-color: #e9f5ff; /* Row hover effect */
+}
+
+/* Image styling */
+#orderTable tbody td img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover; /* Ensures consistent sizing */
+    border-radius: 5px;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+    #orderTable thead {
+        display: none; /* Hide table header on small screens */
+    }
+
+    #orderTable tbody tr {
+        display: block;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+    }
+
+    #orderTable tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+    }
+
+    #orderTable tbody td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #333;
+        text-transform: capitalize;
+    }
+
+    #orderTable tbody td img {
+        width: 40px;
+        height: 40px;
     }
 }
