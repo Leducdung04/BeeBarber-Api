@@ -4,14 +4,14 @@ const router = express.Router();
 const { createVoucher, updateVoucher, getVouchers, getValidVouchers, getVoucherByCode } = require('../controllers/voucherController');
 const { getUserVouchers, useVoucher } = require('../controllers/uservoucherController');
 const {get_list_banner,addBanner,updateBanner,updateBannerStatus,get_list_banner_ByStatus} = require('../controllers/bannerController');
-const {SigupUser,loginPhone,getUserDetailById, getAllUser, lockupUser}  = require('../controllers/userController');
+const {SigupUser,loginPhone,getUserDetailById, getAllUser, lockupUser, sendOtpToEmail, verifyOtp, updatePassword }  = require('../controllers/userController');
 const {add_Category_Product,get_list_Category_Product, getCategoryProduct, changeStatusCategoryProduct, deleteCategoryProduct, update_Category_Product} = require('../controllers/categoryProductController')
 const Upload = require("../config/upload");
 const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices, changeStatusService, deleteService} = require('../controllers/serviceController');
 const {getListCategory,addCategory,updateCategory, changeStatusCategoryService, getCategoryService, deleteCategory} = require('../controllers/categoryController');
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
 const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
-const { createNotification, updateNotification } = require("../controllers/notificationController");
+const { createNotification, updateNotification, getNotificationsByUserId } = require("../controllers/notificationController");
 const {get_list_product,add_product,update_product,get_list_product_by_category,get_product_detail,search_products_by_name, updateQuantityProduct, deleteProduct} = require("../controllers/productController")
 const {get_list_cartItem,add_cartItem,delete_cartItem,update_cartItem} = require("../controllers/cartItemController");
 const {get_user_cart,add_cart,update_cart} = require("../controllers/cartController")
@@ -37,6 +37,10 @@ router.post('/loginPhone',loginPhone)
 router.get('/users/getUserDetailById/:id',getUserDetailById)
 router.get('/user/get_all_user', getAllUser)
 router.get('/user/lock_user/:id', lockupUser)
+
+router.post('/sendOtp', sendOtpToEmail); 
+router.post('/verifyOtp', verifyOtp);
+router.put('/updatePassword/:email', updatePassword);
 
 // RESTful API cho Voucher
 router.post('/vouchers', createVoucher);  // Tạo voucher mới
@@ -85,6 +89,8 @@ router.put('/Update_Barbers/:id',Upload.single("image"), updateBarber);
 // RESTful API cho Notifications
 router.post('/notifications', createNotification);
 router.put('/notifications/:id', updateNotification);
+router.post('/notifications/schedule',createScheduleNotification)
+router.get('/notifications/:user_id',getNotificationsByUserId)
 // router.get('/getnotifications/:user_id', getNotificationsByUserId);
 
 //Restful API cho Product

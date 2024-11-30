@@ -2,6 +2,183 @@ const User = require("../models/user");
 const JWT = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const SECRETKEY = "BeeBarber-Fpoly";
+const Transporter = require('../config/mail');
+
+// Hàm tạo mã số ngẫu nhiên 6 chữ số
+const generateRandomCode = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+exports.sendOtpToEmail = async (req, res) => {
+  try {
+      const { email } = req.body; // Lấy email từ request body
+
+      // Kiểm tra xem email có tồn tại trong cơ sở dữ liệu không
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(400).json({ 
+              status: 400, 
+              messenger: "Email không tồn tại trong hệ thống!" 
+          });
+      }
+
+      const randomCode = generateRandomCode(); // Tạo mã ngẫu nhiên
+
+      const mailOptions = {
+          from: "beebarber4@gmail.com", // Email gửi đi
+          to: email, // Email nhận
+          subject: "Mã xác thực của bạn", // Tiêu đề email
+          text: `Mã xác thực của bạn là: ${randomCode}`, // Nội dung email
+      };
+
+      // Gửi email
+      await Transporter.sendMail(mailOptions);
+
+      // Lưu mã OTP và thời gian hết hạn vào cơ sở dữ liệu
+      user.otp = randomCode; // Lưu mã OTP
+      user.otpExpiration = Date.now() + 1 * 60 * 1000; // Hết hạn sau 1 phút
+      await user.save();
+
+      res.json({
+          status: 200,
+          messenger: "Mã xác thực đã được gửi đến email của bạn.",
+      });
+  } catch (error) {
+      console.log(error);
+      res.json({
+          status: 500,
+          messenger: "Đã xảy ra lỗi khi gửi mã xác thực.",
+          error: error.message
+      });
+  }
+};
+// xác thwucj otp
+exports.verifyOtp = async (req, res) => {
+  try {
+      const { email, otp } = req.body;
+
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(400).json({ status: 400, messenger: "Người dùng không tồn tại!" });
+      }
+
+      // Kiểm tra mã OTP
+      const isOtpValid = user.otp === otp && user.otpExpiration > Date.now();
+      if (isOtpValid) {
+          // Xác thực thành công, có thể xóa OTP
+          user.otp = null;
+          user.otpExpiration = null;
+          await user.save();
+          return res.status(200).json({ status: 200, messenger: "Xác thực thành công!" });
+      } else {
+          return res.status(400).json({ status: 400, messenger: "Mã OTP không chính xác hoặc đã hết hạn!" });
+      }
+  } catch (error) {
+      console.log(error);
+      res.status(500).json({ status: 500, messenger: "Lỗi máy chủ", error: error.message });
+  }
+};
+
+// Hàm đổi mật khẩu mà không cần nhập mật khẩu cũ
+exports.updatePassword = async (req, res) => {
+    try {
+        const { email } = req.params; // Lấy email từ tham số URL
+        const { newPassword } = req.body; // Lấy mật khẩu mới từ request body
+
+        // Tìm người dùng theo email
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ status: 404, messenger: "Người dùng không tồn tại!" });
+        }
+
+        // Mã hóa mật khẩu mới
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedNewPassword; // Cập nhật mật khẩu mới
+
+        // Lưu thay đổi vào cơ sở dữ liệu
+        await user.save();
+
+        res.status(200).json({
+            status: 200,
+            messenger: "Mật khẩu đã được cập nhật thành công!",
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 500, messenger: "Lỗi máy chủ", error: error.message });
+    }
+};
+
+
+// // Hàm đổi mật khẩu
+// exports.updatePassword = async (req, res) => {
+//   try {
+//       const { email } = req.params; // Lấy email từ tham số URL
+//       const { oldPassword, newPassword } = req.body; // Lấy mật khẩu cũ và mới từ request body
+
+//       // Tìm người dùng theo email
+//       const user = await User.findOne({ email });
+//       if (!user) {
+//           return res.status(404).json({ status: 404, messenger: "Người dùng không tồn tại!" });
+//       }
+
+//       // Kiểm tra mật khẩu cũ
+//       const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
+//       if (!isOldPasswordValid) {
+//           return res.status(400).json({ status: 400, messenger: "Mật khẩu cũ không chính xác!" });
+//       }
+
+//       // Mã hóa mật khẩu mới
+//       const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+//       user.password = hashedNewPassword; // Cập nhật mật khẩu mới
+
+//       // Lưu thay đổi vào cơ sở dữ liệu
+//       await user.save();
+
+//       res.status(200).json({
+//           status: 200,
+//           messenger: "Mật khẩu đã được cập nhật thành công!",
+//       });
+//   } catch (error) {
+//       console.error(error);
+//       res.status(500).json({ status: 500, messenger: "Lỗi máy chủ", error: error.message });
+//   }
+// };
+
+// exports.sendOtpToEmail = async (req, res) => {
+//   try {
+//       const { email } = req.body;
+//       const randomCode = generateRandomCode();
+
+//       const mailOptions = {
+//           from: "beebarber4@gmail.com",
+//           to: email,
+//           subject: "Mã xác thực của bạn",
+//           text: `Mã xác thực của bạn là: ${randomCode}`,
+//       };
+
+//       await Transporter.sendMail(mailOptions);
+
+//       const user = await User.findOne({ email });
+//       if (user) {
+//           user.otp = randomCode; // Lưu mã OTP
+//           user.otpExpiration = Date.now() + 1 * 60 * 1000; // Hết hạn sau 1 phút
+//           await user.save();
+//       }
+
+//       res.json({
+//           "status": 200,
+//           "messenger": "Mã xác thực đã được gửi đến email của bạn",
+//       });
+//   } catch (error) {
+//       console.log(error);
+//       res.json({
+//           "status": 500,
+//           "messenger": "Đã xảy ra lỗi khi gửi mã xác thực",
+//           "error": error.message
+//       });
+//   }
+// };
+
 exports.loginPhone = async (req, res) => {
   try {
     const { phone, password, deviceTokens } = req.body;
@@ -61,7 +238,7 @@ exports.loginPhone = async (req, res) => {
 
 exports.SigupUser = async (req, res, next) => {
   try {
-    const { phone, password, deviceTokens,name ,role} = req.body;
+    const { phone, password, deviceTokens, name, role, email } = req.body;
 
     // Kiểm tra nếu số điện thoại hoặc mật khẩu không được cung cấp
     if (!phone || !password) {
@@ -70,12 +247,27 @@ exports.SigupUser = async (req, res, next) => {
         .json({ message: "Số điện thoại và mật khẩu là bắt buộc" });
     }
 
+    // Kiểm tra nếu email đã được cung cấp
+    if (!email) {
+      return res
+        .status(400)
+        .json({ message: "Email là bắt buộc" });
+    }
+
     // Kiểm tra xem số điện thoại đã tồn tại chưa
-    const existingUser = await User.findOne({ phone });
-    if (existingUser) {
+    const existingUserByPhone = await User.findOne({ phone });
+    if (existingUserByPhone) {
       return res
         .status(210)
-        .json({ status:210,message: "Số điện thoại đã được đăng ký" });
+        .json({ status: 210, message: "Số điện thoại đã được đăng ký" });
+    }
+
+    // Kiểm tra xem email đã tồn tại chưa
+    const existingUserByMail = await User.findOne({ email });
+    if (existingUserByMail) {
+      return res
+        .status(210)
+        .json({ status: 210, message: "Email đã được đăng ký" });
     }
 
     // Mã hóa mật khẩu
@@ -83,9 +275,10 @@ exports.SigupUser = async (req, res, next) => {
 
     // Tạo mới người dùng
     const newUser = new User({
-      name:name,
-      phone:phone,
-      role:role,
+      name: name || null,
+      phone: phone,
+      email: email,
+      role: role || "user",
       password: hashedPassword,
       deviceTokens: deviceTokens || null,
     });
@@ -108,12 +301,12 @@ exports.SigupUser = async (req, res, next) => {
       loyaltyPoints: result.loyaltyPoints,
       phone: result.phone,
       email: result.email,
-      deviceTokens: deviceTokens
+      deviceTokens: deviceTokens,
     };
 
     // Trả về phản hồi
     res.status(200).json({
-      status:200,
+      status: 200,
       message: "Đăng ký thành công",
       data: userWithoutPassword,
       token: accessToken,
@@ -124,6 +317,7 @@ exports.SigupUser = async (req, res, next) => {
     res.status(500).json({ message: "Lỗi server", error: err.message });
   }
 };
+
 
 
 exports.updateLoyaltyPoints = async (req, res) => {
