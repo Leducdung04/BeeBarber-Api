@@ -41,40 +41,40 @@
     <nav class="colorlib-sidebar" role="navigation">
       <div class="sidebar-menu">
         <div id="colorlib-logo">
-          <a href="home">Fstyle</a>
+          <a href="home">30Shine</a>
         </div>
         <ul>
           <ul>
             <li class="<%= isActiveRoute('/statistical', locals.currentRoute)%>">
-              <a href="statisticals"><i class="material-icons">bar_chart</i> Thống kê</a>
+              <a href="/statisticals"><i class="material-icons">bar_chart</i> Thống kê</a>
             </li>
             <li class="<%= isActiveRoute('/home', locals.currentRoute)%>">
-              <a href="home"><i class="material-icons">home</i> Home</a>
+              <a href="/home"><i class="material-icons">home</i> Home</a>
             </li>
             <li class="<%= isActiveRoute('/order', locals.currentRoute)%>">
-              <a href="orders"><i class="material-icons">receipt</i> Đơn Hàng</a>
+              <a href="/orders"><i class="material-icons">receipt</i> Đơn Hàng</a>
             </li>
             <li class="<%= isActiveRoute('/category_service', locals.currentRoute)%>">
-              <a href="categories_services"><i class="material-symbols-outlined">health_and_beauty</i>
+              <a href="/categories_services"><i class="material-symbols-outlined">health_and_beauty</i>
                 Thể loại dịch vụ</a>
             </li>
             <li class="<%= isActiveRoute('/service', locals.currentRoute)%>">
-              <a href="services"><i class="material-icons">build</i> Dịch vụ</a>
+              <a href="/services"><i class="material-icons">build</i> Dịch vụ</a>
             </li>
             <li class="<%= isActiveRoute('/category_product', locals.currentRoute)%>">
-              <a href="categories_products"><i class="material-icons">category</i> Thể loại sản phẩm</a>
+              <a href="/categories_products"><i class="material-icons">category</i> Thể loại sản phẩm</a>
             </li>
             <li class="<%= isActiveRoute('/product', locals.currentRoute)%>">
-              <a href="products"><i class="material-icons">inventory</i> Sản phẩm</a>
+              <a href="/products"><i class="material-icons">inventory</i> Sản phẩm</a>
             </li>
             <li class="<%= isActiveRoute('/banner', locals.currentRoute)%>">
-              <a href="banners"><i class="material-icons">image</i> Banner</a>
+              <a href="/banners"><i class="material-icons">image</i> Banner</a>
             </li>
             <li class="<%= isActiveRoute('/barber', locals.currentRoute)%>">
-              <a href="barbers"><i class="material-icons">content_cut</i> Barber</a>
+              <a href="/barbers"><i class="material-icons">content_cut</i> Barber</a>
             </li>
             <li class="<%= isActiveRoute('/revenue', locals.currentRoute)%>">
-              <a href="revenues"><i class="material-icons">attach_money</i> Doanh thu</a>
+              <a href="/revenues"><i class="material-icons">attach_money</i> Doanh thu</a>
             </li>
           </ul>
         </ul>
@@ -88,6 +88,33 @@
       </div>
     </div>
   </main>
+  <script>
+    window.onload = function() {
+        var defaultTitle = document.title;
+        var path = window.location.pathname;
+        if (path === "/home") {
+            document.title = "Trang chủ - 30Shine";
+        } else if (path === "/categories_products") {
+            document.title = "Danh mục sảm phẩm - 30Shine";
+        }else if (path === "/categories_services") {
+            document.title = "Danh mục dịch vụ - 30Shine";
+        } else if (path === "/products") {
+            document.title = "Sản phẩm - 30Shine";
+        } else if (path === "/services") {
+            document.title = "Dịch vụ - 30Shine";
+        } else if (path === "/statisticals") {
+            document.title = "Thống kê - 30Shine";
+        } else if (path === "/orders") {
+            document.title = "Đơn hàng - 30Shine";
+        }else if (path === "/banners") {
+            document.title = "Banner - 30Shine";
+        }else if (path === "/barbers") {
+            document.title = "Barbers - 30Shine";
+        } else {
+            document.title = defaultTitle;
+        }
+    };
+</script>
 </body>
 
 </html>

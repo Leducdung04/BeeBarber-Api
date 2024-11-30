@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/stylesheet/admin.css">
+  <style>
+.modal {
+  z-index: 1055 !important;
+}
+.modal-backdrop {
+  z-index: 1045 !important;
+}
+  </style>
+</head>
+<body>
+  
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="font-weight-bold">Thông tin đơn hàng</h2>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h3 class="font-weight-bold">Thông tin đặt hàng</h3>
+              <p class="row"><strong class="font-weight-bold">ID Đơn hàng:</strong> &nbsp;&nbsp;<%= order._id %></p>
+              <p class="row">
+                <strong class="font-weight-bold">Thời gian đặt hàng:</strong> &nbsp;&nbsp;<%= order.createdAt.toLocaleString() %>
+              </p>
+                <p class="row">
+                  <% if (order.status === 'pending' || order.status === 'active' || order.status === 'trading') { %>
+                    <div class="form-group">
+                        <label for="statusSelect">Trạng thái đơn hàng:</label>
+                        <select class="form-control" id="statusSelect">
+                          <option value="" disabled selected hidden>Chọn trạng thái</option>
+                            <% if (order.status === 'pending') { %>
+                                <option value="active" <%= order.status === 'active' ? 'selected' : '' %>>Xác nhận</option>
+                                <option value="deactive" <%= order.status === 'deactive' ? 'selected' : '' %>>Hủy</option>
+                            <% } else if (order.status === 'active') { %>
+                                <option value="trading" <%= order.status === 'trading' ? 'selected' : '' %>>Đang giao</option>
+                                <option value="deactive" <%= order.status === 'deactive' ? 'selected' : '' %>>Hủy</option>
+                               
+                            <% } else if (order.status === 'trading') { %>
+                                <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Đã giao</option>
+                                
+                            <% } else if (order.status === 'delivered') { %>
+                                <option value="deactive" <%= order.status === 'deactive' ? 'selected' : '' %>>Hủy</option>
+                            <% } %>
+                        </select>
+                    </div>
+                <% } else if (order.status === 'delivered') { %>
+                  <div class="alert alert-success" role="alert" style="margin-left: 0; margin-right: 0;">
+                    Đơn hàng đã được giao thành công!
+                </div>
+                <% } else if (order.status === 'deactive') { %>
+                  <div class="alert alert-danger" role="alert" style="margin-left: 0; margin-right: 0;">
+                    Đơn hàng đã bị huỷ !
+                </div>
+                <% }%>
+                
+
+              <p class="row"><strong class="font-weight-bold">Trạng thái:</strong> &nbsp;&nbsp;
+                <%
+                switch (order.status) {
+                  case 'pending':
+                    %>Đang xử lý<%
+                    break;
+                  case 'trading':
+                    %>Đang giao<%
+                    break;
+                  case 'delivered':
+                    %>Đã giao<%
+                    break;
+                  case 'active':
+                    %>Xác nhận<%
+                    break;
+                    case 'deactive':
+                    %>Đã hủy<%
+                    break;
+                  default:
+                    %>Trạng thái không xác định<%
+                }
+                %>
+                </p> 
+              <div id="timeInfo">
+                <% if (order.timeConfirm !== null && order.timeConfirm !== undefined) { %>
+                  <p class="row"><strong class="font-weight-bold">Thời gian xác nhận đơn hàng:</strong> &nbsp;&nbsp;<%= order.timeConfirm.toLocaleString() %></p>
+                <% } %>
+                <% if (order.timeDelivery !== null && order.timeDelivery !== undefined) { %>
+                  <p class="row"><strong class="font-weight-bold">Thời gian bắt đầu giao hàng:</strong> &nbsp;&nbsp;<%= order.timeDelivery.toLocaleString() %></p>
+                <% } %>
+                <% if (order.timeCancel !== null && order.timeCancel !== undefined) { %>
+                  <p class="row"><strong class="font-weight-bold">Thời gian hủy đơn hàng:   </strong> &nbsp;&nbsp;<%= order.timeCancel.toLocaleString() %></p>
+                <% } %>
+                <% if (order.timeSuccess !== null && order.timeSuccess !== undefined) { %>
+                  <p class="row"><strong class="font-weight-bold">Thời gian giao hàng thành công:</strong> &nbsp;&nbsp;<%= order.timeSuccess.toLocaleString() %></p>
+                <% } %>
+              </div>
+              
+              
+            
+            </div>
+            <div class="col-md-6">
+              <h3 class="font-weight-bold">Thông tin Giao Hàng</h3>
+              <p class="row"><strong class="font-weight-bold">Địa chỉ:</strong>&nbsp;&nbsp; <%= order.address %></p>
+              <p class="row"><strong class="font-weight-bold">Tên người dùng:</strong>&nbsp;&nbsp; <%= user.name %></p>
+              <p class="row"><strong class="font-weight-bold">Số điện thoại:</strong>&nbsp;&nbsp; <%= order.phone %></p>
+              <p class="row"><strong class="font-weight-bold">Tổng tiền:</strong>&nbsp;&nbsp; <%= order.total_price_sold.toLocaleString() %> VNĐ</p>
+              <p class="row">
+                <strong class="font-weight-bold">Phương thức thanh toán:</strong>&nbsp;&nbsp; <%= order.paymentMethods %>
+              </p>
+              <p class="row">
+                <strong class="font-weight-bold">Phương thức giao hàng:</strong>&nbsp;&nbsp;
+                <% 
+                switch (order.shippingMethod) {
+                  case 'standard':
+                    %>Giao hàng tiết kiệm<%
+                    break;
+                  case 'express':
+                    %>Giao hàng nhanh<%
+                    break;
+                  default:
+                    %>Phương thức giao hàng không xác định<%
+                }
+                %>
+              </p>
+            </div>
+          </div>
+          <hr />
+          <h3 class="font-weight-bold">Thông tin sản phẩm</h3>
+          <% order.listProduct.forEach(product => { %>
+          <div class="card mb-3">
+            <div class="row no-gutters">
+              <div class="col-md-4">
+                <img
+                  src="<%= product.image %>"
+                  class="card-img"
+                  style="max-width: 100px; max-height: 100px;"
+                  alt="Product image"
+                />
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <p class="row"><strong class="font-weight-bold">ID Sản phẩm:</strong>&nbsp;&nbsp; <%= product.idProduct %>
+                  </p>
+                  <p class="row"><strong class="font-weight-bold">Tên Sản phẩm :</strong>&nbsp;&nbsp;<%= product.name %></p>
+                  
+                  <p class="row">
+                    <strong class="font-weight-bold">Giá Sản phẩm:</strong> &nbsp;&nbsp;<%= product.price_selling.toLocaleString() %> VNĐ
+                  </p>
+                  <p class="row">
+                    <strong class="font-weight-bold">Số Lượng Sản phẩm:</strong>&nbsp;&nbsp; <%= product.quantity %>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmModalLabel">Xác nhận thay đổi trạng thái đơn hàng</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Bạn có chắc chắn muốn thay đổi trạng thái của đơn hàng?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy bỏ</button>
+        <button id="confirmStatusBtn" type="button" class="btn btn-primary">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+<script src="/js/bootstrap.min.js"></script>
+<script>
+
+  $(document).ready(function () {
+  $("#statusSelect").change(function () {
+    var status = $(this).val();
+    $(".modal-body p").addClass("d-none");
+    switch (status) {
+      case 'pending':
+        $("#timeInfo").empty(); 
+        break;
+      case 'timeSuccess':
+        var timeSuccess = $("#timeSuccess").text();
+        if (timeSuccess !== "" && timeSuccess !== "null" && timeSuccess !== undefined) {
+          $("#timeInfo").html("<p>Giao hàng thành công: " + timeSuccess + "</p>");
+        }
+        break;
+      case 'trading':
+        var tradingTime = $("#tradingTime").text();
+        if (tradingTime !== "" && trading !== "null") {
+          $("#timeInfo").html("<p>Thời gian bắt đầu giao xong: " + tradingTime + "</p>");
+        }
+        break;
+      case 'active':
+        var confirmTime = $("#confirmTime").text();
+        if (confirmTime !== "" && confirmTime !== "null" && confirmTime !== undefined) {
+          $("#timeInfo").html("<p>Thời gian xác nhận đơn hàng: " + confirmTime + "</p>");
+        }
+        break;
+      case 'deactive':
+        var cancelTime = $("#cancelTime").text(); // Assuming you have a hidden element with ID "cancelTime"
+        if (cancelTime !== "" && cancelTime !== "null" && cancelTime !== undefined) {
+          $("#timeInfo").html("<p>Thời gian hủy đơn hàng: " + cancelTime + "</p>");
+        }
+        break;
+    }
+    // Hiển thị modal
+    $("#confirmModal").modal("show");
+  });
+});
+    $("#confirmStatusBtn").click(function () {
+  var confirmTime = $("#confirmTime").text();
+  var deliveryTime = $("#deliveryTime").text();
+  var cancelTime = $("#cancelTime").text();
+      var newStatus = $("#statusSelect").val();
+      $.ajax({
+        url: "/api/updateOrderStatus/<%= order._id %>",
+        type: "POST",
+        data: { status: newStatus },
+        success: function (response) {
+          showAlert("success", "Trạng thái đơn hàng đã được cập nhật thành công!");
+          $("#confirmModal").modal("hide");
+          reloadPage();
+        },
+        error: function (err) {
+          console.error("Lỗi khi cập nhật trạng thái đơn hàng:", err);
+          showAlert("error", "Đã xảy ra lỗi khi cập nhật trạng thái đơn hàng");
+          $("#confirmModal").modal("hide");
+        },
+      });
+    });
+    function reloadPage() {
+    location.reload();
+  }
+
+    function showAlert(type, message) {
+      const alertClass = type === "success" ? "alert-success" : "alert-danger";
+      const alert = $('<div class="alert ' + alertClass + '" role="alert">' + message + "</div>");
+      $("body").append(alert);
+      setTimeout(function () {
+        $(alert).remove();
+      }, 5000);
+    }
+  
+</script>
+</body>
+</html>
