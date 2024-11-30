@@ -176,13 +176,35 @@
 
     // Handle edit category modal
     function openEditModal(id, name, description, image) {
+        // Populate form inputs with current category data
         document.getElementById('editName').value = name;
         document.getElementById('editDescription').value = description;
-        document.getElementById('editImage').value = ''; // Clear file input
 
+        // Clear file input and provide a preview (if needed)
+        const editImageInput = document.getElementById('editImage');
+        editImageInput.value = ''; // Clear file input
+
+        // Optional: Display a preview of the current image
+        const imagePreview = document.createElement('img');
+        imagePreview.src = image;
+        imagePreview.alt = name;
+        imagePreview.style.width = '100px';
+        imagePreview.style.marginTop = '10px';
+
+        // Remove any previous previews to avoid duplicates
+        const previousPreview = document.querySelector('.edit-image-preview');
+        if (previousPreview) {
+            previousPreview.remove();
+        }
+
+        editImageInput.insertAdjacentElement('afterend', imagePreview);
+        imagePreview.classList.add('edit-image-preview');
+
+        // Open the modal
         const modal = document.getElementById('editModal');
         modal.style.display = "flex";
 
+        // Attach the submit handler dynamically for this specific category
         const editForm = document.getElementById('editForm');
         editForm.onsubmit = function (e) {
             e.preventDefault();
@@ -191,27 +213,24 @@
             const editDescription = document.getElementById('editDescription').value;
             const editImage = document.getElementById('editImage').files[0];
 
+            // Prepare data for the API request
             const editData = new FormData();
             editData.append('id', id);
-
             editData.append('name', editName);
             editData.append('description', editDescription);
             if (editImage) {
-                editData.append('image', editImage);
+                editData.append('image', editImage); // Include new image if provided
             }
 
+            // Send the update request to the server
             fetch(`api/categorys/update_category/${id}`, {
                 method: 'PUT',
                 body: editData
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        fetchCategories();
-                        editModal.style.display = "none";
-                    } else {
-                        alert('Có lỗi xảy ra khi cập nhật category');
-                    }
+                    fetchCategories();
+                    modal.style.display = "none";
                 })
                 .catch(error => console.error('Error updating category:', error));
         };

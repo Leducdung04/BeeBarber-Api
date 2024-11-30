@@ -185,7 +185,7 @@
         formData.append('image', image);
         formData.append('category_id', category_id);
 
-        fetch('/products/add_product', {
+        fetch('api/products/add_product', {
             method: 'POST',
             body: formData
         })
