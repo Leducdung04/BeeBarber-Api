@@ -28,9 +28,8 @@ const barberSchema = new mongoose.Schema({
     sunday: { start: String, end: String },
 },
   status: {
-    type: String,
-    enum: ["Active", "Inactive"],
-    default: "Active",
+    type: Boolean, 
+    default: true,
   },
   createdAt: {
     type: Date,

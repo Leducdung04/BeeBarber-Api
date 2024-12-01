@@ -14,8 +14,8 @@
             <div class="form-group">
                 <label for="status">Status:</label>
                 <select id="status" class="input-field">
-                    <option value="true">Active</option>
-                    <option value="false">Inactive</option>
+                    <option value="true">Hoạt động</option>
+                    <option value="false">Đã nghỉ</option>
                 </select>
             </div>
             <div class="form-group">
@@ -48,10 +48,10 @@
                 const barberItem = document.createElement('div');
                 barberItem.classList.add('barber-item');
                 barberItem.innerHTML = `
-                    <img style="width:120px;height:200px" src="${barber.image || '/src/img/barberBackgroug.png'}" alt="Barber Image">
+                    <img style="width:120px;height:200px" src="${barber.image || "../admin/img/barberBackgroug.png"}" alt="Barber Image">
                     <p>Họ tên: ${barber.name}</p>
                     <p>Năm kinh nghiệm: ${barber.experience} years</p>
-                    <p>Status: ${barber.status ? 'Đang hoạt động' : 'Đã nghỉ'}</p>
+                    <p>Status: ${barber.status ? 'Hoạt động' : 'Đã nghỉ'}</p>
                     <button class="btn-update" onclick="editBarber('${barber._id}', '${barber.name}', ${barber.experience}, ${barber.status}, '${barber.image}')">Edit</button>
                 `;
                 barberListContainer.appendChild(barberItem);
@@ -77,9 +77,7 @@
         formData.append('name', name);
         formData.append('experience', experience);
         formData.append('status', status);
-        if (imageFile) {
-            formData.append('image', imageFile);  // Append the image if it exists
-        }
+        formData.append('image', imageFile);  // Append the image if it exists
 
         try {
             if (editBarberId) {

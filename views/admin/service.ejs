@@ -168,9 +168,9 @@
             <td><img src="${service.images}" alt="${service.name}" width="100"></td>
             <td>${service.status ? 'Hiển thị' : 'Ẩn'}</td>
             <td>
-                <div style="button-group">
+                <div style="display: flex; gap: 10px; justify-content: flex-start; align-items: center;">
                     <button class="btn-edit" onclick="openEditModal('${service._id}', '${service.name}', '${service.id_category._id}', '${service.description}', ${service.price}, ${service.duration}, '${service.images}', ${service.status})">Sửa</button>
-                    <button class="btn-delete" onclick="deleteService('${service._id}')">Xóa</button>
+                    <button class="btn-delete" onclick="deleteService('${service._id}',${service.status})">Ẩn</button>
                 </div>
             </td>`
                 ;
@@ -294,9 +294,10 @@
     }
 
 
-    function deleteService(id) {
-        fetch(`api/services/delete_service/${id}`, {
-            method: 'DELETE'
+    function deleteService(id,status) {
+        fetch(`api/services/updateStatus/${id}`, {
+            method: 'PUT',
+            body:!status
         })
             .then(response => response.json())
             .then(data => {

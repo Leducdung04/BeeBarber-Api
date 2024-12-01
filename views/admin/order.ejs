@@ -1,117 +1,95 @@
-<div class="container">
-    <h1>Order List</h1>
-    <table id="orderTable">
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>Product Name</th>
-                <th>Image</th>
-                <th>Price</th>
-                <th>Order Date</th>
-                <th>Location</th>
-                <th>Status</th>
-                <th>Update Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Order data will be inserted here -->
-        </tbody>
-    </table>
-</div>
-<script>
-    const apiUrl = '/api/getOrdersAdmin'
-    // Fetch order data from API
-    function fetchOrder() {
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                const orderTableBody = document.querySelector('#orderTable tbody')
-                console.log(data, "Data");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders</title>
+<style>
+    .list-group-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
 
-                data.forEach(order => {
-                    const row = document.createElement('tr');
-                    console.log(order, "Odê");
+.list-group-item img {
+    max-width: 100px;
 
-                    // Order ID
-                    row.innerHTML += `<td>${order._id}</td>`;
+}
 
-                    // Product Name
-                    row.innerHTML += `<td>${order.product_id.name}</td>`;
+.list-group-item h5 {
+    font-size: 18px;
+    font-weight: bold;
+}
+.list-group-item .btn {
+    min-width: 120px;
+}
 
-                    // Product Image
-                    row.innerHTML += `<td><img src="${order.listProduct.product_id.image}" alt="${order.product_id.name}"></td>`;
-
-                    // Price
-                    row.innerHTML += `<td>${order.total_price_import.toLocaleString()} VND</td>`;
-
-                    // Order Date
-                    const orderDate = new Date(order.order_date);
-                    row.innerHTML += `<td>${orderDate.toLocaleDateString()}</td>`;
-
-                    // Location
-                    row.innerHTML += `<td>${order.location}</td>`;
-
-                    // Status
-                    const statusLabels = ["Chờ xác nhận", "Đã xác nhận", "Đang giao hàng", "Đã giao hàng", "Đã hủy"];
-                    row.innerHTML += `<td>${statusLabels[order.status - 1]}</td>`;
-
-                    // Update Status Button
-                    const statusBtnCell = document.createElement('td');
-                    const statusBtn = document.createElement('button');
-                    statusBtn.classList.add('status-btn');
-
-                    // Set button text and actions based on status
-                    if (order.status === 1) {
-                        statusBtn.textContent = 'Xác nhận';
-                        statusBtn.onclick = () => updateOrderStatus(order._id, 2, statusBtn);
-                    } else if (order.status === 2) {
-                        statusBtn.textContent = 'Đã chuyển giao';
-                        statusBtn.onclick = () => updateOrderStatus(order._id, 3, statusBtn);
-                    } else if (order.status === 3) {
-                        statusBtn.textContent = 'Đã giao xong';
-                        statusBtn.onclick = () => updateOrderStatus(order._id, 4, statusBtn);
-                    } else {
-                        statusBtn.disabled = true; // Disable button for other statuses
-                    }
-
-                    statusBtnCell.appendChild(statusBtn);
-                    row.appendChild(statusBtnCell);
-
-                    orderTableBody.appendChild(row);
-                });
-            })
-            .catch(error => console.error('Error fetching orders:', error));
+@media (min-width: 768px) {
+    .list-group-item {
+        flex-wrap: nowrap;
     }
+}
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="col">
+            <h2 class="mb-4 text-center ">Danh Sách Đơn Hàng</h2>
+            <div id="orderList" class="list-group"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Fetch order data from API
+        fetch('api/getOrdersAdmin')
+        .then(response => response.json())
+        .then(data => {
+            const orderList = document.getElementById('orderList');
+    
+            data.forEach(order => {
+                const orderDate = new Date(order.createdAt).toLocaleDateString();
+                const statusBadge = getStatusBadge(order.status);
+    
+                const item = document.createElement('div');
+                item.classList.add('list-group-item', 'py-3', 'd-flex', 'align-items-center', 'justify-content-between', 'flex-wrap', 'shadow-sm');
 
-
-    // Update order status in the backend
-    function updateOrderStatus(orderId, newStatus, button) {
-        fetch(`api/updateOrderStatus/${orderId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ status: newStatus })
+                item.onclick = ()=> viewOrderDetails(order._id)
+                
+                item.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <img src="${order.listProduct[0].image}" class="img-fluid rounded me-3" style="width: 120px; height: 120px; object-fit: cover;" alt="${order.listProduct[0].name}">
+                        <div style="margin-left:10px">
+                            <h5 class="mb-2">${order.listProduct[0].name}</h5>
+                            <p class="mb-1"><strong>Giá:</strong> ${order.total_price_sold.toLocaleString()} VND</p>
+                            <p class="mb-1"><strong>Ngày đặt:</strong> ${orderDate}</p>
+                            <p class="mb-1"><strong>Địa điểm:</strong> ${order.location}</p>
+                            <div>${statusBadge}</div>
+                        </div>
+                    </div>
+                `;
+    
+                orderList.appendChild(item);
+            });
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    button.disabled = true;
-                    button.textContent = getStatusLabel(newStatus);
-                    button.style.backgroundColor = '#ccc';
-                } else {
-                    alert('Failed to update the status.');
-                }
-            })
-            .catch(error => console.error('Error updating order status:', error));
+        .catch(error => console.error('Error fetching orders:', error));
+    
+        function getStatusBadge(status) {
+        switch (status) {
+            case "pending":
+                return '<span class="badge bg-warning text-dark">Chờ xác nhận</span>';
+            case "active":
+                return '<span class="badge bg-info text-dark">Xác nhận</span>';
+            case "trading":
+                return '<span class="badge bg-info text-dark">Đang giao</span>';
+            case "delivered":
+                return '<span class="badge bg-success">Đã giao</span>';
+            case "deactive":
+                return '<span class="badge bg-success">Đã hủy</span>';
+        }
     }
-
-    // Get status label based on status number
-    function getStatusLabel(status) {
-        const statusLabels = ["Chờ xác nhận", "Đã xác nhận", "Đang giao hàng", "Đã giao hàng", "Đã hủy"];
-        return statusLabels[status - 1];
+    function viewOrderDetails(orderId){
+        location.href=`showDetailOrder/${orderId}`
     }
-
-    fetchOrder();
-
-</script>
+    </script>
+</body>
+</html>

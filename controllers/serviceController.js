@@ -148,3 +148,26 @@ exports.deleteService = async (req,res)=>{
   }
 }
 
+exports.updateStatus = async (req, res) => {
+  try {
+    const { id } = req.params; // Lấy ID từ URL
+    const { status } = req.body; // Lấy giá trị status từ body của request
+
+    // Cập nhật trạng thái của dịch vụ
+    const result = await Service.findByIdAndUpdate(
+      id,
+      { status }, // Cập nhật trường status
+      { new: true } // Trả về tài liệu đã được cập nhật
+    );
+
+    if (result) {
+      res.json({ success: true, message: 'Status updated successfully', data: result });
+    } else {
+      res.status(404).json({ success: false, message: 'Service not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error', error });
+  }
+};
+
+
