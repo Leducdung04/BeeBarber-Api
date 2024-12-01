@@ -2,7 +2,7 @@ const Notification = require("../models/notifications");
 const User = require("../models/user");
 const { GoogleAuth } = require('google-auth-library');
 const schedule = require("node-schedule");
-const { zonedTimeToUtc } = require('date-fns-tz');
+const { fromZonedTime, toDate } = require('date-fns-tz');
 
 const path = require('path');
 
@@ -21,17 +21,9 @@ async function getBearerToken() {
 
 exports.getNotifications = async (req, res) => {
   try {
-    const { user_id, relates_id, type, status } = req.query;
+    const { user_id, status } = req.query;
 
     const filter = { user_id };
-
-    if (relates_id) {
-      filter.relates_id = relates_id;
-    }
-
-    if (type) {
-      filter.type = type;
-    }
 
     if (status) {
       filter.status = status;
@@ -110,33 +102,35 @@ exports.createNotification = async (req, res) => {
 };
 
 
-// Cập nhật thông báo
 exports.updateNotification = async (req, res) => {
   try {
     const { id } = req.params;
-    const { relates_id, type, content, status } = req.body;
+    const { status } = req.body;
 
-    // Kiểm tra xem thông báo có tồn tại không
+    if (status !== 'read' && status !== 'unread') {
+      return res.status(400).json({ message: "Trạng thái không hợp lệ" });
+    }
+
     const notificationExists = await Notification.findById(id);
     if (!notificationExists) {
       return res.status(404).json({ message: "Không tìm thấy thông báo" });
     }
-    // Cập nhật các trường trong thông báo
-    notificationExists.relates_id = relates_id || notificationExists.relates_id;
-    notificationExists.type = type || notificationExists.type;
-    notificationExists.content = content || notificationExists.content;
-    notificationExists.status = status || notificationExists.status;
-    notificationExists.updated_at = Date.now(); // Cập nhật thời gian sửa
 
-    // Lưu thông báo đã sửa
+    notificationExists.status = status;
+    notificationExists.updated_at = Date.now();
+
     await notificationExists.save();
 
-    res.status(200).json({ message: "Thông báo đã được cập nhật", notification: notificationExists });
+    res.status(200).json({
+      message: "Thông báo đã được cập nhật",
+      notification: notificationExists,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Đã xảy ra lỗi", error });
   }
 };
+
 
 exports.getNotificationsByUserId = async (req, res, next) => {
   try {
@@ -179,8 +173,10 @@ exports.createScheduleNotification = async (req, res) => {
     await newNotification.save();
 
     if (scheduleTime) {
-      const scheduleDate = zonedTimeToUtc(scheduleTime, 'Asia/Ho_Chi_Minh');
-      schedule.scheduleJob(newNotification._id.toString(), scheduleDate, async () => {
+      console.log(scheduleTime,"Hello");
+      const zonedDate = fromZonedTime(scheduleTime, 'Asia/Ho_Chi_Minh');
+      const utcDate = toDate(zonedDate);
+      schedule.scheduleJob(newNotification._id.toString(), utcDate, async () => {
         const token = await getBearerToken();
         const fcmUrl = `https://fcm.googleapis.com/v1/projects/beebarber-3a718/messages:send`;
         const message = {
@@ -209,7 +205,7 @@ exports.createScheduleNotification = async (req, res) => {
           });
 
           if (response.ok) {
-            console.log(`Đặt Lịch  ${newNotification._id}`);
+            console.log(`Notification sent: ${newNotification._id}`);
           } else {
             const errorResponse = await response.json();
             console.error("Error sending scheduled FCM notification:", errorResponse);
@@ -220,6 +216,7 @@ exports.createScheduleNotification = async (req, res) => {
       });
     }
 
+    // Respond to the client
     res.status(200).json({
       message: "Thông báo được tạo và sẽ được gửi đi",
       notification: newNotification,
