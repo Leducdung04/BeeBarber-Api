@@ -11,7 +11,7 @@ const {getListService,addService,updateService,getListServiceByCategory,getGroup
 const {getListCategory,addCategory,updateCategory, changeStatusCategoryService, getCategoryService, deleteCategory} = require('../controllers/categoryController');
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
 const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
-const { createNotification, updateNotification, getNotificationsByUserId, createScheduleNotification } = require("../controllers/notificationController");
+const { getNotifications,createNotification, updateNotification, getNotificationsByUserId, createScheduleNotification } = require("../controllers/notificationController");
 const {get_list_product,add_product,update_product,get_list_product_by_category,get_product_detail,search_products_by_name, updateQuantityProduct, deleteProduct} = require("../controllers/productController")
 const {get_list_cartItem,add_cartItem,delete_cartItem,update_cartItem} = require("../controllers/cartItemController");
 const {get_user_cart,add_cart,update_cart} = require("../controllers/cartController")
@@ -88,6 +88,7 @@ router.post('/add_Barbers',Upload.single("image"), createBarber);
 router.put('/Update_Barbers/:id',Upload.single("image"), updateBarber);
 
 // RESTful API cho Notifications
+router.get('/notifications/getNotifications',getNotifications)
 router.post('/notifications', createNotification);
 router.put('/notifications/:id', updateNotification);
 router.post('/notifications/schedule',createScheduleNotification)
