@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const qs = require('qs')
 const expressLayout = require('express-ejs-layouts');
+const agenda = require("../BeeBarber-Api/config/agenda")
 
 
 // zaloPay 
@@ -14,7 +15,7 @@ const CryptoJS = require('crypto-js'); // npm install crypto-js
 const moment = require('moment'); // npm install moment
 const cors = require('cors');
 
-const {isActiveRoute} = require('../BeeBarber-Api/helpers/routeHelpers')
+const { isActiveRoute } = require('../BeeBarber-Api/helpers/routeHelpers')
 
 
 var apiRouter = require("./routes/api");
@@ -27,7 +28,7 @@ app.use(cors());
 
 const database = require('./config/db')
 // view engine setup
-app.set('layout','./layouts/signIn')
+app.set('layout', './layouts/signIn')
 app.set("view engine", "ejs");
 
 app.use(cors());
@@ -43,9 +44,10 @@ app.use(expressLayout);
 app.use("/api", apiRouter);
 app.use("/", signInRouter);
 app.use("/", homeRouter);
-app.use(cors({
-  origin: 'http://127.0.0.1:5500/' 
-}));
+
+(async () => {
+  await agenda.start();
+})();
 
 // zalo pay 
 const config = {
@@ -73,11 +75,11 @@ const config = {
 //       bank_code: "zalopayapp",
 //       callback_url:"https://0bfe-2001-ee0-45d8-9da0-4daf-2efd-91d2-c26c.ngrok-free.app/callback"
 //   };
-  
+
 //   // appid|app_trans_id|appuser|amount|apptime|embeddata|item
 //   const data = config.app_id + "|" + order.app_trans_id + "|" + order.app_user + "|" + order.amount + "|" + order.app_time + "|" + order.embed_data + "|" + order.item;
 //   order.mac = CryptoJS.HmacSHA256(data, config.key1).toString();
-  
+
 //   axios.post(config.endpoint, null, { params: order })
 //       .then(res => {
 //           console.log(res.data);
@@ -167,34 +169,34 @@ app.post('/callback', (req, res) => {
 
 // check trạng thái zalopay 
 
-app.post("/order-status/:app_trans_id", async (req, res)=>{
+app.post("/order-status/:app_trans_id", async (req, res) => {
   const app_trans_id = req.params.app_trans_id;
   let postData = {
     app_id: config.app_id,
     app_trans_id: app_trans_id, // Input your app_trans_id
-}
+  }
 
-let data = postData.app_id + "|" + postData.app_trans_id + "|" + config.key1; // appid|app_trans_id|key1
-postData.mac = CryptoJS.HmacSHA256(data, config.key1).toString();
+  let data = postData.app_id + "|" + postData.app_trans_id + "|" + config.key1; // appid|app_trans_id|key1
+  postData.mac = CryptoJS.HmacSHA256(data, config.key1).toString();
 
 
-let postConfig = {
+  let postConfig = {
     method: 'post',
     url: "https://sb-openapi.zalopay.vn/v2/query",
     headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/x-www-form-urlencoded'
     },
     data: qs.stringify(postData)
-};
+  };
 
-axios(postConfig)
+  axios(postConfig)
     .then(function (response) {
-        console.log(JSON.stringify(response.data));
-        res.json(response.data);
-        //response.data
+      console.log(JSON.stringify(response.data));
+      res.json(response.data);
+      //response.data
     })
     .catch(function (error) {
-        console.log(error);
+      console.log(error);
     });
 })
 
@@ -231,12 +233,12 @@ axios(postConfig)
 database.connect();
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
