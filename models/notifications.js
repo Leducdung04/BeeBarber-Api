@@ -7,14 +7,11 @@ const notificationSchema = new mongoose.Schema({
     ref: "User",  // Liên kết với bảng User
     required: true 
   },
-  relates_id: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    required: true
-  },
   type: { 
     type: String, 
     enum: ["review", "booking", "order"],
-    required: true 
+    required: true ,
+    default: "order"
   },
   content: { 
     type: String, 
@@ -29,12 +26,6 @@ const notificationSchema = new mongoose.Schema({
     type: Date, 
     default: Date.now 
   },
-  updated_at: { 
-    type: Date 
-  },
-  schedule :{
-    type: Date,
-  }
 });
 
 // Tạo model từ schema

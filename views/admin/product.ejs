@@ -156,7 +156,7 @@
 
                       <td><img src="${product.image}" alt="${product.name}" width="100"></td>
                   <td>
-                  <div style="button-group">
+                  <div style="display: flex; gap: 10px; justify-content: flex-start; align-items: center;">
                       <button class="btn-edit" onclick="openEditModal('${product._id}', '${product.name}', '${product.description}', '${product.import_price}', '${product.price_selling}', '${product.category_id._id}', '${product.image}')">Sửa</button>
                       <button class="btn-delete" onclick="deleteProduct('${product._id}')">Ẩn</button>
                   </div>

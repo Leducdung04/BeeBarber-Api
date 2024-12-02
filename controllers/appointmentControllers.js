@@ -2,6 +2,7 @@ const { default: mongoose } = require('mongoose');
 const Appointment = require('../models/appointments');
 const Payment = require('../models/payments');
 const User = require('../models/user');
+const Notification = require('../models/notifications');
 exports.addAppointment = async (req, res, next) => {
     try {
         const { barber_id, user_id, service_id, appointment_time, appointment_date, status, price } = req.body;
@@ -37,7 +38,6 @@ exports.addAppointmentWithPayment = async (req, res) => {
         if (!appointment || !payment) {
             return res.status(400).json({ message: 'Missing appointment or payment data' });
         }
-
         // Kiểm tra từng trường quan trọng trong `appointment`
         const requiredFields = ['barber_id', 'user_id', 'service_id', 'appointment_time', 'appointment_date', 'price'];
         for (const field of requiredFields) {
@@ -62,12 +62,18 @@ exports.addAppointmentWithPayment = async (req, res) => {
             ...payment,
         });
 
+        const newNotification = new Notification({
+            user_id: appointment.user_id,
+              type:"order" ,
+              content: `Bạn có lịch hẹn cắt tóc tại BeeBarber vào lúc ngày ${appointment. appointment_time} ${appointment.appointment_date} `,
+        })
+        
         if (isNaN(newPayment.price)) {
             return res.status(400).json({ message: 'Invalid price format in payment' });
         }
 
         const paymentResult = await newPayment.save();
-
+        await newNotification.save();
         res.status(201).json({
             status: 201,
             message: 'Appointment and Payment added successfully',
