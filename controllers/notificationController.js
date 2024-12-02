@@ -3,6 +3,7 @@ const User = require("../models/user");
 const { GoogleAuth } = require('google-auth-library');
 const schedule = require("node-schedule");
 const { fromZonedTime, toDate } = require('date-fns-tz');
+let rule = new schedule.RecurrenceRule();
 
 const path = require('path');
 
@@ -155,6 +156,7 @@ exports.getNotificationsByUserId = async (req, res, next) => {
 exports.createScheduleNotification = async (req, res) => {
   try {
     const { user_id, relates_id, type, content, schedule: scheduleTime } = req.body;
+    console.log("Received schedule request with data:", req.body);
 
     const user = await User.findById(user_id);
     if (!user) {
@@ -173,10 +175,17 @@ exports.createScheduleNotification = async (req, res) => {
     await newNotification.save();
 
     if (scheduleTime) {
-      console.log(scheduleTime,"Hello");
-      const zonedDate = fromZonedTime(scheduleTime, 'Asia/Ho_Chi_Minh');
-      const utcDate = toDate(zonedDate);
-      schedule.scheduleJob(newNotification._id.toString(), utcDate, async () => {
+      const utcDate = new Date(scheduleTime); 
+      if (isNaN(utcDate.getTime())) {
+        console.error("Invalid scheduleTime:", scheduleTime);
+        return res.status(400).json({ message: "Invalid schedule time." });
+      }
+
+      if (utcDate <= new Date()) {
+        console.error("Cannot schedule notification in the past:", utcDate);
+        return res.status(400).json({ message: "Schedule time must be in the future." });
+      }
+      schedule.scheduleJob(newNotification._id.toString(), testDate, async () => {
         const token = await getBearerToken();
         const fcmUrl = `https://fcm.googleapis.com/v1/projects/beebarber-3a718/messages:send`;
         const message = {
@@ -193,7 +202,7 @@ exports.createScheduleNotification = async (req, res) => {
             },
           },
         };
-
+        console.log("Message",message);
         try {
           const response = await fetch(fcmUrl, {
             method: "POST",
@@ -205,24 +214,24 @@ exports.createScheduleNotification = async (req, res) => {
           });
 
           if (response.ok) {
-            console.log(`Notification sent: ${newNotification._id}`);
+            console.log(`Notification sent successfully: ${newNotification._id}`);
           } else {
             const errorResponse = await response.json();
-            console.error("Error sending scheduled FCM notification:", errorResponse);
+            console.error("Error sending FCM notification:", errorResponse);
           }
         } catch (err) {
-          console.error("Error sending scheduled notification:", err);
+          console.error("Error during scheduled notification:", err);
         }
       });
     }
 
-    // Respond to the client
     res.status(200).json({
       message: "Thông báo được tạo và sẽ được gửi đi",
       notification: newNotification,
     });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error creating scheduled notification:", error);
     res.status(500).json({ message: "An error occurred", error });
   }
 };
+
