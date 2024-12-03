@@ -1,8 +1,6 @@
 const Notification = require("../models/notifications");
 const User = require("../models/user");
 const { GoogleAuth } = require('google-auth-library');
-const schedule = require("node-schedule");
-const moment = require('moment-timezone');
 const agenda = require('../config/agenda');
 
 const path = require('path');
@@ -222,7 +220,7 @@ exports.createScheduleNotification = async (req, res) => {
       relates_id,
       type,
       content,
-      schedule: utcScheduleTime, // Save in UTC
+      schedule: utcScheduleTime, 
       status: 'unread',
       created_at: currentUTC,
     });
