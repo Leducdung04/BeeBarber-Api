@@ -40,6 +40,11 @@ const orderProductSchema = new mongoose.Schema({
         enum: ["active", "deactive", "pending", "trading", "delivered"],
         default: "pending",
       },
+      paymentMethod:{
+        type: String,
+        enum: ['ZaloPay', 'cash'], 
+        default: 'cash',
+      },
     total_price_import: {
         type: Number,
         required: true,
@@ -58,15 +63,6 @@ const orderProductSchema = new mongoose.Schema({
         default: Date.now,
     },
     timeConfirm: {
-        type: Date,
-    },
-    timeDelivery: {
-        type: Date,
-    },
-    timeCancel: {
-        type: Date,
-    },
-    timeSuccess: {
         type: Date,
     },
 });

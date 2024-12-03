@@ -78,7 +78,6 @@ exports.totalAmount = async (req, res) => {
         if (!dailySoldQuantity[date]) {
             dailySoldQuantity[date] = 0;
         }
-
         const revenue = order.total_price_sold - order.total_price_import
         dailyTotalPrices[date] += parseFloat(revenue);
 
@@ -135,7 +134,7 @@ exports.totalAmount = async (req, res) => {
 exports.addOrderProduct = async (req, res, next) => {
     try {
         const idUser = req.params.id
-        const {listProduct, location, status, user_voucher_id} = req.body
+        const {listProduct, location, status, user_voucher_id,paymentMethod} = req.body
 
         let total_price_import = 0
         let total_price_sold = 0
@@ -150,6 +149,7 @@ exports.addOrderProduct = async (req, res, next) => {
             user_id: idUser,
             location: location,
             status,
+            paymentMethod:paymentMethod,
             total_price_import: total_price_import,
             total_price_sold: total_price_sold,
             user_voucher_id: user_voucher_id
@@ -175,7 +175,6 @@ exports.addOrderWithPayment = async (req, res) => {
         if (!order || !payment) {
             return res.status(400).json({ message: 'Missing order or payment data' });
         }
-
         // Tạo và lưu đơn hàng
         const newOrder = new Order_Product(order);
         const orderResult = await newOrder.save();
@@ -219,7 +218,6 @@ exports.getOrdersByUserId = async (req, res, next) => {
             user_id,
             // status: { $ne: 5 }, // Bỏ qua đơn hàng đã hủy (status = 5)
         })
-            .populate('product_id')
             .populate('user_voucher_id') // Lấy thông tin từ bảng UserVoucher nếu có
             .sort({ createdAt: -1 }); // Sắp xếp theo thời gian tạo mới nhất
 
@@ -287,7 +285,7 @@ exports.updateOderStatusToCanceled = async (req, res) => {
         // Tìm và cập nhật trạng thái của Appointment
         const updatedAppointment = await Order_Product.findByIdAndUpdate(
             oderId,
-            { status: 5 }, // Cập nhật trạng thái
+            { status: 'deactive' }, // Cập nhật trạng thái
             { new: true } // Trả về dữ liệu đã cập nhật
         );
 
@@ -324,7 +322,7 @@ exports.updateOderStatusToCanceled_ByZaloPay = async (req, res) => {
         // Tìm và cập nhật trạng thái của Appointment
         const updatedAppointment = await Order_Product.findByIdAndUpdate(
             oderId,
-            { status: 5 }, // Cập nhật trạng thái
+            { status: 'deactive' }, // Cập nhật trạng thái
             { new: true, session } // Trả về dữ liệu đã cập nhật, dùng session để đảm bảo transaction
         );
 

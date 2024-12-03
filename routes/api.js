@@ -7,7 +7,7 @@ const {get_list_banner,addBanner,updateBanner,updateBannerStatus,get_list_banner
 const {SigupUser,loginPhone,getUserDetailById, getAllUser, lockupUser, sendOtpToEmail, verifyOtp, updatePassword, updateUserById }  = require('../controllers/userController');
 const {add_Category_Product,get_list_Category_Product, getCategoryProduct, changeStatusCategoryProduct, deleteCategoryProduct, update_Category_Product} = require('../controllers/categoryProductController')
 const Upload = require("../config/upload");
-const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices, changeStatusService, deleteService} = require('../controllers/serviceController');
+const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices, changeStatusService, deleteService, updateStatus} = require('../controllers/serviceController');
 const {getListCategory,addCategory,updateCategory, changeStatusCategoryService, getCategoryService, deleteCategory} = require('../controllers/categoryController');
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
 const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
@@ -61,6 +61,7 @@ router.get('/services/getListServiceByCategory/:id_category',getListServiceByCat
 router.get('/getGroupedServices',getGroupedServices)
 router.get('/services/update_status_service/:id',changeStatusService)
 router.delete('/services/delete_service/:id',deleteService)
+router.put('/services/updateStatus/:id',updateStatus)
 
 //RESTful API cho Category
 router.get('/categorys/get_list_category',getListCategory)
