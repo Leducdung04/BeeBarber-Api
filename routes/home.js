@@ -111,4 +111,19 @@ router.get("/showDetailOrder/:orderId", async (req, res) => {
     res.status(500).send("Error retrieving order details");
   }
 });
+
+router.get("/users", async (req, res) => {
+  try {
+    const locals = {
+      currentRoute: `/user`,
+      title: "Hello",
+    }
+    res.render("admin/user", {locals, layout: admin});
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Lỗi khi lấy danh sách người dùng");
+  }
+});
+
+
 module.exports = router;
