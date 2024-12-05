@@ -68,7 +68,7 @@ exports.totalAmount = async (req, res) => {
       let totalAmount = 0;
       const dailyTotalPrices = {};
       const dailySoldQuantity = {};
-  
+      
       orders.forEach(order => {
         const date = order.timeSuccess.toISOString().slice(0, 10);
         if (!dailyTotalPrices[date]) {
@@ -85,7 +85,7 @@ exports.totalAmount = async (req, res) => {
         order.listProduct.map(product =>{
             totalSoldProduct += product.quantity
         })
-        dailySoldQuantity[date] = totalSoldProduct
+        dailySoldQuantity[date] += totalSoldProduct
 
       });
       console.log(dailyTotalPrices)
@@ -97,9 +97,9 @@ exports.totalAmount = async (req, res) => {
       for (const order of orders) {
         const revenue = order.total_price_sold - order.total_price_import
         totalAmount += parseFloat(revenue);
-  
+       
         for (const product of order.listProduct) {
-          const existingProduct = uniqueProduct.find(item => item.idProduct === product.idProduct.toString());
+          const existingProduct = uniqueProduct.find(item => item.idProduct && product.idProduct && item.idProduct.toString() === product.idProduct.toString());
          
           if (!existingProduct) {
              const foundProduct = await Product.findOne({ _id: product.idProduct });
@@ -109,7 +109,7 @@ exports.totalAmount = async (req, res) => {
               quantity: product.quantity,
               price: product.price_selling,
               image: product.image,
-              soldQuantity: foundProduct ? foundProduct.soldQuantity : 1
+              soldQuantity: foundProduct ? foundProduct.soldQuantity : 0
             });
           }
         }

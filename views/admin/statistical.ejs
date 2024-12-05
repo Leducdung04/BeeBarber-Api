@@ -69,9 +69,22 @@
                   <small id="endDateError" class="form-text text-danger"></small>
                 </div>
                 <div class="col-md-4 text-center">
-                  <button type="submit" class="btn btn-primary" id="showCalendarBtn">
-                    Thống kê
-                  </button>
+                  <div class="dropdown">
+                    <button
+                      class="btn btn-primary dropdown-toggle"
+                      type="button"
+                      id="dropdownMenuButton"
+                      data-toggle="dropdown"
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                    >
+                      Thống kê
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <li><button class="dropdown-item"  id="showProductStats">Thống kê sản phẩm</button></li>
+                      <li><button class="dropdown-item"  id="showServiceStats">Thống kê dịch vụ</button></li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </form>
