@@ -163,7 +163,7 @@
             <td>${truncateText(service.name, 50)}</td>
             <td>${service.id_category.name}</td>
             <td>${truncateText(service.description, 50)}</td>
-            <td>${service.price}</td>
+            <td>${service.price.toLocaleString('vi')}</td>
             <td>${service.duration}</td>
             <td><img src="${service.images}" alt="${service.name}" width="100"></td>
             <td>${service.status ? 'Hiển thị' : 'Ẩn'}</td>
