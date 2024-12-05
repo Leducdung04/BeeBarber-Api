@@ -151,8 +151,8 @@
                       <td>${truncateText(product.name, 50)}</td>
                       <td>${truncateText(product.description, 50)}</td> 
                       <td>${product.category_id.name}</td> 
-                      <td>${product.import_price}</td>
-                      <td>${product.price_selling}</td>
+                      <td>${product.import_price.toLocaleString('vi')}</td>
+                      <td>${product.price_selling.toLocaleString('vi')}</td>
 
                       <td><img src="${product.image}" alt="${product.name}" width="100"></td>
                   <td>
