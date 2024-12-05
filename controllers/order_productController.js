@@ -99,7 +99,7 @@ exports.totalAmount = async (req, res) => {
         totalAmount += parseFloat(revenue);
   
         for (const product of order.listProduct) {
-          const existingProduct = uniqueProduct.find(item => item.idProduct.toString() === product.idProduct.toString());
+          const existingProduct = uniqueProduct.find(item => item.idProduct === product.idProduct.toString());
          
           if (!existingProduct) {
              const foundProduct = await Product.findOne({ _id: product.idProduct });
@@ -109,7 +109,7 @@ exports.totalAmount = async (req, res) => {
               quantity: product.quantity,
               price: product.price_selling,
               image: product.image,
-              soldQuantity: foundProduct ? foundProduct.soldQuantity : 0
+              soldQuantity: foundProduct ? foundProduct.soldQuantity : 1
             });
           }
         }
