@@ -1,4 +1,5 @@
 const Service = require("../models/service");
+const Appointment = require("../models/appointments")
 const mongoose = require("mongoose")
 
 exports.getListService = async (req, res, next) => {
@@ -70,12 +71,12 @@ exports.addService = async (req, res, next) => {
     });
 
     const result = await newService.save();
-    if(result){
-      return res.status(201).json({message:"Create new service successfully", data:result});
-    }else{
-      return res.json({message: "Create new service failed"})
+    if (result) {
+      return res.status(201).json({ success: true, message: "Create new service successfully", data: result });
+    } else {
+      return res.json({ success: false, message: "Create new service failed" })
     }
-    
+
   } catch (error) {
     console.error(error);
     res.status(400).json({ message: "Server Error" });
@@ -113,28 +114,28 @@ exports.updateService = async (req, res, next) => {
   }
 };
 
-exports.changeStatusService = async (req,res)=>{
+exports.changeStatusService = async (req, res) => {
   try {
     const id = req.params.id
     const serviceAuth = await Service.findById(id)
-    if(serviceAuth){
-      const serviceUpdate = await Service.findByIdAndUpdate(serviceAuth._id,{
-        status:false
-      },{
-        new:true
+    if (serviceAuth) {
+      const serviceUpdate = await Service.findByIdAndUpdate(serviceAuth._id, {
+        status: false
+      }, {
+        new: true
       })
-      if(serviceUpdate){
-        return res.json({message:"Update service successfully", data:serviceUpdate})
-      }else{
-        return res.json({message: "Update service failed"})
+      if (serviceUpdate) {
+        return res.json({ message: "Update service successfully", data: serviceUpdate })
+      } else {
+        return res.json({ message: "Update service failed" })
       }
     }
   } catch (error) {
-    return res.status(500).json({message: `${error}`})
+    return res.status(500).json({ message: `${error}` })
   }
 }
 
-exports.deleteService = async (req,res)=>{
+exports.deleteService = async (req, res) => {
   try {
     const { id } = req.params;
     const result = await Service.findByIdAndDelete(id);

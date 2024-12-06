@@ -1,5 +1,6 @@
 const Category_Product = require("../models/categoryProduct");
 const mongoose = require("mongoose");
+const Product = require("../models/product")
 
 exports.get_list_Category_Product = async (req, res, next) => {
   try {
@@ -26,11 +27,10 @@ exports.add_Category_Product = async (req, res, next) => {
     });
     const result = await newCategory.save();
     if(result){
-      return res.status(201).json({message:"Create new category product successfully", data:result});
+      return res.status(201).json({success:true, message:"Create new category product successfully", data : result});
     }else{
-      return res.json({message: "Create new category product failed"})
+      return res.json({success:false ,message: "Create new category product failed"})
     }
-    
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
@@ -115,6 +115,15 @@ exports.deleteCategoryProduct = async (req,res)=>{
   try {
     const { id } = req.params;
     const result = await Category_Product.findByIdAndDelete(id);
+
+    const products = await Product.find({ category_id: id });
+    if (products.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Không thể xóa thể loại khi đang có sản phẩm đang sử dụng',
+      });
+    }
+
     if (result) {
       res.json({ success: true, message: 'Category Product deleted successfully' });
     } else {

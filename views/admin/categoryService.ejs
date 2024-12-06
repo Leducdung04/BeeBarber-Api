@@ -100,6 +100,7 @@
     var editModal = document.getElementById("editModal");
     var closeBtn = document.getElementById("closeModal")
     var detailModal = document.getElementById('detailModal');
+    const categoryForm = document.getElementById('categoryServiceForm');
 
     function openAddModal() {
         editModal.style.display = "none";
@@ -109,7 +110,6 @@
 
     function closeAddModal() {
         const modal = document.getElementById('categoryServiceModal');
-        console.log(modal);
         if (modal) {
             modal.style.display = "none";
         } else {
@@ -119,8 +119,6 @@
 
     function closeEditModal() {
         const modal = document.getElementById('editModal');
-        console.log(modal);
-
         if (modal) {
             modal.style.display = "none";
         } else {
@@ -159,7 +157,9 @@
                             <div class="button-group">
                               <button class="btn-edit" onclick="openDetailModal('${category._id}', '${category.name}', '${category.description}', '${category.image}','${category.status}')">Chi tiết</button>
                               <button class="btn-edit" onclick="openEditModal('${category._id}', '${category.name}', '${category.description}', '${category.image}')">Sửa</button>
-                              <button class="btn-delete" onclick="deleteCategory('${category._id}')">Ẩn</button>
+                             <button class="btn-status" onclick="changeCategoryService('${category._id}')">
+                                    ${category.status ? "Ẩn" : "Hiển thị"}
+                            </button>
                             </div>
                         </td>
                     `;
@@ -167,8 +167,7 @@
         });
     }
 
-    // Handle adding new category
-    const categoryForm = document.getElementById('categoryServiceForm');
+
     categoryForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
@@ -266,6 +265,19 @@
     }
 
 
+    function changeCategoryService(id) {
+        fetch(`api/categorys/change_category_status/${id}`, {
+            method: 'PUT',
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert('Cập nhật trạng thái thành công');
+                fetchCategories();
+            })
+            .catch(error => console.error('Error changing category status:', error));
+    }
+
+
     function deleteCategory(id) {
         fetch(`api/categorys/delete_category/${id}`, {
             method: 'delete'
@@ -284,7 +296,7 @@
     function openDetailModal(id, name, description, image, status) {
         document.getElementById('detailName').textContent = name;
         document.getElementById('detailDescription').textContent = description;
-        document.getElementById('detailStatus').textContent = status ? 'Hiển thị' : 'Ẩn';
+        document.getElementById('detailStatus').textContent = status === 'true' ? 'Hiển thị' : 'Ẩn';
         document.getElementById('detailImage').src = image;
 
         detailModal.style.display = 'flex';

@@ -67,7 +67,9 @@ router.put('/services/updateStatus/:id',updateStatus)
 router.get('/categorys/get_list_category',getListCategory)
 router.post('/categorys/add_category',Upload.single("image"),addCategory)
 router.put('/categorys/update_category/:id',Upload.single("image"),updateCategory)
+router.put('/categorys/change_category_status/:id',changeStatusCategoryService)
 router.delete('/categorys/delete_category/:id',deleteCategory)
+
 
 
 // RESTful API cho CategoryProduct

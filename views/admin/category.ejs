@@ -83,6 +83,10 @@
                     <span id="detailDescription">Mô tả về thể loại sản phẩm...</span>
                 </div>
                 <div class="detail-item">
+                    <strong>Trạng thái:</strong>
+                    <span id="detailStatus">Hiển thị</span>
+                </div>
+                <div class="detail-item">
                     <strong>Ảnh:</strong>
                     <div class="image-container">
                         <img id="detailImage" src="" alt="Category Image">
@@ -136,7 +140,7 @@
     function openDetailModal(id, name, description, status, image) {
         document.getElementById('detailName').textContent = name;
         document.getElementById('detailDescription').textContent = description;
-        document.getElementById('detailStatus').textContent = status ? 'Hiển thị' : 'Ẩn';
+        document.getElementById('detailStatus').textContent = status === "true"? 'Hiển thị' : 'Ẩn';
         document.getElementById('detailImage').src = image;
 
         detailModal.style.display = 'flex';
@@ -239,27 +243,24 @@
 
         const imagePreview = document.getElementById('currentImagePreview');
         if (image) {
-            imagePreview.src = image; // Set the source of the image preview
-            imagePreview.style.display = 'block'; // Show the preview
+            imagePreview.src = image; 
+            imagePreview.style.display = 'block'; 
         } else {
-            imagePreview.style.display = 'none'; // Hide the preview if no image is provided
+            imagePreview.style.display = 'none'; 
         }
 
         // Show the modal
         const modal = document.getElementById('editModal');
         modal.style.display = "flex";
 
-        // Handle form submission
         const editForm = document.getElementById('editForm');
         editForm.onsubmit = function (e) {
             e.preventDefault();
 
-            // Gather updated data from the form fields
             const updatedName = document.getElementById('editName').value;
             const updatedDescription = document.getElementById('editDescription').value;
             const updatedImage = document.getElementById('editImage').files[0];
 
-            // Create a FormData object for the updated data
             const formData = new FormData();
             formData.append('name', updatedName);
             formData.append('description', updatedDescription);
@@ -267,7 +268,6 @@
                 formData.append('image', updatedImage);
             }
 
-            // Send the PUT request to update the category product
             fetch(`api/categoryProducts/update_category_product/${id}`, {
                 method: 'PUT',
                 body: formData
@@ -275,8 +275,8 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log('Category product updated:', data);
-                    fetchCategoryProducts(); // Refresh the category product list
-                    modal.style.display = "none"; // Close the modal
+                    fetchCategoryProducts();
+                    modal.style.display = "none"; 
                 })
                 .catch(error => console.error('Error updating category product:', error));
         };
@@ -293,5 +293,8 @@
             .catch(error => console.error('Error deleting category product:', error));
     }
 
+    function changeCategoryProduct(id){
+
+    }
     fetchCategoryProducts();
 </script>
