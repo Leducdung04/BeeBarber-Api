@@ -1,6 +1,6 @@
 <div class="container">
     <!-- List Container -->
-    <div class="list-container">
+    <div class="list-container" data-screen="service-screen">
         <div class="list-header">
             <h2>Danh Sách Dịch Vụ</h2>
             <button onclick="openAddModal()">Thêm Dịch Vụ</button>
@@ -10,7 +10,6 @@
                 <tr>
                     <th>Tên</th>
                     <th>Danh mục</th>
-                    <th>Mô tả</th>
                     <th>Giá</th>
                     <th>Thời lượng</th>
                     <th>Ảnh</th>
@@ -162,13 +161,13 @@
             row.innerHTML = `
             <td>${truncateText(service.name, 50)}</td>
             <td>${service.id_category.name}</td>
-            <td>${truncateText(service.description, 50)}</td>
             <td>${service.price.toLocaleString('vi')}</td>
             <td>${service.duration}</td>
             <td><img src="${service.images}" alt="${service.name}" width="100"></td>
             <td>${service.status ? 'Hiển thị' : 'Ẩn'}</td>
             <td>
                 <div style="display: flex; gap: 10px; justify-content: flex-start; align-items: center;">
+                    <button class="btn-detail" onclick="openEditModal('${service._id}', '${service.name}', '${service.id_category._id}', '${service.description}', ${service.price}, ${service.duration}, '${service.images}', ${service.status})">Chi tiết</button>
                     <button class="btn-edit" onclick="openEditModal('${service._id}', '${service.name}', '${service.id_category._id}', '${service.description}', ${service.price}, ${service.duration}, '${service.images}', ${service.status})">Sửa</button>
                     <button class="btn-delete" onclick="deleteService('${service._id}',${service.status})">Ẩn</button>
                 </div>

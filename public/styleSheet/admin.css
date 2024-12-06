@@ -121,6 +121,9 @@ body {
     align-items: center;
     background-color: #4caf50;
     color: white;
+    width: 100%;
+    max-width: 2000px;
+    min-width: 1140px;
     padding: 10px 20px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -142,6 +145,16 @@ body {
     transition: background-color 0.3s ease;
 }
 
+[data-screen="product-screen"] table th:nth-child(1),
+[data-screen="product-screen"] table td:nth-child(1) {
+    width: 15%;
+}
+
+[data-screen="service-screen"] table th:nth-child(1),
+[data-screen="service-screen"] table td:nth-child(1) {
+    width: 17%;
+}
+
 /* Button hover effect */
 .list-header button:hover {
     background-color: #4caf50;
@@ -157,6 +170,7 @@ body {
 .list-container table {
     width: 100%;
     height: 100%;
+    max-width: 1200px;
     border-collapse: collapse;
     margin-top: 20px;
     table-layout: auto;
@@ -177,68 +191,16 @@ body {
 
 .list-container table th {
     background-color: #283593;
-    /* Darker blue for more formal look */
     color: white;
     font-weight: bold;
 }
 
-/* Alternating row colors for readability */
 .list-container table tbody tr:nth-child(even) {
     background-color: #f4f4f4;
 }
 
 .list-container table tbody tr:hover {
     background-color: #e0e0e0;
-    /* Slightly darker hover for better contrast */
-}
-
-/* Table Columns Specific Width */
-.list-container table th:nth-child(1),
-.list-container table td:nth-child(1) {
-    width: 15%;
-    /* Reduced width for first column */
-}
-
-.list-container table th:nth-child(2),
-.list-container table td:nth-child(2) {
-    width: 20%;
-    /* Reduced width for second column */
-}
-
-.list-container table th:nth-child(3),
-.list-container table td:nth-child(3) {
-    width: 25%;
-    /* Increased width for third column */
-}
-
-.list-container table th:nth-child(4),
-.list-container table td:nth-child(4) {
-    width: 20%;
-    /* Adjusted width for fourth column */
-}
-
-.list-container table th:nth-child(5),
-.list-container table td:nth-child(5) {
-    width: 20%;
-    /* Adjusted width for fifth column */
-}
-
-.list-container table th:nth-child(6),
-.list-container table td:nth-child(6) {
-    width: 10%;
-    /* Slightly narrower for smaller data */
-}
-
-.list-container table th:nth-child(7),
-.list-container table td:nth-child(7) {
-    width: 10%;
-    /* Same as column 6 */
-}
-
-.list-container table th:nth-child(8),
-.list-container table td:nth-child(8) {
-    width: 15%;
-    /* Adjusted for a more consistent look */
 }
 
 /* Buttons Styling */
@@ -397,6 +359,62 @@ body {
     color: red;
 }
 
+.detail-item {
+    margin-bottom: 15px;
+}
+
+.detail-item strong {
+    display: inline-block;
+    width: 150px;
+    color: #333;
+}
+/* CSS for Redesigned Modal Image */
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    max-height: 300px; /* Restrict the container's maximum height */
+    overflow: hidden; /* Prevent the image from overflowing */
+}
+
+.image-container img {
+    max-width: 250px; 
+    max-height: 250px; 
+    width: auto; 
+    height: auto;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.image-container img:hover {
+    transform: scale(1.05); 
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+.modal-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: space-evenly;
+}
+
+.modal-actions button {
+    background-color: #0088a9;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.modal-actions button:hover {
+    background-color: #005f73;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {
@@ -421,7 +439,7 @@ body {
 /*Banner Styling*/
 .grid-container {
     display: grid;
-    grid-template-columns: 1fr 1fr; 
+    grid-template-columns: 1fr 1fr;
     max-width: 1000px;
     margin: 0 auto;
 }
@@ -620,7 +638,8 @@ body {
 
 .appointments-list {
     display: flex;
-    flex-direction: column; /* Đảm bảo mỗi item trên một hàng */
+    flex-direction: column;
+    /* Đảm bảo mỗi item trên một hàng */
     gap: 20px;
 }
 
@@ -631,7 +650,8 @@ body {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     display: flex;
-    flex-direction: column; /* Đảm bảo mỗi mục là một hàng */
+    flex-direction: column;
+    /* Đảm bảo mỗi mục là một hàng */
 }
 
 .appointment-header {
@@ -656,7 +676,8 @@ body {
 
 .appointment-details {
     display: flex;
-    justify-content: space-between; /* Hiển thị các thông tin theo chiều ngang */
+    justify-content: space-between;
+    /* Hiển thị các thông tin theo chiều ngang */
     width: 100%;
     margin-bottom: 15px;
     font-size: 14px;
@@ -701,14 +722,16 @@ body {
 .btn-refund {
     background-color: #dc3545;
     color: white;
-   
+
 }
+
 /* General container styling */
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #f9f9f9; /* Light background */
+    background-color: #f9f9f9;
+    /* Light background */
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -717,22 +740,26 @@ body {
     text-align: center;
     font-size: 24px;
     margin-bottom: 20px;
-    color: #333; /* Dark text */
+    color: #333;
+    /* Dark text */
 }
 
 /* Table styling */
 #orderTable {
     width: 100%;
-    border-collapse: collapse; /* Removes extra spaces between table borders */
+    border-collapse: collapse;
+    /* Removes extra spaces between table borders */
     margin-bottom: 20px;
     background-color: #fff;
     border-radius: 10px;
-    overflow: hidden; /* Ensures rounded corners apply to the entire table */
+    overflow: hidden;
+    /* Ensures rounded corners apply to the entire table */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 #orderTable thead {
-    background-color: #007bff; /* Header background color */
+    background-color: #007bff;
+    /* Header background color */
     color: #fff;
 }
 
@@ -747,29 +774,34 @@ body {
     padding: 10px;
     font-size: 14px;
     text-align: left;
-    color: #555; /* Darker text for better readability */
+    color: #555;
+    /* Darker text for better readability */
 }
 
 #orderTable tbody tr:nth-child(even) {
-    background-color: #f2f2f2; /* Alternating row background */
+    background-color: #f2f2f2;
+    /* Alternating row background */
 }
 
 #orderTable tbody tr:hover {
-    background-color: #e9f5ff; /* Row hover effect */
+    background-color: #e9f5ff;
+    /* Row hover effect */
 }
 
 /* Image styling */
 #orderTable tbody td img {
     width: 50px;
     height: 50px;
-    object-fit: cover; /* Ensures consistent sizing */
+    object-fit: cover;
+    /* Ensures consistent sizing */
     border-radius: 5px;
 }
 
 /* Responsive styling */
 @media (max-width: 768px) {
     #orderTable thead {
-        display: none; /* Hide table header on small screens */
+        display: none;
+        /* Hide table header on small screens */
     }
 
     #orderTable tbody tr {

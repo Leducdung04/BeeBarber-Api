@@ -1,5 +1,5 @@
 <div class="container">
-    <div class="list-container">
+    <div class="list-container" data-screen="service-category-screen">
         <div class="list-header">
             <h2>Danh Sách Thể Loại Dịch Vụ </h2>
             <button onclick="openAddModal()">Thêm Thể Loại Dịch Vụ </button>
@@ -8,7 +8,6 @@
             <thead>
                 <tr>
                     <th>Tên</th>
-                    <th>Mô tả</th>
                     <th>Ảnh</th>
                     <th>Hành động</th>
                 </tr>
@@ -57,6 +56,40 @@
             </form>
         </div>
     </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDetailModal()">&times;</span>
+            <h2>Chi Tiết Thể Loại Dịch Vụ</h2>
+            <div class="modal-body">
+                <div class="detail-item">
+                    <strong>Tên:</strong>
+                    <span id="detailName">Tên Thể Loại Dịch Vụ</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Mô tả:</strong>
+                    <span id="detailDescription">Mô tả về thể loại sản phẩm...</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Trạng thái:</strong>
+                    <span id="detailStatus">Hiển thị</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Ảnh:</strong>
+                    <div class="image-container">
+                        <img id="detailImage" src="" alt="Category Image">
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="modal-actions">
+                <button onclick="openEditModal()">Chỉnh sửa</button>
+                <button onclick="deleteCategoryProduct()">Xóa</button>
+            </div>
+        </div>
+    </div>
 </div>
 <script>
     const apiUrl = 'api/categorys/get_list_category';
@@ -66,7 +99,7 @@
     var addModal = document.getElementById("categoryServiceModal");
     var editModal = document.getElementById("editModal");
     var closeBtn = document.getElementById("closeModal")
-
+    var detailModal = document.getElementById('detailModal');
 
     function openAddModal() {
         editModal.style.display = "none";
@@ -95,6 +128,11 @@
         }
     }
 
+    function closeDetailModal() {
+        document.getElementById('detailModal').style.display = 'none';
+    }
+
+
     function fetchCategories() {
         fetch(apiUrl)
             .then(response => response.json())
@@ -116,12 +154,12 @@
             const row = document.createElement('tr');
             row.innerHTML = `
                         <td>${category.name}</td>
-                        <td>${category.description}</td>
                         <td><img src="${category.image}" alt="${category.name}" width="100"></td>
                         <td>
                             <div class="button-group">
-                            <button class="btn-edit" onclick="openEditModal('${category._id}', '${category.name}', '${category.description}', '${category.image}')">Sửa</button>
-                            <button class="btn-delete" onclick="deleteCategory('${category._id}')">Ẩn</button>
+                              <button class="btn-edit" onclick="openDetailModal('${category._id}', '${category.name}', '${category.description}', '${category.image}','${category.status}')">Chi tiết</button>
+                              <button class="btn-edit" onclick="openEditModal('${category._id}', '${category.name}', '${category.description}', '${category.image}')">Sửa</button>
+                              <button class="btn-delete" onclick="deleteCategory('${category._id}')">Ẩn</button>
                             </div>
                         </td>
                     `;
@@ -168,30 +206,25 @@
             pageButton.className = i === currentPage ? 'active' : '';
             pageButton.onclick = () => {
                 currentPage = i;
-                renderCategoryService(); // Render selected page
+                renderCategoryService();
             };
             paginationContainer.appendChild(pageButton);
         }
     }
 
-    // Handle edit category modal
     function openEditModal(id, name, description, image) {
-        // Populate form inputs with current category data
         document.getElementById('editName').value = name;
         document.getElementById('editDescription').value = description;
 
-        // Clear file input and provide a preview (if needed)
         const editImageInput = document.getElementById('editImage');
-        editImageInput.value = ''; // Clear file input
+        editImageInput.value = '';
 
-        // Optional: Display a preview of the current image
         const imagePreview = document.createElement('img');
         imagePreview.src = image;
         imagePreview.alt = name;
         imagePreview.style.width = '100px';
         imagePreview.style.marginTop = '10px';
 
-        // Remove any previous previews to avoid duplicates
         const previousPreview = document.querySelector('.edit-image-preview');
         if (previousPreview) {
             previousPreview.remove();
@@ -200,11 +233,9 @@
         editImageInput.insertAdjacentElement('afterend', imagePreview);
         imagePreview.classList.add('edit-image-preview');
 
-        // Open the modal
         const modal = document.getElementById('editModal');
         modal.style.display = "flex";
 
-        // Attach the submit handler dynamically for this specific category
         const editForm = document.getElementById('editForm');
         editForm.onsubmit = function (e) {
             e.preventDefault();
@@ -213,16 +244,14 @@
             const editDescription = document.getElementById('editDescription').value;
             const editImage = document.getElementById('editImage').files[0];
 
-            // Prepare data for the API request
             const editData = new FormData();
             editData.append('id', id);
             editData.append('name', editName);
             editData.append('description', editDescription);
             if (editImage) {
-                editData.append('image', editImage); // Include new image if provided
+                editData.append('image', editImage);
             }
 
-            // Send the update request to the server
             fetch(`api/categorys/update_category/${id}`, {
                 method: 'PUT',
                 body: editData
@@ -237,7 +266,6 @@
     }
 
 
-    // Handle delete category
     function deleteCategory(id) {
         fetch(`api/categorys/delete_category/${id}`, {
             method: 'delete'
@@ -253,6 +281,14 @@
             .catch(error => console.error('Error deleting category:', error));
     }
 
-    // Initial fetch categories
+    function openDetailModal(id, name, description, image, status) {
+        document.getElementById('detailName').textContent = name;
+        document.getElementById('detailDescription').textContent = description;
+        document.getElementById('detailStatus').textContent = status ? 'Hiển thị' : 'Ẩn';
+        document.getElementById('detailImage').src = image;
+
+        detailModal.style.display = 'flex';
+    }
+
     fetchCategories();
 </script>

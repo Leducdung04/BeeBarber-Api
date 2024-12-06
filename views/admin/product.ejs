@@ -1,6 +1,6 @@
 <div class="container">
     <!-- List Container -->
-    <div class="list-container">
+    <div class="list-container" data-screen="product-screen">
         <div class="list-header">
             <h2>Danh Sách Sản Phẩm</h2>
             <button onclick="openAddModal()">Thêm Sản Phẩm</button>
@@ -9,7 +9,6 @@
             <thead>
                 <tr>
                     <th>Tên</th>
-                    <th>Mô tả</th>
                     <th>Thể Loại</th>
                     <th>Giá Nhập</th>
                     <th>Giá Bán</th>
@@ -85,6 +84,8 @@
             </form>
         </div>
     </div>
+
+    
 </div>
 <script>
     const apiUrl = 'api/products/get_list_product';
@@ -149,7 +150,6 @@
             const row = document.createElement('tr');
             row.innerHTML = `
                       <td>${truncateText(product.name, 50)}</td>
-                      <td>${truncateText(product.description, 50)}</td> 
                       <td>${product.category_id.name}</td> 
                       <td>${product.import_price.toLocaleString('vi')}</td>
                       <td>${product.price_selling.toLocaleString('vi')}</td>
@@ -157,6 +157,7 @@
                       <td><img src="${product.image}" alt="${product.name}" width="100"></td>
                   <td>
                   <div style="button-group">
+                      <button class="btn-edit" onclick="openEditModal('${product._id}', '${product.name}', '${product.description}', '${product.import_price}', '${product.price_selling}', '${product.category_id._id}', '${product.image}')">Chi tiết</button>
                       <button class="btn-edit" onclick="openEditModal('${product._id}', '${product.name}', '${product.description}', '${product.import_price}', '${product.price_selling}', '${product.category_id._id}', '${product.image}')">Sửa</button>
                       <button class="btn-delete" onclick="deleteProduct('${product._id}')">Ẩn</button>
                   </div>
