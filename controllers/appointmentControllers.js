@@ -62,17 +62,17 @@ exports.addAppointmentWithPayment = async (req, res) => {
             ...payment,
         });
 
-        const newNotification = new Notification({
-            user_id: appointment.user_id,
-              type:"order" ,
-              content: `Bạn có lịch hẹn cắt tóc tại BeeBarber vào lúc ngày ${appointment. appointment_time} ${appointment.appointment_date} `,
-        })
+        // const newNotification = new Notification({
+        //     user_id: appointment.user_id,
+        //       type:"order" ,
+        //       content: `Bạn có lịch hẹn cắt tóc tại BeeBarber vào lúc ngày ${appointment. appointment_time} ${appointment.appointment_date} `,
+        // })
         
         if (isNaN(newPayment.price)) {
             return res.status(400).json({ message: 'Invalid price format in payment' });
         }
 
-        const paymentResult = await newPayment.save();
+        // const paymentResult = await newPayment.save();
         await newNotification.save();
         res.status(201).json({
             status: 201,
