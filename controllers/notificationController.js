@@ -1,9 +1,7 @@
 const Notification = require("../models/notifications");
 const User = require("../models/user");
 const { GoogleAuth } = require('google-auth-library');
-const schedule = require("node-schedule");
-const { fromZonedTime, toDate } = require('date-fns-tz');
-let rule = new schedule.RecurrenceRule();
+const agenda = require('../config/agenda');
 
 const path = require('path');
 
@@ -153,85 +151,96 @@ exports.getNotificationsByUserId = async (req, res, next) => {
   }
 };
 
+agenda.define('send notification', async (job) => {
+  const { user_id, relates_id, type, content } = job.attrs.data;
+
+  console.log('Agenda Execution Time (UTC):', new Date().toISOString());
+  console.log('Executing Notification Job for User:', user_id);
+
+  try {
+    const user = await User.findById(user_id);
+    if (!user) {
+      throw new Error('User not found.');
+    }
+
+    const token = await getBearerToken();
+    const fcmUrl = `https://fcm.googleapis.com/v1/projects/beebarber-3a718/messages:send`;
+    const message = {
+      message: {
+        token: user.deviceTokens,
+        notification: {
+          title: 'Thông báo đặt lịch',
+          body: content,
+        },
+        data: { relates_id, type, content },
+      },
+    };
+
+    const response = await fetch(fcmUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(message),
+    });
+
+    if (response.ok) {
+      console.log('Notification sent successfully.');
+    } else {
+      console.error('Error sending FCM notification:', await response.json());
+    }
+  } catch (error) {
+    console.error('Error in notification job:', error.message);
+  }
+});
+
+
+
 exports.createScheduleNotification = async (req, res) => {
   try {
     const { user_id, relates_id, type, content, schedule: scheduleTime } = req.body;
-    console.log("Received schedule request with data:", req.body);
 
-    const user = await User.findById(user_id);
-    if (!user) {
-      return res.status(400).json({ message: "Người dùng không hợp lệ" });
-    }
+    console.log('Received Local Schedule Time:', scheduleTime);
+
+    const localScheduleTime = new Date(scheduleTime);
+
+    const vietnamOffsetInMinutes = 7 * 60;
+
+    const utcScheduleTime = new Date(localScheduleTime.getTime() - vietnamOffsetInMinutes * 60000);
+
+    console.log('Converted Local Time to UTC Schedule Time:', utcScheduleTime.toISOString());
+
+    const currentUTC = new Date();
+    console.log('Current UTC Time:', currentUTC.toISOString());
+    console.log('Scheduled Time Difference (ms):', utcScheduleTime - currentUTC);
 
     const newNotification = new Notification({
       user_id,
       relates_id,
       type,
       content,
-      schedule: scheduleTime,
-      status: "unread",
+      schedule: utcScheduleTime, 
+      status: 'unread',
+      created_at: currentUTC,
     });
 
     await newNotification.save();
+    console.log('Saved Notification:', newNotification);
 
-    if (scheduleTime) {
-      const utcDate = new Date(scheduleTime); 
-      if (isNaN(utcDate.getTime())) {
-        console.error("Invalid scheduleTime:", scheduleTime);
-        return res.status(400).json({ message: "Invalid schedule time." });
-      }
-
-      if (utcDate <= new Date()) {
-        console.error("Cannot schedule notification in the past:", utcDate);
-        return res.status(400).json({ message: "Schedule time must be in the future." });
-      }
-      schedule.scheduleJob(newNotification._id.toString(), testDate, async () => {
-        const token = await getBearerToken();
-        const fcmUrl = `https://fcm.googleapis.com/v1/projects/beebarber-3a718/messages:send`;
-        const message = {
-          message: {
-            token: user.deviceTokens,
-            notification: {
-              title: "Thông báo đặt lịch",
-              body: content,
-            },
-            data: {
-              relates_id,
-              type,
-              content,
-            },
-          },
-        };
-        console.log("Message",message);
-        try {
-          const response = await fetch(fcmUrl, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(message),
-          });
-
-          if (response.ok) {
-            console.log(`Notification sent successfully: ${newNotification._id}`);
-          } else {
-            const errorResponse = await response.json();
-            console.error("Error sending FCM notification:", errorResponse);
-          }
-        } catch (err) {
-          console.error("Error during scheduled notification:", err);
-        }
-      });
-    }
+    await agenda.schedule(utcScheduleTime, 'send notification', {
+      user_id,
+      relates_id,
+      type,
+      content,
+    });
 
     res.status(200).json({
-      message: "Thông báo được tạo và sẽ được gửi đi",
+      message: 'Notification scheduled successfully.',
       notification: newNotification,
     });
   } catch (error) {
-    console.error("Error creating scheduled notification:", error);
-    res.status(500).json({ message: "An error occurred", error });
+    console.error('Error scheduling notification:', error);
+    res.status(500).json({ message: 'An error occurred', error });
   }
 };
-

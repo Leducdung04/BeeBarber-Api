@@ -2,7 +2,78 @@ const { default: mongoose } = require('mongoose');
 const Appointment = require('../models/appointments');
 const Payment = require('../models/payments');
 const User = require('../models/user');
+<<<<<<< HEAD
 const Notification = require('../models/notifications');
+=======
+const Service = require('../models/service');
+exports.appointment_total = async (req,res) =>{
+    try {
+        const { startDate, endDate } = req.query;
+  
+        console.log(`${startDate}#${endDate}`)
+  
+        const startTime = new Date(startDate);
+        const endTime = new Date(endDate);
+    
+        const appointments = await Appointment.find({
+          appointment_status: "completed",
+          timeCompleted: {$gte: startTime, $lte: endTime }
+        })
+        .populate('service_id')
+        .populate('barber_id');
+    
+        let uniqueService = [];
+        let totalAmount = 0;
+        const dailyTotalPrices = {};
+        const dailyTotalService = {};
+        
+        appointments.forEach(appointment => {
+          const date = appointment.timeCompleted.toISOString().slice(0, 10);
+          if (!dailyTotalPrices[date]) {
+            dailyTotalPrices[date] = 0;
+          }
+          if (!dailyTotalService[date]) {
+            dailyTotalService[date] = 0;
+          }
+          const revenue = appointment.price
+          dailyTotalPrices[date] += parseFloat(revenue);
+
+          let totalService = 0
+          appointment.service_id.map((service)=>{
+            totalService += 1
+          })
+          dailyTotalService[date] += totalService
+        })
+
+        const sortedDates = Object.keys(dailyTotalPrices).sort();
+        const labels = sortedDates;
+        const prices = sortedDates.map(date => dailyTotalPrices[date]);
+        const services = sortedDates.map(date  => dailyTotalService[date]);
+
+        for (const appointment of appointments){
+            totalAmount += appointment.price
+
+            for (const service of appointment.service_id) {
+                const existingService = uniqueService.find(item => item._id && service._id && item._id.toString() === service._id.toString());
+               
+                if (!existingService) {
+                   uniqueService.push({
+                    _id: service._id,
+                    name: service.name,
+                    duration: service.duration,
+                    price: service.price,
+                    images: service.images,
+                    description: service.description
+                  });
+                }
+              }
+        }
+        return res.json({message: "successfully",total:totalAmount, uniqueService,labels, prices,services })
+    }catch(error){
+        return res.status(500).json({message: `${error}`})
+    }
+}
+>>>>>>> f6f44ce53bc48e1c1f4aa2be71883eb88fe42daa
 exports.addAppointment = async (req, res, next) => {
     try {
         const { barber_id, user_id, service_id, appointment_time, appointment_date, status, price } = req.body;
@@ -366,20 +437,29 @@ exports.updateAppointmentStatusAdmin = async (req, res) => {
             return res.status(400).json({ message: "Invalid appointment ID format" });
         }
 
-        // Tìm và cập nhật trạng thái của Appointment
-        const updatedAppointment = await Appointment.findByIdAndUpdate(
-            appointmentId,
-            { appointment_status: appointment_status }, // Cập nhật trạng thái
-            { new: true, session } // Trả về dữ liệu đã cập nhật, dùng session để đảm bảo transaction
-        );
-
-        // Nếu không tìm thấy Appointment
-        if (!updatedAppointment) {
-            await session.abortTransaction(); // Hủy transaction
-            session.endSession();
-            return res.status(404).json({ message: 'Appointment not found' });
+        const appointment = await Appointment.findById(appointmentId);
+  
+        if (!appointment) {
+          return res.status(404).json({
+            status: 404,
+            message: "Appointment not found",
+          });
         }
-
+    
+        appointment.appointment_status = appointment_status;
+        switch (appointment_status) {
+          case "completed":
+            appointment.timeCompleted = new Date();
+            break;
+          case "canceled":
+            appointment.timeCanceled = new Date();
+            break;
+          case "Evaluate":
+            appointment.timeEvaluate = new Date();
+            break;
+        }
+    
+        await appointment.save();
         // Tìm payment liên quan và cập nhật trạng thái pay_method_status và bank_account
         const relatedPayment = await Payment.findOneAndUpdate(
             { related_id: appointmentId }, // Liên kết payment thông qua related_id
@@ -405,7 +485,7 @@ exports.updateAppointmentStatusAdmin = async (req, res) => {
             status: 200,
             message: 'Appointment and payment status updated successfully',
             data: {
-                appointment: updatedAppointment,
+                appointment: appointment,
                 payment: relatedPayment,
             },
         });
