@@ -1,4 +1,5 @@
 const Service = require("../models/service");
+const Appointment = require("../models/appointments")
 const mongoose = require("mongoose")
 
 exports.getListService = async (req, res, next) => {
@@ -55,7 +56,6 @@ exports.getListServiceByCategory = async (req, res, next) => {
 exports.addService = async (req, res, next) => {
   try {
     const { id_category, description, price, duration, name } = req.body;
-    const { file } = req;
     let images = null;
     if (req.file) {
       images = `${req.protocol}://localhost:3000/uploads/${req.file.filename}`;
@@ -70,12 +70,12 @@ exports.addService = async (req, res, next) => {
     });
 
     const result = await newService.save();
-    if(result){
-      return res.status(201).json({message:"Create new service successfully", data:result});
-    }else{
-      return res.json({message: "Create new service failed"})
+    if (result) {
+      return res.status(201).json({ success: true, message: "Create new service successfully", data: result });
+    } else {
+      return res.json({ success: false, message: "Create new service failed" })
     }
-    
+
   } catch (error) {
     console.error(error);
     res.status(400).json({ message: "Server Error" });
@@ -113,31 +113,66 @@ exports.updateService = async (req, res, next) => {
   }
 };
 
-exports.changeStatusService = async (req,res)=>{
+// exports.changeStatusService = async (req, res) => {
+//   try {
+//     const id = req.params.id
+//     const serviceAuth = await Service.findById(id)
+//     if (serviceAuth) {
+//       const serviceUpdate = await Service.findByIdAndUpdate(serviceAuth._id, {
+//         status: false
+//       }, {
+//         new: true
+//       })
+//       if (serviceUpdate) {
+//         return res.json({ message: "Update service successfully", data: serviceUpdate })
+//       } else {
+//         return res.json({ message: "Update service failed" })
+//       }
+//     }
+//   } catch (error) {
+//     return res.status(500).json({ message: `${error}` })
+//   }
+// }
+
+exports.changeStatusService = async (req, res) => {
   try {
-    const id = req.params.id
-    const serviceAuth = await Service.findById(id)
-    if(serviceAuth){
-      const serviceUpdate = await Service.findByIdAndUpdate(serviceAuth._id,{
-        status:false
-      },{
-        new:true
-      })
-      if(serviceUpdate){
-        return res.json({message:"Update service successfully", data:serviceUpdate})
-      }else{
-        return res.json({message: "Update service failed"})
+    const id = req.params.id;
+
+    const service = await Service.findById(id);
+    if (service) {
+      const updatedService = await Service.findByIdAndUpdate(
+        id,
+        { status: !service.status },
+        { new: true }
+      );
+      if (updatedService) {
+        return res.json({
+          message: "Status updated successfully",
+          data: updatedService,
+        });
+      } else {
+        return res.json({ message: "Failed to update service status" });
       }
+    } else {
+      return res.status(404).json({ message: "Service not found" });
     }
   } catch (error) {
-    return res.status(500).json({message: `${error}`})
+    return res.status(500).json({ status: 500, message: `${error}` });
   }
 }
 
-exports.deleteService = async (req,res)=>{
+exports.deleteService = async (req, res) => {
   try {
     const { id } = req.params;
     const result = await Service.findByIdAndDelete(id);
+
+    const appointments = await Appointment.find({ id_service: id });
+    if (appointments.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Không thể xóa dịch vụ này',
+      });
+    }
     if (result) {
       res.json({ success: true, message: 'Service deleted successfully' });
     } else {

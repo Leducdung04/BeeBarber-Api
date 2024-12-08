@@ -392,6 +392,16 @@ exports.getAllUser = async(req,res)=>{
     return res.json({message: "Get all user failed"})
   }
 }
+
+exports.getAllCustomer = async(req,res,next) =>{
+  const users = await User.find({ role: "user" })
+  if(users){
+    return res.json({message:"Get all user success", data: users})
+  }else{
+    return res.json({message: "Get all user failed"})
+  }
+}
+
 exports.lockupUser = async (req, res) => {
   const userId = req.params.id;
   try {
