@@ -41,6 +41,15 @@ const appointmentSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    timeCompleted:{
+        type:Date
+    },
+    timeCanceled:{
+        type:Date
+    },
+    timeEvaluate:{
+        type:Date
+    }
 });
 
 // Tạo model từ schema

@@ -66,6 +66,15 @@ const orderProductSchema = new mongoose.Schema({
   timeConfirm: {
     type: Date,
   },
+    timeDelivery: {
+        type: Date,
+    },
+    timeCancel: {
+        type: Date,
+    },
+    timeSuccess: {
+        type: Date,
+   },
 });
 
 // Tạo model từ schema

@@ -2,7 +2,8 @@ const { default: mongoose } = require('mongoose');
 const Order_Product = require('../models/oder_product');
 const Payment = require('../models/payments');
 const Product = require('../models/product');
-
+const User = require('../models/user');
+const admin = require('firebase-admin')
 exports.updateOrderStatus = async (req, res) => {
     try {
       const orderId = req.params.id;
@@ -15,7 +16,7 @@ exports.updateOrderStatus = async (req, res) => {
           message: "Order not found",
         });
       }
-  
+      const oldStatus = order.status;
       order.status = status;
       switch (status) {
         case "active":
@@ -39,8 +40,66 @@ exports.updateOrderStatus = async (req, res) => {
           }
           break;
       }
-  
+      
       await order.save();
+      if (oldStatus !== status) {
+        const user = await User.findById(order.user_id).lean();
+        const registrationToken = user.deviceTokens;
+  
+        let notificationMessage = "";
+        switch (status) {
+          case "pending":
+            notificationMessage =
+              "Đơn hàng " +
+              orderId +
+              " của bạn đang chờ xác nhận. Vui lòng kiểm tra trạng thái đơn hàng trong trang cá nhân!";
+            break;
+          case "active":
+            notificationMessage =
+              "Đơn hàng " +
+              orderId +
+              " của bạn đã được xác nhận. Cửa hàng sẽ xử lý và sớm giao tới địa chỉ bạn cung cấp. Vui lòng kiểm tra trạng thái đơn hàng trong trang cá nhân!";
+            break;
+          case "deactive":
+            notificationMessage =
+              "Đơn hàng " +
+              orderId +
+              " của bạn đã xác nhận hủy thành công. Vui lòng kiểm tra trạng thái đơn hàng trong trang cá nhân!";
+            break;
+          case "trading":
+            notificationMessage =
+              "Quý khách vui lòng chú ý điện thoại, đơn hàng " +
+              orderId +
+              " đang được giao đến. Hãy kiểm tra trạng thái của đơn hàng trong trang cá nhân của mình.";
+            break;
+          case "delivered":
+            notificationMessage =
+              "Đơn hàng " +
+              orderId +
+              " của bạn đã được giao thành công. Nếu có vấn đề gì xảy ra hãy liên hệ với của hàng qua hotline: 0123456789";
+            break;
+          default:
+            notificationMessage = "Trạng thái đơn hàng đã được cập nhật.";
+        }
+  
+        const message = {
+          data: {
+            key1: "Cập nhật đơn hàng",
+            key2: notificationMessage,
+          },
+          token: registrationToken,
+        };
+  
+        admin
+          .messaging()
+          .send(message)
+          .then((response) => {
+            console.log("Successfully sent message:", response);
+          })
+          .catch((error) => {
+            console.error("Error sending message:", error);
+          });
+      }
       res.status(200).json({
         status: 200,
         message: "Order status updated successfully",
@@ -68,7 +127,7 @@ exports.totalAmount = async (req, res) => {
       let totalAmount = 0;
       const dailyTotalPrices = {};
       const dailySoldQuantity = {};
-  
+      
       orders.forEach(order => {
         const date = order.timeSuccess.toISOString().slice(0, 10);
         if (!dailyTotalPrices[date]) {
@@ -85,7 +144,7 @@ exports.totalAmount = async (req, res) => {
         order.listProduct.map(product =>{
             totalSoldProduct += product.quantity
         })
-        dailySoldQuantity[date] = totalSoldProduct
+        dailySoldQuantity[date] += totalSoldProduct
 
       });
       console.log(dailyTotalPrices)
@@ -97,9 +156,9 @@ exports.totalAmount = async (req, res) => {
       for (const order of orders) {
         const revenue = order.total_price_sold - order.total_price_import
         totalAmount += parseFloat(revenue);
-  
+       
         for (const product of order.listProduct) {
-          const existingProduct = uniqueProduct.find(item => item.idProduct.toString() === product.idProduct.toString());
+          const existingProduct = uniqueProduct.find(item => item.idProduct && product.idProduct && item.idProduct.toString() === product.idProduct.toString());
          
           if (!existingProduct) {
              const foundProduct = await Product.findOne({ _id: product.idProduct });
@@ -154,13 +213,44 @@ exports.addOrderProduct = async (req, res, next) => {
             total_price_sold: total_price_sold,
             user_voucher_id: user_voucher_id
         });
+        let user = await User.findById(idUser).lean();
+  console.log("====================================");
+  console.log("User: ", user);
+  console.log("====================================");
 
-        const result = await newOrderProduct.save();
-        if(result){
-            return res.status(201).json({messsage:"Create a new order successfully", data:result});
-        }else{
-            return res.json({messsage:"Create a new order failed", data:{}});
-        }
+  const registrationToken = user.deviceTokens + "";
+  console.log("token: ", user.deviceTokens);
+
+  try {
+    const order = await newOrderProduct.save();
+    const orderId = order._id;
+    let user = await User.findById(idUser).lean();
+    const registrationToken = user.deviceTokens;
+    const message = {
+      data: {
+        key1: "Mã đơn hàng: " + orderId,
+        key2: "Đơn hàng của quý khách đang chờ xác nhận, vui lòng kiểm tra lại trong danh sách đơn hàng",
+      },
+      token: registrationToken,
+    };
+    admin
+      .messaging()
+      .send(message)
+      .then((response) => {
+        console.log("Successfully sent message:", response);
+      })
+      .catch((error) => {
+        console.error("Error sending message:", error);
+      });
+
+    res.status(201).json({
+      status: 201,
+      message: "Create a new order successfully",
+      data: newOrderProduct,
+    });
+  } catch (error) {
+    res.status(500).json({ status: 500, message: error.message });
+  }
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server Error' });
