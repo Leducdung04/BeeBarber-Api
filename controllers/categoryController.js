@@ -4,7 +4,7 @@ const Service = require("../models/service")
 
 exports.getListCategory = async (req, res, next) => {
   try {
-    const category = await Category.find().sort({ createdAt: -1, })
+    const category = await Category.find().sort({ createdAt: -1})
     res.status(200).json(category);
   } catch (error) {
     res.status(400).json({ msg: error.message });
@@ -68,45 +68,45 @@ exports.updateCategory = async (req, res, next) => {
     res.status(400).json({ message: 'Server Error' });
   }
 };
-exports.updateCategoryStatus = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
 
-    const updatedCategory = await Category.findByIdAndUpdate(
-      id,
-      { status: status }, // Chỉ cập nhật trường status
-    );
+// exports.updateCategoryStatus = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const { status } = req.body;
 
-    // Kiểm tra xem Category có tồn tại không
-    if (!updatedCategory) {
-      return res.status(404).json({ message: 'Category không tồn tại.' });
-    }
+//     const updatedCategory = await Category.findByIdAndUpdate(
+//       id,
+//       { status: status }, // Chỉ cập nhật trường status
+//     );
 
-    // Trả về phản hồi thành công
-    return res.status(200).json({
-      message: 'Cập nhật trạng thái category thành công.',
-      category: updatedCategory,
-    });
-  } catch (error) {
-    console.error('Lỗi khi cập nhật status của category:', error);
+//     // Kiểm tra xem Category có tồn tại không
+//     if (!updatedCategory) {
+//       return res.status(404).json({ message: 'Category không tồn tại.' });
+//     }
 
-    // Trả về lỗi nếu có vấn đề trong quá trình xử lý
-    return res.status(500).json({
-      message: 'Đã xảy ra lỗi trong quá trình cập nhật.',
-      error: error.message,
-    });
-  }
-};
+//     // Trả về phản hồi thành công
+//     return res.status(200).json({
+//       message: 'Cập nhật trạng thái category thành công.',
+//       category: updatedCategory,
+//     });
+//   } catch (error) {
+//     console.error('Lỗi khi cập nhật status của category:', error);
 
-exports.changeStatusCategoryService = async (req, res) => {
+//     // Trả về lỗi nếu có vấn đề trong quá trình xử lý
+//     return res.status(500).json({
+//       message: 'Đã xảy ra lỗi trong quá trình cập nhật.',
+//       error: error.message,
+//     });
+//   }
+// };
+
+exports.updateCategoryStatus = async (req, res) => {
   try {
     const id = req.params.id;
     console.log(id);
 
     const category = await Category.findById(id);
     if (category) {
-      // Toggle the status dynamically
       const updatedCategory = await Category.findByIdAndUpdate(
         id,
         { status: !category.status },

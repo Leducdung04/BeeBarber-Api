@@ -85,8 +85,7 @@
 
             <!-- Actions -->
             <div class="modal-actions">
-                <button onclick="openEditModal()">Chỉnh sửa</button>
-                <button onclick="deleteCategoryProduct()">Xóa</button>
+                <button>Chỉnh sửa</button>
             </div>
         </div>
     </div>
@@ -155,8 +154,8 @@
                         <td><img src="${category.image}" alt="${category.name}" width="100"></td>
                         <td>
                             <div class="button-group">
-                              <button class="btn-edit" onclick="openDetailModal('${category._id}', '${category.name}', '${category.description}', '${category.image}','${category.status}')">Chi tiết</button>
-                              <button class="btn-edit" onclick="openEditModal('${category._id}', '${category.name}', '${category.description}', '${category.image}')">Sửa</button>
+                             <button class="btn-detail" onclick="openDetailModal('${category._id}', '${category.name}', '${category.description}', '${category.image}','${category.status}')">Chi tiết</button>
+                             <button class="btn-edit" onclick="openEditModal('${category._id}', '${category.name}', '${category.description}', '${category.image}')">Sửa</button>
                              <button class="btn-status" onclick="changeCategoryService('${category._id}')">
                                     ${category.status ? "Ẩn" : "Hiển thị"}
                             </button>
@@ -286,6 +285,7 @@
             .then(data => {
                 if (data.success) {
                     fetchCategories();
+                    alert("Xóa thể loại thành công")
                 } else {
                     alert('Có lỗi xảy ra khi xóa category');
                 }
@@ -299,8 +299,16 @@
         document.getElementById('detailStatus').textContent = status === 'true' ? 'Hiển thị' : 'Ẩn';
         document.getElementById('detailImage').src = image;
 
+        const editButton = document.querySelector('#detailModal .modal-actions button:nth-child(1)');
+
+        editButton.onclick = function () {
+            closeDetailModal()
+            openEditModal(id, name, description, image);
+        };
+
         detailModal.style.display = 'flex';
     }
+
 
     fetchCategories();
 </script>

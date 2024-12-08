@@ -112,13 +112,13 @@ router.get("/showDetailOrder/:orderId", async (req, res) => {
   }
 });
 
-router.get("/users", async (req, res) => {
+router.get("/customers", async (req, res) => {
   try {
     const locals = {
-      currentRoute: `/user`,
+      currentRoute: `/customer`,
       title: "Hello",
     }
-    res.render("admin/user", {locals, layout: admin});
+    res.render("admin/customer", {locals, layout: admin});
   } catch (err) {
     console.error(err);
     res.status(500).send("Lỗi khi lấy danh sách người dùng");

@@ -1,95 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orders</title>
-<style>
-    .list-group-item {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-.list-group-item img {
-    max-width: 100px;
+        th,
+        td {
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            text-align: left;
+        }
 
-}
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
 
-.list-group-item h5 {
-    font-size: 18px;
-    font-weight: bold;
-}
-.list-group-item .btn {
-    min-width: 120px;
-}
+        img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
 
-@media (min-width: 768px) {
-    .list-group-item {
-        flex-wrap: nowrap;
-    }
-}
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+        }
+
+        .bg-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .bg-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .bg-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .bg-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+
+        .user-id {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .modal {
+            z-index: 1055 !important;
+        }
+
+        .modal-backdrop {
+            z-index: 1045 !important;
+        }
     </style>
 </head>
+
 <body>
     <div class="container mt-5">
-        <div class="col">
-            <h2 class="mb-4 text-center ">Danh Sách Đơn Hàng</h2>
-            <div id="orderList" class="list-group"></div>
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3 class="font-weight-bold">Thông tin đặt hàng</h3>
+                        <p id="idDisplay"></p>
+                        <select id="statusSelect"></select>
+                        <p id="statusDisplay"></p>
+                        <p id="confirmTimeDisplay"></p>
+                        <p id="deliveryTimeDisplay"></p>
+                        <p id="cancelTimeDisplay"></p>
+                        <p id="successTimeDisplay"></p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h3 class="font-weight-bold">Thông tin Giao Hàng</h3>
+                    <p id="addressDisplay"></p>
+                    <p id="userIdDisplay"></p>
+                    <p id="userPhoneDisplay"></p>
+                    <p id="totalPriceSoldDisplay"></p>
+                    <p id="paymentMethodDisplay"></p>
+                    <p id="shippingMethodDisplay"></p>
+                </div>
+            </div>
+            <hr />
+            <h3 class="font-weight-bold">Thông tin sản phẩm</h3>
+            <div id="productDetails"></div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Hình Ảnh</th>
+                    <th>Tên Sản Phẩm</th>
+                    <th>Giá</th>
+                    <th>Ngày Đặt</th>
+                    <th>Địa Điểm</th>
+                    <th>Trạng Thái</th>
+                </tr>
+            </thead>
+            <tbody id="orderList"></tbody>
+        </table>
+
+        <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmModalLabel">Xác nhận thay đổi trạng thái đơn hàng</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn thay đổi trạng thái của đơn hàng?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy bỏ</button>
+                        <button id="confirmStatusBtn" type="button" class="btn btn-primary">Xác nhận</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
     <script>
+        let orderId = null;
         // Fetch order data from API
         fetch('api/getOrdersAdmin')
-        .then(response => response.json())
-        .then(data => {
-            const orderList = document.getElementById('orderList');
-    
-            data.forEach(order => {
-                const orderDate = new Date(order.createdAt).toLocaleDateString();
-                const statusBadge = getStatusBadge(order.status);
-    
-                const item = document.createElement('div');
-                item.classList.add('list-group-item', 'py-3', 'd-flex', 'align-items-center', 'justify-content-between', 'flex-wrap', 'shadow-sm');
+            .then(response => response.json())
+            .then(data => {
+                const orderList = document.getElementById('orderList');
 
-                item.onclick = ()=> viewOrderDetails(order._id)
-                
-                item.innerHTML = `
-                    <div class="d-flex align-items-center">
-                        <img src="${order.listProduct[0].image}" class="img-fluid rounded me-3" style="width: 120px; height: 120px; object-fit: cover;" alt="${order.listProduct[0].name}">
-                        <div style="margin-left:10px">
-                            <h5 class="mb-2">${order.listProduct[0].name}</h5>
-                            <p class="mb-1"><strong>Giá:</strong> ${order.total_price_sold.toLocaleString()} VND</p>
-                            <p class="mb-1"><strong>Ngày đặt:</strong> ${orderDate}</p>
-                            <p class="mb-1"><strong>Địa điểm:</strong> ${order.location}</p>
-                            <div>${statusBadge}</div>
-                        </div>
-                    </div>
-                `;
-    
-                orderList.appendChild(item);
-            });
-        })
-        .catch(error => console.error('Error fetching orders:', error));
-    
+                if (data && data.length > 0) {
+                    document.getElementById('userIdDisplay').textContent = `User ID: ${data[0].user_id || 'Unknown'}`;
+                } else {
+                    document.getElementById('userIdDisplay').textContent = `User ID: Unknown`; // Handle empty data scenario
+                }
+
+                data.forEach(order => {
+                    const orderDate = new Date(order.createdAt).toLocaleDateString();
+                    const statusBadge = getStatusBadge(order.status);
+
+                    const row = document.createElement('tr');
+                    row.onclick = () => viewOrderDetails(order); // Pass the entire order object
+
+                    row.innerHTML =
+                        `<td><img src="${order.listProduct[0].image}" alt="${order.listProduct[0].name}"></td>
+                 <td>${order.listProduct[0].name}</td>
+                 <td>${order.total_price_sold.toLocaleString()} VND</td>
+                 <td>${orderDate}</td>
+                 <td>${order.location}</td>
+                 <td>${statusBadge}</td>`;
+
+                    orderList.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching orders:', error));
+
+
         function getStatusBadge(status) {
-        switch (status) {
-            case "pending":
-                return '<span class="badge bg-warning text-dark">Chờ xác nhận</span>';
-            case "active":
-                return '<span class="badge bg-info text-dark">Xác nhận</span>';
-            case "trading":
-                return '<span class="badge bg-info text-dark">Đang giao</span>';
-            case "delivered":
-                return '<span class="badge bg-success">Đã giao</span>';
-            case "deactive":
-                return '<span class="badge bg-success">Đã hủy</span>';
+            switch (status) {
+                case "pending":
+                    return '<span class="status-badge bg-warning">Chờ xác nhận</span>';
+                case "active":
+                    return '<span class="status-badge bg-info">Xác nhận</span>';
+                case "trading":
+                    return '<span class="status-badge bg-info">Đang giao</span>';
+                case "delivered":
+                    return '<span class="status-badge bg-success">Đã giao</span>';
+                case "deactive":
+                    return '<span class="status-badge bg-danger">Đã hủy</span>';
+            }
         }
-    }
-    function viewOrderDetails(orderId){
-        location.href=`showDetailOrder/${orderId}`
-    }
+
+        function viewOrderDetails(order) {
+            orderId = order._id;
+            document.getElementById('idDisplay').textContent = `ID Đơn hàng:: ${order._id}`;
+            document.getElementById('userIdDisplay').textContent = `User ID: ${order.user_id.name}`;
+            document.getElementById('addressDisplay').textContent = `Địa chỉ: ${order.location}`;
+            document.getElementById('userPhoneDisplay').textContent = `Số Điện Thoại: ${order.user_id.phone}`;
+            document.getElementById('totalPriceSoldDisplay').textContent = `Tổng tiền: ${order.total_price_sold.toLocaleString()} VNĐ`;
+            document.getElementById('paymentMethodDisplay').textContent = `Phương thức thanh toán: ${order.paymentMethod}`;
+
+
+
+            const statusDisplay = document.getElementById('statusDisplay');
+            const statusSelect = document.getElementById('statusSelect');
+            const statusOptions = {
+                pending: [{ value: 'active', label: 'Xác nhận' }, { value: 'deactive', label: 'Hủy' }],
+                active: [{ value: 'trading', label: 'Đang giao' }, { value: 'deactive', label: 'Hủy' }],
+                trading: [{ value: 'delivered', label: 'Đã giao' }],
+                delivered: [],
+                deactive: [],
+            };
+
+            statusSelect.innerHTML = '';
+            if (statusOptions[order.status]) {
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                defaultOption.hidden = true;
+                defaultOption.textContent = 'Chọn trạng thái';
+                statusSelect.appendChild(defaultOption);
+
+                statusOptions[order.status].forEach(option => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option.value;
+                    optionElement.textContent = option.label;
+                    statusSelect.appendChild(optionElement);
+                });
+            } else {
+                statusSelect.disabled = true;
+            }
+
+            let statusText;
+            switch (order.status) {
+                case 'pending': statusText = 'Chờ xác nhận'; break;
+                case 'active': statusText = 'Xác nhận'; break;
+                case 'trading': statusText = 'Đang giao'; break;
+                case 'delivered': statusText = 'Đã giao'; break;
+                case 'deactive': statusText = 'Đã hủy'; break;
+                default: statusText = 'Trạng thái không xác định';
+            }
+            statusDisplay.textContent = `Trạng thái: ${statusText}`;
+
+            statusSelect.addEventListener('change', function () {
+                const newStatus = this.value;
+                $("#confirmModal").modal("show");
+            });
+
+            if (order.timeConfirm) {
+                document.getElementById('confirmTimeDisplay').textContent = `Thời gian xác nhận: ${new Date(order.timeConfirm).toLocaleString()}`;
+            } else {
+                document.getElementById('confirmTimeDisplay').textContent = '';
+            }
+
+            if (order.timeDelivery) {
+                document.getElementById('deliveryTimeDisplay').textContent = `Thời gian giao: ${new Date(order.timeDelivery).toLocaleString()}`;
+            } else {
+                document.getElementById('deliveryTimeDisplay').textContent = '';
+            }
+
+            if (order.timeCancel) {
+                document.getElementById('cancelTimeDisplay').textContent = `Thời gian hủy: ${new Date(order.timeCancel).toLocaleString()}`;
+            } else {
+                document.getElementById('cancelTimeDisplay').textContent = '';
+            }
+
+            if (order.timeSuccess) {
+                document.getElementById('successTimeDisplay').textContent = `Thời gian hoàn thành: ${new Date(order.timeSuccess).toLocaleString()}`;
+            } else {
+                document.getElementById('successTimeDisplay').textContent = '';
+            }
+
+            let shippingMethodText;
+            switch (order.shippingMethod) {
+                case 'standard':
+                    shippingMethodText = 'Giao hàng tiết kiệm';
+                    break;
+                case 'express':
+                    shippingMethodText = 'Giao hàng nhanh';
+                    break;
+                default:
+                    shippingMethodText = 'Phương thức không xác định';
+            }
+            document.getElementById('shippingMethodDisplay').textContent = `Phương thức giao hàng: ${shippingMethodText}`;
+
+            const productDetailsContainer = document.getElementById('productDetails');
+            productDetailsContainer.innerHTML = '';  // Clear previous content
+
+            order.listProduct.forEach(product => {
+                const productDiv = document.createElement('div');
+                productDiv.classList.add('row', 'mb-3', 'align-items-center');
+
+                productDiv.innerHTML = `
+            <div class="col-4">
+                <img src="${product.image}" class="img-fluid rounded" alt="Product image" />
+            </div>
+            <div class="col-8">
+                <p><strong>ID Sản phẩm:</strong> ${product.idProduct}</p>
+                <p><strong>Tên Sản phẩm:</strong> ${product.name}</p>
+                <p><strong>Giá:</strong> ${product.price_selling.toLocaleString()} VNĐ</p>
+                <p><strong>Số Lượng:</strong> ${product.quantity}</p>
+            </div>
+        `;
+                productDetailsContainer.appendChild(productDiv);
+            });
+        }
+
+
+        $(document).ready(function () {
+            $("#confirmStatusBtn").click(function () {
+                var confirmTime = $("#confirmTime").text();
+                var deliveryTime = $("#deliveryTime").text();
+                var cancelTime = $("#cancelTime").text();
+                var newStatus = $("#statusSelect").val();
+                if (!newStatus) {
+                    showAlert("error", "Vui lòng chọn trạng thái để cập nhật.");
+                    return;
+                }
+                $.ajax({
+                    url: `/api/updateOrderStatus/${orderId}`,
+                    type: "POST",
+                    data: { status: newStatus },
+                    success: function (response) {
+                        showAlert("success", "Trạng thái đơn hàng đã được cập nhật thành công!");
+                        $("#confirmModal").modal("hide");
+                        reloadPage();
+                    },
+                    error: function (err) {
+                        console.error("Lỗi khi cập nhật trạng thái đơn hàng:", err);
+                        showAlert("error", "Đã xảy ra lỗi khi cập nhật trạng thái đơn hàng.");
+                        $("#confirmModal").modal("hide");
+                    },
+                });
+            });
+
+
+            function reloadPage() {
+                location.reload();
+            }
+            function showAlert(type, message) {
+                const alertClass = type === "success" ? "alert-success" : "alert-danger";
+                const alert = $('<div class="alert ' + alertClass + '" role="alert">' + message + "</div>");
+                $("body").append(alert);
+                setTimeout(function () {
+                    $(alert).remove();
+                }, 5000);
+            }
+        });
     </script>
 </body>
+
 </html>

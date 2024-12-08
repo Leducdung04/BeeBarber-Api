@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title></title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Rokkitt:100,300,400,700" rel="stylesheet" />
+
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="css/animate.css" />
+  <!-- Icomoon Icon Fonts-->
+  <link rel="stylesheet" href="css/icomoon.css" />
+  <!-- Ion Icon Fonts-->
+  <link rel="stylesheet" href="css/ionicons.min.css" />
+  <!-- Bootstrap  -->
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+
+  <!-- Magnific Popup -->
+  <link rel="stylesheet" href="css/magnific-popup.css" />
+
+  <!-- Flexslider  -->
+  <link rel="stylesheet" href="css/flexslider.css" />
+
+  <!-- Owl Carousel -->
+  <link rel="stylesheet" href="css/owl.carousel.min.css" />
+  <link rel="stylesheet" href="css/owl.theme.default.min.css" />
+
+  <!-- Flaticons  -->
+  <link rel="stylesheet" href="fonts/flaticon/font/flaticon.css" />
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="list-container" data-screen="customer-screen">
+      <div class="list-header">
+        <h2>Danh Sách Người Dùng</h2>
+      </div>
+      <table id="customerList">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Số Điện Thoại</th>
+            <th>Vai Trò</th>
+            <th>Trạng Thái</th>
+            <th>Thao Tác</th>
+          </tr>
+        </thead>
+        <tbody id="user-list"></tbody>
+      </table>
+      <div id="pagination" class="pagination"></div>
+    </div>
+  </div>
+  <div class="modal fade" id="confirmModalUser" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmModalLabel">
+            Xác nhận Thay đổi trạng thái
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">Bạn có chắc chắn muốn thay đổi?</div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Hủy bỏ
+          </button>
+          <button id="confirmProductBtn" type="button" class="btn btn-primary">
+            Xác nhận
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- jQuery -->
+  <script src="js/jquery.min.js"></script>
+  <!-- popper -->
+  <script src="js/popper.min.js"></script>
+  <!-- bootstrap 4.1 -->
+  <script src="js/bootstrap.min.js"></script>
+  <!-- jQuery easing -->
+  <script src="js/jquery.easing.1.3.js"></script>
+  <!-- Waypoints -->
+  <script src="js/jquery.waypoints.min.js"></script>
+  <!-- Flexslider -->
+  <script src="js/jquery.flexslider-min.js"></script>
+  <!-- Owl carousel -->
+  <script src="js/owl.carousel.min.js"></script>
+  <!-- Magnific Popup -->
+  <script src="js/jquery.magnific-popup.min.js"></script>
+  <script src="js/magnific-popup-options.js"></script>
+  <!-- Date Picker -->
+  <script src="js/bootstrap-datepicker.js"></script>
+  <!-- Stellar Parallax -->
+  <script src="js/jquery.stellar.min.js"></script>
+  <script>
+    const apiUrl = "api/user/get_all_customer";
+    let customers = [];
+    let currentPage = 1;
+    const limit = 5;
+
+    function fetchCustomers() {
+      fetch(apiUrl)
+        .then((response) => response.json())
+        .then((data) => {
+          customers = data.data;
+          renderCustomers();
+          renderPagination();
+        })
+        .catch((error) => console.error("Error fetching user:", error));
+    }
+    function renderCustomers() {
+      const customerList = document
+        .getElementById("customerList")
+        .getElementsByTagName("tbody")[0];
+      customerList.innerHTML = "";
+      const startIndex = (currentPage - 1) * limit;
+      const endIndex = startIndex + limit;
+      const paginatedServices = customers.slice(startIndex, endIndex);
+
+      paginatedServices.forEach((customer) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+                <td class="h5">${customer.name}</td>
+                <td class="h5">${customer.email}</td>
+                <td class="h5">${customer.phone}</td>
+                <td class="h5">${customer.role}</td>
+                <td class="h5">${customer.isLocked ? "Locked" : "UnLocked"}</td>
+                <td><a href="${customer._id}"style="color:
+       #007bff; font-size:15px; text-decoration: underline;"
+       >${customer.isLocked ? "Gỡ khóa" : "Khóa"}</a></td>`;
+        customerList.appendChild(row);
+      });
+    }
+
+    function renderPagination() {
+      const paginationContainer = document.getElementById("pagination");
+      paginationContainer.innerHTML = "";
+
+      const totalPages = Math.ceil(customers.length / limit);
+
+      for (let i = 1; i <= totalPages; i++) {
+        const pageButton = document.createElement("button");
+        pageButton.innerText = i;
+        pageButton.className = i === currentPage ? "active" : "";
+        pageButton.onclick = () => {
+          currentPage = i;
+          renderCustomers(); // Render selected page
+        };
+        paginationContainer.appendChild(pageButton);
+      }
+    }
+
+    document
+      .getElementById("user-list")
+      .addEventListener("click", async function (event) {
+        if (event.target.tagName === "A") {
+          event.preventDefault();
+          const userId = await event.target.getAttribute("href");
+          console.log(userId);
+          $("#confirmModalUser").modal("show");
+          $("#confirmProductBtn").click(function () {
+            fetch(`/api/user/lock_user/${userId}`)
+              .then((res) => res.json())
+              .then((data) => {
+                if (data.message === "User locked status updated") {
+                  alert("update thành công");
+                  $("#confirmModalUser").modal("hide");
+                  window.location.replace("/customers");
+                } else if (data.message === "User not found") {
+                  alert("Không tìm thấy người dùng");
+                } else {
+                  alert("Internal server error");
+                }
+              });
+          });
+        }
+      });
+
+    fetchCustomers();
+  </script>
+</body>

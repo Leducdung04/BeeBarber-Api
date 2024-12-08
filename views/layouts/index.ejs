@@ -76,8 +76,8 @@
             <li class="<%= isActiveRoute('/revenue', locals.currentRoute)%>">
               <a href="/revenues"><i class="material-icons">attach_money</i> Doanh thu</a>
             </li>
-            <li class="<%= isActiveRoute('/user', locals.currentRoute)%>">
-              <a href="/users"><i class="material-icons">person</i> Người dùng</a>
+            <li class="<%= isActiveRoute('/customer', locals.currentRoute)%>">
+              <a href="/customers"><i class="material-icons">person</i> Người dùng</a>
             </li>
           </ul>
         </ul>
@@ -92,32 +92,34 @@
     </div>
   </main>
   <script>
-    window.onload = function() {
-        var defaultTitle = document.title;
-        var path = window.location.pathname;
-        if (path === "/home") {
-            document.title = "Trang chủ - 30Shine";
-        } else if (path === "/categories_products") {
-            document.title = "Danh mục sảm phẩm - 30Shine";
-        }else if (path === "/categories_services") {
-            document.title = "Danh mục dịch vụ - 30Shine";
-        } else if (path === "/products") {
-            document.title = "Sản phẩm - 30Shine";
-        } else if (path === "/services") {
-            document.title = "Dịch vụ - 30Shine";
-        } else if (path === "/statisticals") {
-            document.title = "Thống kê - 30Shine";
-        } else if (path === "/orders") {
-            document.title = "Đơn hàng - 30Shine";
-        }else if (path === "/banners") {
-            document.title = "Banner - 30Shine";
-        }else if (path === "/barbers") {
-            document.title = "Barbers - 30Shine";
-        } else {
-            document.title = defaultTitle;
-        }
+    window.onload = function () {
+      var defaultTitle = document.title;
+      var path = window.location.pathname;
+      if (path === "/home") {
+        document.title = "Trang chủ - BeeBarber";
+      } else if (path === "/categories_products") {
+        document.title = "Danh mục sảm phẩm - BeeBarber";
+      } else if (path === "/categories_services") {
+        document.title = "Danh mục dịch vụ - BeeBarber";
+      } else if (path === "/products") {
+        document.title = "Sản phẩm - BeeBarber";
+      } else if (path === "/services") {
+        document.title = "Dịch vụ - BeeBarber";
+      } else if (path === "/statisticals") {
+        document.title = "Thống kê - BeeBarber";
+      } else if (path === "/orders") {
+        document.title = "Đơn hàng - BeeBarber";
+      } else if (path === "/banners") {
+        document.title = "Banner - BeeBarber";
+      } else if (path === "/barbers") {
+        document.title = "Barbers - BeeBarber";
+      } else if (path === "/customers") {
+        document.title = "Người Dùng - BeeBarber";
+      } else {
+        document.title = defaultTitle;
+      }
     };
-</script>
+  </script>
 </body>
 
 </html>

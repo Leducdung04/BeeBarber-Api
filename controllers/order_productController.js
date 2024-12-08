@@ -248,7 +248,8 @@ exports.getAllOrdersAdmin = async (req, res, next) => {
         // Lấy tất cả các đơn hàng
         const orders = await Order_Product.find()// Lấy thông tin sản phẩm
             .populate('user_voucher_id') // Lấy thông tin từ bảng UserVoucher nếu có
-            .sort({ createdAt: -1 }); // Sắp xếp theo thời gian tạo mới nhất
+            .sort({ createdAt: -1 }) // Sắp xếp theo thời gian tạo mới nhất
+            .populate('user_id')
 
         // Lấy tất cả các thanh toán
         const payments = await Payment.find({ status: true });

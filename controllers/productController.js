@@ -135,3 +135,31 @@ exports.deleteProduct = async (req, res, next) => {
     res.status(500).json({ success: false, message: 'Server error', error });
   }
 }
+
+exports.changeProductStatus = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    const product = await Product.findById(id);
+    if (product) {
+      // Toggle the status dynamically
+      const updatedProduct = await Product.findByIdAndUpdate(
+        id,
+        { status: !product.status },
+        { new: true }
+      );
+      if (updatedProduct) {
+        return res.json({
+          message: "Status updated successfully",
+          data: updatedProduct,
+        });
+      } else {
+        return res.json({ message: "Failed to update product status" });
+      }
+    } else {
+      return res.status(404).json({ message: "Category not found" });
+    }
+  } catch (error) {
+    return res.status(500).json({ status: 500, message: `${error}` });
+  }
+}
