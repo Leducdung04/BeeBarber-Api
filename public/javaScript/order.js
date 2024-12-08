@@ -94,7 +94,11 @@ fetch('api/getOrdersAdmin')
             const statusBadge = getStatusBadge(order.status);
 
             const row = document.createElement('tr');
-            row.onclick = () => viewOrderDetails(order); 
+            row.onclick = () => {
+                document.querySelectorAll('tr').forEach(r => r.classList.remove('selected-row'));
+                row.classList.add('selected-row');
+                viewOrderDetails(order);
+            };
 
             row.innerHTML =
                 `<td><img src="${order.listProduct[0].image}" alt="${order.listProduct[0].name}"></td>
