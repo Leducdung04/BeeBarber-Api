@@ -1,6 +1,6 @@
 <div class="container">
     <!-- List Container -->
-    <div class="list-container">
+    <div class="list-container" data-screen="service-screen">
         <div class="list-header">
             <h2>Danh Sách Dịch Vụ</h2>
             <button onclick="openAddModal()">Thêm Dịch Vụ</button>
@@ -10,7 +10,6 @@
                 <tr>
                     <th>Tên</th>
                     <th>Danh mục</th>
-                    <th>Mô tả</th>
                     <th>Giá</th>
                     <th>Thời lượng</th>
                     <th>Ảnh</th>
@@ -26,7 +25,7 @@
     </div>
 
     <!-- Modal for Editing Service -->
-    <div id="editModal" class="modal" >
+    <div id="editModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeEditModal()">&times;</span>
             <h2>Sửa Dịch Vụ</h2>
@@ -57,7 +56,7 @@
     </div>
 
     <div id="serviceModal" class="modal">
-        <div class="modal-content" >
+        <div class="modal-content">
             <span class="close" onclick="closeAddModal()">&times;</span>
             <h2>Thêm Mới Dịch Vụ</h2>
             <form id="serviceForm" enctype="multipart/form-data">
@@ -85,6 +84,51 @@
             </form>
         </div>
     </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDetailModal()">&times;</span>
+            <h2>Chi Tiết Dịch Vụ</h2>
+            <div class="modal-body">
+                <div class="detail-item">
+                    <strong>Tên:</strong>
+                    <span id="detailName">Tên Dịch Vụ</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Giá:</strong>
+                    <span id="detailPrice">Giá Dịch Vụ</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Thời Lượng:</strong>
+                    <span id="detailDuration">Hiển thị</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Thể Loại:</strong>
+                    <span id="detailCategory">Thể Loại Dịch Vụ</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Mô tả:</strong>
+                    <span id="detailDescription">Mô tả về dịch vụ</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Trạng thái:</strong>
+                    <span id="detailStatus">Hiển thị</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Ảnh:</strong>
+                    <div class="image-container">
+                        <img id="detailImage" src="" alt="Category Image">
+                    </div>
+
+                </div>
+            </div>
+            <!-- Actions -->
+            <div class="modal-actions">
+                <button>Chỉnh sửa</button>
+            </div>
+        </div>
+    </div>
+
 </div>
 <script type="text/javascript">
     const apiUrl = 'api/services/get_list_service';
@@ -120,6 +164,30 @@
             console.error("Edit Modal not found!");
         }
     }
+
+    function closeDetailModal() {
+        document.getElementById('detailModal').style.display = 'none';
+    }
+
+    function openDetailModal(id, name, id_category, name_category, description, price, duration, images, status) {
+        document.getElementById('detailName').textContent = name;
+        document.getElementById('detailPrice').textContent = `${price.toLocaleString('vi')} VNĐ`;
+        document.getElementById('detailDuration').textContent = `${duration} phút`;
+        document.getElementById('detailCategory').textContent = name_category;
+        document.getElementById('detailDescription').textContent = description;
+        document.getElementById('detailStatus').textContent = status === true ? 'Hiển thị' : 'Ẩn';
+        document.getElementById('detailImage').src = images;
+
+        const editButton = document.querySelector('#detailModal .modal-actions button:nth-child(1)');
+
+        editButton.onclick = function () {
+            closeDetailModal();
+            openEditModal(id, name, id_category, description, price, duration, images);
+        };
+
+        document.getElementById('detailModal').style.display = 'flex';
+    }
+
     function fetchCategories() {
         fetch('api/categorys/get_list_category')
             .then(response => response.json())
@@ -162,15 +230,15 @@
             row.innerHTML = `
             <td>${truncateText(service.name, 50)}</td>
             <td>${service.id_category.name}</td>
-            <td>${truncateText(service.description, 50)}</td>
             <td>${service.price.toLocaleString('vi')}</td>
             <td>${service.duration}</td>
             <td><img src="${service.images}" alt="${service.name}" width="100"></td>
             <td>${service.status ? 'Hiển thị' : 'Ẩn'}</td>
             <td>
                 <div style="display: flex; gap: 10px; justify-content: flex-start; align-items: center;">
+                    <button class="btn-detail" onclick="openDetailModal('${service._id}', '${service.name}', '${service.id_category._id}', '${service.id_category.name}','${service.description}', ${service.price}, ${service.duration}, '${service.images}', ${service.status})">Chi tiết</button>
                     <button class="btn-edit" onclick="openEditModal('${service._id}', '${service.name}', '${service.id_category._id}', '${service.description}', ${service.price}, ${service.duration}, '${service.images}', ${service.status})">Sửa</button>
-                    <button class="btn-delete" onclick="deleteService('${service._id}',${service.status})">Ẩn</button>
+                    <button class="btn-delete" onclick="updateService('${service._id}',${service.status})">${service.status ? "Ẩn" : "Hiển Thị"}</button>
                 </div>
             </td>`
                 ;
@@ -294,17 +362,30 @@
     }
 
 
-    function deleteService(id,status) {
-        fetch(`api/services/updateStatus/${id}`, {
-            method: 'PUT',
-            body:!status
+    function deleteService(id, status) {
+        fetch(`api/services/delete_service/${id}`, {
+            method: 'DELETE'
         })
             .then(response => response.json())
             .then(data => {
                 fetchServices();
             })
+            .catch(error => console.error('Error deleting category product:', error));
+    }
+
+    function updateService(id, status) {
+        fetch(`api/services/update_status_service/${id}`, {
+            method: 'PUT',
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert('Cập nhật trạng thái thành công');
+                fetchServices();
+                fetchCategories();
+            })
             .catch(error => console.error('Error deleting service:', error));
     }
+
     // Initialize page
     fetchCategories();
     fetchServices();

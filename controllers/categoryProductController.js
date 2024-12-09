@@ -1,5 +1,6 @@
 const Category_Product = require("../models/categoryProduct");
 const mongoose = require("mongoose");
+const Product = require("../models/product")
 
 exports.get_list_Category_Product = async (req, res, next) => {
   try {
@@ -13,7 +14,7 @@ exports.get_list_Category_Product = async (req, res, next) => {
 
 exports.add_Category_Product = async (req, res, next) => {
   try {
-    const { name, description} = req.body;
+    const { name, description } = req.body;
     const { file } = req;
     let image = null;
     if (req.file) {
@@ -25,12 +26,11 @@ exports.add_Category_Product = async (req, res, next) => {
       image,
     });
     const result = await newCategory.save();
-    if(result){
-      return res.status(201).json({message:"Create new category product successfully", data:result});
-    }else{
-      return res.json({message: "Create new category product failed"})
+    if (result) {
+      return res.status(201).json({ success: true, message: "Create new category product successfully", data: result });
+    } else {
+      return res.json({ success: false, message: "Create new category product failed" })
     }
-    
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
@@ -74,47 +74,85 @@ exports.update_Category_Product = async (req, res, next) => {
 };
 
 
-exports.getCategoryProduct = async (req,res)=>{
+exports.getCategoryProduct = async (req, res) => {
   try {
     const id = req.params.id
     const category = await Category_Product.findById(id)
-    if(category){
-      return res.json({message: "Get category product successfully", data: category})
-    }else{
-      return res.json({message: "Get category product failed"})
+    if (category) {
+      return res.json({ message: "Get category product successfully", data: category })
+    } else {
+      return res.json({ message: "Get category product failed" })
     }
   } catch (error) {
-    return res.json({message: `${error}`})
-  }
-}
-exports.changeStatusCategoryProduct = async (req,res)=>{
-  try {
-    const id = req.params.id
-    console.log(id)
-    const category = await Category_Product.findById({_id:id})
-    if(category){
-     const updateCategoryService = await  Category_Product.findByIdAndUpdate(category._id,{
-      status: false
-    },{
-      new: true
-    })
-    if(updateCategoryService){
-         return res.json({message:"update status successfully", data: updateCategoryService})
-    }else{
-         return res.json({message: "Update category product failed"})
-    }
-    }else{
-      return res.json({message: "Not found category product"})
-    }
-    } catch (error) {
-     return res.status(500).json({status:500, message: `${error}`})
+    return res.json({ message: `${error}` })
   }
 }
 
-exports.deleteCategoryProduct = async (req,res)=>{
+// exports.changeStatusCategoryProduct = async (req,res)=>{
+//   try {
+//     const id = req.params.id
+//     console.log(id)
+//     const category = await Category_Product.findById({_id:id})
+//     if(category){
+//      const updateCategoryService = await  Category_Product.findByIdAndUpdate(category._id,{
+//       status: false
+//     },{
+//       new: true
+//     })
+//     if(updateCategoryService){
+//          return res.json({message:"update status successfully", data: updateCategoryService})
+//     }else{
+//          return res.json({message: "Update category product failed"})
+//     }
+//     }else{
+//       return res.json({message: "Not found category product"})
+//     }
+//     } catch (error) {
+//      return res.status(500).json({status:500, message: `${error}`})
+//   }
+// }
+
+exports.changeStatusCategoryProduct = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const productCategory = await Category_Product.findById(id);
+    if (productCategory) {
+      // Toggle the status dynamically
+      const updatedCategoryProduct = await Category_Product.findByIdAndUpdate(
+        id,
+        { status: !productCategory.status },
+        { new: true }
+      );
+      if (updatedCategoryProduct) {
+        return res.json({
+          message: "Status updated successfully",
+          data: updatedCategoryProduct,
+        });
+      } else {
+        return res.json({ message: "Failed to update product status" });
+      }
+    } else {
+      return res.status(404).json({ message: "Category not found" });
+    }
+  } catch (error) {
+    return res.status(500).json({ status: 500, message: `${error}` });
+  }
+}
+
+exports.deleteCategoryProduct = async (req, res) => {
   try {
     const { id } = req.params;
     const result = await Category_Product.findByIdAndDelete(id);
+
+    const products = await Product.find({ category_id: id });
+    if (products.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Không thể xóa thể loại khi đang có sản phẩm đang sử dụng',
+      });
+    }
+
     if (result) {
       res.json({ success: true, message: 'Category Product deleted successfully' });
     } else {

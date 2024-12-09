@@ -1,95 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orders</title>
-<style>
-    .list-group-item {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-.list-group-item img {
-    max-width: 100px;
+        th,
+        td {
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            text-align: left;
+        }
 
-}
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
 
-.list-group-item h5 {
-    font-size: 18px;
-    font-weight: bold;
-}
-.list-group-item .btn {
-    min-width: 120px;
-}
+        img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
 
-@media (min-width: 768px) {
-    .list-group-item {
-        flex-wrap: nowrap;
-    }
-}
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+        }
+
+        .bg-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .bg-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .bg-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .bg-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+
+        .user-id {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .modal {
+            z-index: 1055 !important;
+        }
+
+        .modal-backdrop {
+            z-index: 1045 !important;
+        }
+
+        .selected-row {
+            background-color: lavender;
+        }
     </style>
 </head>
+
 <body>
     <div class="container mt-5">
-        <div class="col">
-            <h2 class="mb-4 text-center ">Danh Sách Đơn Hàng</h2>
-            <div id="orderList" class="list-group"></div>
-        </div>
-    </div>
-    
-    <script>
-        // Fetch order data from API
-        fetch('api/getOrdersAdmin')
-        .then(response => response.json())
-        .then(data => {
-            const orderList = document.getElementById('orderList');
-    
-            data.forEach(order => {
-                const orderDate = new Date(order.createdAt).toLocaleDateString();
-                const statusBadge = getStatusBadge(order.status);
-    
-                const item = document.createElement('div');
-                item.classList.add('list-group-item', 'py-3', 'd-flex', 'align-items-center', 'justify-content-between', 'flex-wrap', 'shadow-sm');
-
-                item.onclick = ()=> viewOrderDetails(order._id)
-                
-                item.innerHTML = `
-                    <div class="d-flex align-items-center">
-                        <img src="${order.listProduct[0].image}" class="img-fluid rounded me-3" style="width: 120px; height: 120px; object-fit: cover;" alt="${order.listProduct[0].name}">
-                        <div style="margin-left:10px">
-                            <h5 class="mb-2">${order.listProduct[0].name}</h5>
-                            <p class="mb-1"><strong>Giá:</strong> ${order.total_price_sold.toLocaleString()} VND</p>
-                            <p class="mb-1"><strong>Ngày đặt:</strong> ${orderDate}</p>
-                            <p class="mb-1"><strong>Địa điểm:</strong> ${order.location}</p>
-                            <div>${statusBadge}</div>
+        <div class="container py-4">
+            <div class="row justify-content-center">
+                <!-- Order Information Section -->
+                <div class="col-lg-10">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-body">
+                            <h3 class="font-weight-bold mb-3">Thông tin Đặt Hàng</h3>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <p><strong>ID Đơn Hàng:</strong> <span id="idDisplay"></span></p>
+                                    <p>
+                                        <strong>Trạng Thái:</strong>
+                                        <select id="statusSelect" class="form-control d-inline-block w-auto"></select>
+                                    </p>
+                                    <p><strong>Trạng Thái Hiện Tại:</strong> <span id="statusDisplay"></span></p>
+                                    <p><strong>Thời Gian Xác Nhận:</strong> <span id="confirmTimeDisplay"></span></p>
+                                    <p><strong>Thời Gian Giao Hàng:</strong> <span id="deliveryTimeDisplay"></span></p>
+                                    <p><strong>Thời Gian Hủy:</strong> <span id="cancelTimeDisplay"></span></p>
+                                    <p><strong>Thời Gian Hoàn Thành:</strong> <span id="successTimeDisplay"></span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h4 class="font-weight-bold">Thông tin Giao Hàng</h4>
+                                    <p><strong>Địa Chỉ:</strong> <span id="addressDisplay"></span></p>
+                                    <p><strong>User ID:</strong> <span id="userIdDisplay"></span></p>
+                                    <p><strong>Số Điện Thoại:</strong> <span id="userPhoneDisplay"></span></p>
+                                    <p><strong>Tổng Tiền:</strong> <span id="totalPriceSoldDisplay"></span></p>
+                                    <p><strong>Phương Thức Thanh Toán:</strong> <span id="paymentMethodDisplay"></span>
+                                    </p>
+                                    <p><strong>Phương Thức Giao Hàng:</strong> <span id="shippingMethodDisplay"></span>
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                `;
-    
-                orderList.appendChild(item);
-            });
-        })
-        .catch(error => console.error('Error fetching orders:', error));
-    
-        function getStatusBadge(status) {
-        switch (status) {
-            case "pending":
-                return '<span class="badge bg-warning text-dark">Chờ xác nhận</span>';
-            case "active":
-                return '<span class="badge bg-info text-dark">Xác nhận</span>';
-            case "trading":
-                return '<span class="badge bg-info text-dark">Đang giao</span>';
-            case "delivered":
-                return '<span class="badge bg-success">Đã giao</span>';
-            case "deactive":
-                return '<span class="badge bg-success">Đã hủy</span>';
-        }
-    }
-    function viewOrderDetails(orderId){
-        location.href=`showDetailOrder/${orderId}`
-    }
-    </script>
+
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h3 class="font-weight-bold mb-3">Thông tin Sản Phẩm</h3>
+                            <div id="productDetails" class="row">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Hình Ảnh</th>
+                    <th>Tên Sản Phẩm</th>
+                    <th>Giá</th>
+                    <th>Ngày Đặt</th>
+                    <th>Địa Điểm</th>
+                    <th>Trạng Thái</th>
+                </tr>
+            </thead>
+            <tbody id="orderList"></tbody>
+        </table>
+        <div id="pagination" class="pagination"></div>
+        <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmModalLabel">Xác nhận thay đổi trạng thái đơn hàng</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn thay đổi trạng thái của đơn hàng?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy bỏ</button>
+                        <button id="confirmStatusBtn" type="button" class="btn btn-primary">Xác nhận</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/javaScript/order.js"></script>
 </body>
+
 </html>

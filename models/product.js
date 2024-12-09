@@ -35,7 +35,8 @@ const productShema = new mongoose.Schema({
     default: true,
   },
   soldQuantity:{
-    type:Number
+    type:Number,
+    default : 0
   }
 });
 

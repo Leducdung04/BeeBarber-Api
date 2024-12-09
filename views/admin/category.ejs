@@ -1,6 +1,6 @@
 <div class="container">
     <!-- List Container -->
-    <div class="list-container">
+    <div class="list-container" data-screen="product-category-screen">
         <div class="list-header">
 <<<<<<< HEAD
             <h2>Danh Sách Thể Loại Sản phẩm</h2>
@@ -14,7 +14,6 @@
             <thead>
                 <tr>
                     <th>Tên</th>
-                    <th>Mô tả</th>
                     <th>Ảnh</th>
                     <th>Trạng thái</th>
                     <th>Hành động</th>
@@ -39,11 +38,6 @@
                 <label for="editDescription">Mô tả</label>
                 <input type="text" id="editDescription" placeholder="Nhập mô tả" required>
 
-                <label for="editStatus">Trạng thái</label>
-                <select id="editStatus" class="input-field" required>
-                    <option value="true">Hiển thị</option>
-                    <option value="false">Ẩn</option>
-                </select>
 
                 <label for="editImage">Ảnh</label>
                 <input type="file" id="editImage">
@@ -66,12 +60,6 @@
                 <label for="description">Mô tả</label>
                 <input type="text" id="description" placeholder="Nhập mô tả" required>
 
-                <label for="status">Trạng thái</label>
-                <select id="status" class="input-field" required>
-                    <option value="true">Hiển thị</option>
-                    <option value="false">Ẩn</option>
-                </select>
-
                 <label for="image">Ảnh</label>
                 <input type="file" id="image" required>
 
@@ -79,7 +67,41 @@
             </form>
         </div>
     </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDetailModal()">&times;</span>
+            <h2>Chi Tiết Thể Loại Sản Phẩm</h2>
+            <div class="modal-body">
+                <div class="detail-item">
+                    <strong>Tên:</strong>
+                    <span id="detailName">Tên Thể Loại Sản Phẩm</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Mô tả:</strong>
+                    <span id="detailDescription">Mô tả về thể loại sản phẩm...</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Trạng thái:</strong>
+                    <span id="detailStatus">Hiển thị</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Ảnh:</strong>
+                    <div class="image-container">
+                        <img id="detailImage" src="" alt="Category Image">
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="modal-actions">
+                <button>Chỉnh sửa</button>
+            </div>
+        </div>
+    </div>
 </div>
+
 <script type="text/javascript">
     const apiUrl = 'api/categoryProducts/get_list_Category_Product';
     let categoryProducts = [];
@@ -87,6 +109,7 @@
     const limit = 5;
     var addModal = document.getElementById("categoryProductModal");
     var editModal = document.getElementById("editModal");
+    var detailModal = document.getElementById('detailModal');
     var closeBtn = document.getElementById("closeModal")
 
     function openAddModal() {
@@ -112,6 +135,28 @@
         }
     }
 
+    function openDetailModal(id, name, description, status, image) {
+
+        console.log('Image URL:', image);
+        document.getElementById('detailName').textContent = name;
+        document.getElementById('detailDescription').textContent = description;
+        document.getElementById('detailStatus').textContent = status === "true" ? 'Hiển thị' : 'Ẩn';
+        document.getElementById('detailImage').src = image;
+
+        const editButton = document.querySelector('#detailModal .modal-actions button:nth-child(1)');
+
+        editButton.onclick = function () {
+            closeDetailModal()
+            openEditModal(id, name, description, image);
+        };
+
+        detailModal.style.display = 'flex';
+    }
+
+    function closeDetailModal() {
+        document.getElementById('detailModal').style.display = 'none';
+    }
+
     function fetchCategoryProducts() {
         fetch(apiUrl)
             .then(response => response.json())
@@ -134,13 +179,14 @@
             const row = document.createElement('tr');
             row.innerHTML = `
                         <td>${categoryProduct.name}</td>
-                        <td>${truncateText(categoryProduct.description, 50)}</td>
                         <td><img src="${categoryProduct.image}" alt="${categoryProduct.name}" width="100"></td>
                         <td>${categoryProduct.status ? 'Hiển thị' : 'Ẩn'}</td>
                         <td>
                             <div style="button-group">
-                                <button class="btn-edit" onclick="openEditModal('${categoryProduct._id}', '${categoryProduct.name}', '${categoryProduct.description}', '${categoryProduct.status}', '${categoryProduct.image}')">Sửa</button>
-                                <button class="btn-delete" onclick="deleteCategoryProduct('${categoryProduct._id}')">Ẩn</button>
+                                <button class="btn-detail" onclick="openDetailModal('${categoryProduct._id}', '${categoryProduct.name}', '${categoryProduct.description}', '${categoryProduct.status}', '${categoryProduct.image}')">Chi tiết</button>
+                                <button class="btn-edit" onclick="openEditModal('${categoryProduct._id}', '${categoryProduct.name}', '${categoryProduct.description}', '${categoryProduct.image}')">Sửa</button>
+                                <button class="btn-delete" onclick="updateCategoryProduct('${categoryProduct._id}')">
+                                    ${categoryProduct.status ? "Ẩn " : "Hiển Thị"}</button>
                             </div>
                         </td>
                     `;
@@ -173,13 +219,11 @@
 
         const name = document.getElementById('name').value;
         const description = document.getElementById('description').value;
-        const status = document.getElementById('status').value === 'true';
         const image = document.getElementById('image').files[0];
 
         const formData = new FormData();
         formData.append('name', name);
         formData.append('description', description);
-        formData.append('status', status);
         formData.append('image', image);
 
         fetch('api/categoryProducts/add_category_product', {
@@ -201,45 +245,37 @@
         return text;
     }
 
-
-    function openEditModal(id, name, description, status, image) {
+    function openEditModal(id, name, description, image) {
         document.getElementById('editName').value = name;
         document.getElementById('editDescription').value = description;
-        document.getElementById('editStatus').value = status ? 'true' : 'false';
 
         const imagePreview = document.getElementById('currentImagePreview');
         if (image) {
-            imagePreview.src = image; // Set the source of the image preview
-            imagePreview.style.display = 'block'; // Show the preview
+            imagePreview.src = image;
+            imagePreview.style.display = 'block';
         } else {
-            imagePreview.style.display = 'none'; // Hide the preview if no image is provided
+            imagePreview.style.display = 'none';
         }
 
         // Show the modal
         const modal = document.getElementById('editModal');
         modal.style.display = "flex";
 
-        // Handle form submission
         const editForm = document.getElementById('editForm');
         editForm.onsubmit = function (e) {
             e.preventDefault();
 
-            // Gather updated data from the form fields
             const updatedName = document.getElementById('editName').value;
             const updatedDescription = document.getElementById('editDescription').value;
-            const updatedStatus = document.getElementById('editStatus').value === 'true';
             const updatedImage = document.getElementById('editImage').files[0];
 
-            // Create a FormData object for the updated data
             const formData = new FormData();
             formData.append('name', updatedName);
             formData.append('description', updatedDescription);
-            formData.append('status', updatedStatus);
             if (updatedImage) {
                 formData.append('image', updatedImage);
             }
 
-            // Send the PUT request to update the category product
             fetch(`api/categoryProducts/update_category_product/${id}`, {
                 method: 'PUT',
                 body: formData
@@ -247,13 +283,12 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log('Category product updated:', data);
-                    fetchCategoryProducts(); // Refresh the category product list
-                    modal.style.display = "none"; // Close the modal
+                    fetchCategoryProducts();
+                    modal.style.display = "none";
                 })
                 .catch(error => console.error('Error updating category product:', error));
         };
     }
-
 
     function deleteCategoryProduct(id) {
         fetch(`api/categoryProducts/delete_category_product/${id}`, {
@@ -261,10 +296,22 @@
         })
             .then(response => response.json())
             .then(data => {
+                alert("Xóa Thành Công")
                 fetchCategoryProducts();
             })
             .catch(error => console.error('Error deleting category product:', error));
     }
 
+    function updateCategoryProduct(id) {
+        fetch(`api/categoryProducts/update_status_category_product/${id}`, {
+            method: 'PUT',
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert('Cập nhật trạng thái thành công');
+                fetchCategoryProducts();
+            })
+            .catch(error => console.error('Error changing category product status:', error));
+    }
     fetchCategoryProducts();
 </script>
