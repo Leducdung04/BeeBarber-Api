@@ -9,6 +9,7 @@
                 <tr>
                     <th>Tên</th>
                     <th>Ảnh</th>
+                    <th>Trạng Thái</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
@@ -152,6 +153,7 @@
             row.innerHTML = `
                         <td>${category.name}</td>
                         <td><img src="${category.image}" alt="${category.name}" width="100"></td>
+                        <td>${category.status ? "Hiển Thị" : "Ẩn"}</td>
                         <td>
                             <div class="button-group">
                              <button class="btn-detail" onclick="openDetailModal('${category._id}', '${category.name}', '${category.description}', '${category.image}','${category.status}')">Chi tiết</button>
