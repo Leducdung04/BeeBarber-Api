@@ -104,7 +104,7 @@ router.put('/products/update_product/:id',Upload.single("image"),update_product)
 router.put('/products/update_product_status/:id',changeProductStatus);
 router.get('/products/get_product_detail/:id',get_product_detail)
 router.get('/products/search_product_by_name',search_products_by_name)
-router.put("/products/update_status_product/:id", updateQuantityProduct)
+router.put("/products/update_quantity_product/:id", updateQuantityProduct)
 router.delete("/products/delete_product/:id",deleteProduct)
 
 //Restful API cho cart
