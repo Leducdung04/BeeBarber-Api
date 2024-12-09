@@ -61,9 +61,9 @@ router.get("/banners", (req, res) => {
   res.render("admin/banner", { locals, layout: admin });
 });
 
-router.get("/barbers", (req, res) => {
+router.get("/stylists", (req, res) => {
   const locals = {
-    currentRoute: `/barber`,
+    currentRoute: `/stylist`,
     title: "Hello",
   }
   res.render("admin/barber", { locals, layout: admin });
