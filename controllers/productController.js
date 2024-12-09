@@ -89,29 +89,35 @@ exports.search_products_by_name = async (req, res, next) => {
 }
 exports.updateQuantityProduct = async (req, res) => {
   try {
-    const _id = req.params.id
-    const updateProduct = await Product.findByIdAndUpdate(_id, {
-      quantity: 0,
-      status: false
-    }, {
-      new: true
-    })
+    const _id = req.params.id;
+    const { quantity, status } = req.body; 
+
+    const updateProduct = await Product.findByIdAndUpdate(
+      _id,
+      {
+        quantity: quantity, 
+        status: status,     
+      },
+      { new: true }
+    );
+
     if (updateProduct) {
       res.status(200).json({
         status: 200,
-        message: "update product successfully",
+        message: "Product updated successfully",
         data: updateProduct
-      })
+      });
     } else {
       res.status(401).json({
         status: 401,
-        message: "update product failed"
-      })
+        message: "Failed to update product"
+      });
     }
   } catch (error) {
-    res.status(500).json({ status: 500, message: `${error}` })
+    res.status(500).json({ status: 500, message: `Error: ${error}` });
   }
-}
+};
+
 
 exports.deleteProduct = async (req, res, next) => {
   try {
@@ -142,7 +148,6 @@ exports.changeProductStatus = async (req, res, next) => {
 
     const product = await Product.findById(id);
     if (product) {
-      // Toggle the status dynamically
       const updatedProduct = await Product.findByIdAndUpdate(
         id,
         { status: !product.status },

@@ -1,15 +1,15 @@
 <div class="container">
-    <h2>Danh Sách Barber</h2>
+    <h2>Danh Sách Stylist</h2>
     <div class="grid-container">
         <div class="form-container">
-            <h2 id="form-title">Thêm Barber</h2>
+            <h2 id="form-title">Thêm Stylist</h2>
             <div class="form-group">
                 <label for="name">Name:</label>
                 <input type="text" id="name" class="input-field">
             </div>
             <div class="form-group">
                 <label for="experience">Experience:</label>
-                <input type="number" id="experience" class="input-field">
+                <input type="number" id="experience" class="input-field" min="0">
             </div>
             <div class="form-group">
                 <label for="status">Status:</label>
@@ -19,10 +19,10 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="image">Barber Image:</label>
+                <label for="image">Stylist Image:</label>
                 <input type="file" id="image" class="input-field" accept="image/*">
             </div>
-            <button class="btn-add" id="submit-btn" onclick="addBarber()">Add Barber</button>
+            <button class="btn-add" id="submit-btn" onclick="addBarber()">Thêm Stylist</button>
             <button class="btn-cancel" id="cancel-btn" onclick="cancelEdit()" style="display: none;">Cancel</button>
         </div>
 

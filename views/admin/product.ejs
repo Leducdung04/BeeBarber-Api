@@ -13,6 +13,7 @@
                     <th>Giá Nhập</th>
                     <th>Giá Bán</th>
                     <th>Ảnh</th>
+                    <th>Số Lượng</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
@@ -36,10 +37,10 @@
                 <input type="text" id="editProductDescription" placeholder="Nhập mô tả" required>
 
                 <label for="editImportPrice">Giá Nhập</label>
-                <input type="number" id="editImportPrice" placeholder="Nhập giá nhập" required>
+                <input type="number" id="editImportPrice" placeholder="Nhập giá nhập" min="0" required>
 
                 <label for="editSellingPrice">Giá Bán</label>
-                <input type="number" id="editSellingPrice" placeholder="Nhập giá bán" required>
+                <input type="number" id="editSellingPrice" placeholder="Nhập giá bán" min="0" required>
 
                 <label for="category_id">Thể Loại</label>
                 <select id="editProductCategory" class="input-field" required>
@@ -67,7 +68,7 @@
                 <input type="text" id="productDescription" placeholder="Nhập mô tả" required>
 
                 <label for="importPrice">Giá Nhập</label>
-                <input type="number" id="importPrice" placeholder="Nhập giá nhập" required>
+                <input type="number" id="importPrice" placeholder="Nhập giá nhập" required min="0">
 
                 <label for="productCategory">Thể Loại</label>
                 <select id="productCategory" class="input-field" required>
@@ -75,7 +76,10 @@
                 </select>
 
                 <label for="sellingPrice">Giá Bán</label>
-                <input type="number" id="sellingPrice" placeholder="Nhập giá bán" required>
+                <input type="number" id="sellingPrice" placeholder="Nhập giá bán" min="0" required>
+
+                <label for="productQuantity">Số Lượng</label>
+                <input type="number" id="productQuantity" placeholder="Nhập số lượng" min="0" required>
 
                 <label for="productImage">Ảnh</label>
                 <input type="file" id="productImage" required>
@@ -208,21 +212,19 @@
                       <td>${product.category_id.name}</td> 
                       <td>${product.import_price.toLocaleString('vi')}</td>
                       <td>${product.price_selling.toLocaleString('vi')}</td>
+                      <td><img src="${product.image}" alt="${product.name}" width="100"></td> 
+                     <td><input type="number" class="form-control form-control-sm quantity-input" value="${product.quantity}" min="0" data-product-id="${product._id}" onchange="updateProductQuantity(event)" style="width: 80px;" /></td>
 
-                      <td><img src="${product.image}" alt="${product.name}" width="100"></td>
-                  <td>
-                  <div style="button-group">
-                      <button class="btn-detail" onclick="openDetailModal('${product._id}', 
-                      '${product.name}', '${product.description}', '${product.import_price}', 
-                      '${product.price_selling}', '${product.category_id.name}', '${product.category_id._id}',
-                      '${product.quantity}','${product.soldQuantity}','${product.status}', '${product.image}')">Chi tiết</button>
-                      <button class="btn-edit" onclick="openEditModal('${product._id}', '${product.name}', 
-                      '${product.description}', '${product.import_price}', '${product.price_selling}', 
-                      '${product.category_id._id}', '${product.image}')">Sửa</button>
-                      <button class="btn-delete" onclick="updateProduct('${product._id}')">
-                        ${product.status ?  "Ẩn" : "Hiển Thị"}
+                      <td>
+                        <div style="button-group">
+                         <button class="btn-detail" onclick="openDetailModal('${product._id}', 
+                            '${product.name}', '${product.description}', '${product.import_price}', 
+                            '${product.price_selling}', '${product.category_id.name}', '${product.category_id._id}',
+                            '${product.quantity}','${product.soldQuantity}','${product.status}', '${product.image}')">Chi tiết</button>
+                        <button class="btn-delete" onclick="updateProduct('${product._id}')">
+                            ${product.status ? "Ẩn" : "Hiển Thị"}
                       </button>
-                  </div>
+                    </div>
                   </td>
       `;
             productList.appendChild(row);
@@ -237,12 +239,13 @@
         const import_price = document.getElementById('importPrice').value;
         const price_selling = document.getElementById('sellingPrice').value;
         const image = document.getElementById('productImage').files[0];
+        const quantity = document.getElementById('productQuantity').value;
         const category_id = document.getElementById('productCategory').value;
-
 
         const formData = new FormData();
         formData.append('name', name);
         formData.append('description', description);
+        formData.append("quantity", quantity)
         formData.append('import_price', import_price);
         formData.append('price_selling', price_selling);
         formData.append('image', image);
@@ -393,7 +396,34 @@
             .catch(error => console.error('Error deleting product:', error));
     }
 
-    function updateProduct(id){
+    function updateProductQuantity(event) {
+        const inputElement = event.target;
+        const productId = inputElement.getAttribute("data-product-id");
+        const updatedQuantity = inputElement.value;
+
+        console.log(inputElement);
+
+        fetch(`api/products/update_quantity_product/${productId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                quantity: updatedQuantity,
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 200) {
+                    console.log('Product updated successfully');
+                } else {
+                    alert('Thất bại thêm số lượng');
+                }
+            })
+            .catch(error => console.error('Error updating product status:', error));
+    }
+
+    function updateProduct(id) {
         fetch(`api/products/update_product_status/${id}`, {
             method: 'PUT',
         })
@@ -406,17 +436,17 @@
             .catch(error => console.error('Error changing product status:', error));
     }
 
-    function openDetailModal(id, name, description, importPrice, priceSelling, categoryName,categoryId, quantity, soldQuantity,  status, image) {
+    function openDetailModal(id, name, description, importPrice, priceSelling, categoryName, categoryId, quantity, soldQuantity, status, image) {
         document.getElementById('detailName').textContent = name;
         document.getElementById('detailImportPrice').textContent = `${importPrice.toLocaleString('vi')} VNĐ`;
         document.getElementById('detailPriceSelling').textContent = `${priceSelling.toLocaleString('vi')} VNĐ`;
-        document.getElementById('detailQuantity').textContent = quantity;
+        document.getElementById('detailQuantity').textContent = quantity > 0 ? quantity : "Hết Hàng";
         document.getElementById('detailDescription').textContent = description;
         document.getElementById('detailStatus').textContent = status === 'true' ? 'Hiển thị' : 'Ẩn';
         document.getElementById('detailSoldQuantity').textContent = soldQuantity;
         document.getElementById('detailCategory').textContent = categoryName;
         document.getElementById('detailImage').src = image;
-        
+
         const editButton = document.querySelector('#detailModal .modal-actions button:nth-child(1)');
 
         editButton.onclick = function () {
@@ -426,10 +456,6 @@
         document.getElementById('detailModal').style.display = 'flex';
     }
 
-
     fetchProducts();
     fetchCategoriesForDropdown();
-
-    
-
 </script>
