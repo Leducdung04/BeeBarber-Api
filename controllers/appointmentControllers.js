@@ -2,9 +2,8 @@ const { default: mongoose } = require('mongoose');
 const Appointment = require('../models/appointments');
 const Payment = require('../models/payments');
 const User = require('../models/user');
-<<<<<<< HEAD
 const Notification = require('../models/notifications');
-=======
+
 const Service = require('../models/service');
 exports.appointment_total = async (req,res) =>{
     try {
@@ -73,7 +72,7 @@ exports.appointment_total = async (req,res) =>{
         return res.status(500).json({message: `${error}`})
     }
 }
->>>>>>> f6f44ce53bc48e1c1f4aa2be71883eb88fe42daa
+
 exports.addAppointment = async (req, res, next) => {
     try {
         const { barber_id, user_id, service_id, appointment_time, appointment_date, status, price } = req.body;
@@ -143,8 +142,8 @@ exports.addAppointmentWithPayment = async (req, res) => {
             return res.status(400).json({ message: 'Invalid price format in payment' });
         }
 
-        // const paymentResult = await newPayment.save();
-        await newNotification.save();
+         const paymentResult = await newPayment.save();
+        // await newNotification.save();
         res.status(201).json({
             status: 201,
             message: 'Appointment and Payment added successfully',
@@ -521,3 +520,62 @@ exports.updateAppointmentStatus = async (req, res, next) => {
         res.status(400).json({ message: 'Server Error' });
     }
 };
+
+const listTimes = [
+    '8:00','8:20','8:40','9:00','9:20','9:40',
+    '10:00','10:20','10:40','11:00','11:20','11:40',
+    '12:00','12:20','12:40','13:00','13:20','13:40',
+    '14:00','14:20','14:40','15:00','15:20','15:40',
+    '16:00','16:20','16:40','17:00','17:20','17:40',
+    '18:00','18:20','18:40','19:00','19:20','19:40',
+    '20:00','20:20','20:40',
+];
+
+// Hàm kiểm tra lịch hẹn và tính thời gian làm việc
+exports.getBookedTimesForBarber = async (req, res, next) => {
+    try {
+        const { barberId, appointmentDate } = req.params;
+
+
+        // Kiểm tra và chuyển đổi appointmentDate
+        if (!appointmentDate || isNaN(Date.parse(appointmentDate))) {
+            return res.status(400).json({ error: "Invalid or missing appointmentDate." });
+        }
+
+        const parsedDate = new Date(appointmentDate);
+
+        // Tìm tất cả các lịch hẹn của barber vào ngày cụ thể
+        const appointments = await Appointment.find({
+            barber_id: barberId,
+            appointment_date: {
+                $gte: new Date(parsedDate.setHours(0, 0, 0, 0)), // Đầu ngày
+                $lt: new Date(parsedDate.setHours(23, 59, 59, 999)), // Cuối ngày
+            },
+        }).populate("service_id"); // Lấy thông tin dịch vụ của từng lịch hẹn
+
+        // Lấy danh sách thời gian đã đặt
+        const bookedTimes = appointments.map(app => app.appointment_time);
+
+        // Tính tổng thời gian làm việc dựa trên duration của từng dịch vụ
+        let totalWorkingTime = 0;
+        appointments.forEach(app => {
+            app.service_id.forEach(service => {
+                totalWorkingTime += service.duration; // Cộng thời gian từng dịch vụ
+            });
+        });
+
+        // Loại bỏ các thời gian đã đặt ra khỏi listTimes
+        const availableTimes = listTimes.filter(time => !bookedTimes.includes(time));
+
+        return res.status(200).json({
+            bookedTimes,
+            availableTimes,
+            totalWorkingTime, // Tổng thời gian làm việc (tính bằng phút)
+        });
+    } catch (error) {
+        console.error("Error fetching appointments:", error);
+        res.status(500).json({ error: "An error occurred while fetching appointments." });
+    }
+};
+
+
