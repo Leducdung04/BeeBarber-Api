@@ -31,10 +31,8 @@ exports.add_cartItem = async (req, res, next) => {
             cart_id: cart._id,
             product_id: req.body.product_id
         });
-
         const currentQuantity = existingCartItem ? existingCartItem.quantity : 0;
         const totalQuantity = currentQuantity + requestedQuantity;
-
         if (totalQuantity > product.quantity) {
             return res.status(400).json({
                 msg: `Số lượng sản phẩm vượt quá số lượng tồn kho. Còn lại: ${product.quantity - currentQuantity}`,
@@ -87,3 +85,42 @@ exports.update_cartItem = async (req, res, next) => {
         res.status(400).json({ msg: error.message });
     }
 }
+
+exports.update_cartItem_quantity = async (req, res, next) => {
+    try {
+        const { id } = req.params; 
+        const { quantity } = req.body;
+
+        const cartItem = await CartItem.findById(id);
+        if (!cartItem) {
+            return res.status(404).json({ msg: "Không tìm thấy sản phẩm trong giỏ hàng." });
+        }
+
+        const product = await Product.findById(cartItem.product_id);
+        if (!product) {
+            return res.status(404).json({ msg: "Sản phẩm không tồn tại." });
+        }
+
+        if (quantity > product.quantity) {
+            return res.status(400).json({
+                msg: `Số lượng sản phẩm vượt quá số lượng tồn kho. Còn lại: ${product.quantity}`,
+            });
+        }
+
+        const updatedCartItem = await CartItem.findOneAndUpdate(
+            { _id: id },
+            {
+                quantity: quantity,
+            },
+            { new: true } 
+        );
+
+        res.status(200).json({
+            msg: "Cập nhật số lượng sản phẩm thành công.",
+        });
+    } catch (error) {
+        res.status(400).json({ msg: error.message });
+    }
+};
+
+
