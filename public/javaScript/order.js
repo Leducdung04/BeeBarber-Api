@@ -101,7 +101,7 @@ fetch('api/getOrdersAdmin')
             };
 
             row.innerHTML =
-                `<td><img src="${order.listProduct[0].image}" alt="${order.listProduct[0].name}"></td>
+                `<td><img src="${order.listProduct[0].image}" alt="Ảnh"></td>
          <td>${order.listProduct[0].name}</td>
          <td>${order.total_price_sold.toLocaleString()} VND</td>
          <td>${orderDate}</td>

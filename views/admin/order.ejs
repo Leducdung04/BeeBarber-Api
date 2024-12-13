@@ -78,6 +78,13 @@
         .selected-row {
             background-color: lavender;
         }
+
+        .product-name-column {
+            width: 25%;
+        }
+        .badge-column {
+            width: 13%;
+        }
     </style>
 </head>
 
@@ -85,7 +92,6 @@
     <div class="container mt-5">
         <div class="container py-4">
             <div class="row justify-content-center">
-                <!-- Order Information Section -->
                 <div class="col-lg-10">
                     <div class="card mb-4 shadow-sm">
                         <div class="card-body">
@@ -97,21 +103,21 @@
                                         <strong>Trạng Thái:</strong>
                                         <select id="statusSelect" class="form-control d-inline-block w-auto"></select>
                                     </p>
-                                    <p><strong>Trạng Thái Hiện Tại:</strong> <span id="statusDisplay"></span></p>
-                                    <p><strong>Thời Gian Xác Nhận:</strong> <span id="confirmTimeDisplay"></span></p>
-                                    <p><strong>Thời Gian Giao Hàng:</strong> <span id="deliveryTimeDisplay"></span></p>
-                                    <p><strong>Thời Gian Hủy:</strong> <span id="cancelTimeDisplay"></span></p>
-                                    <p><strong>Thời Gian Hoàn Thành:</strong> <span id="successTimeDisplay"></span></p>
+                                    <p><strong>Trạng Thái Hiện Tại :</strong> <span id="statusDisplay"></span></p>
+                                    <p><strong>Thời Gian Xác Nhận :</strong> <span id="confirmTimeDisplay"></span></p>
+                                    <p><strong>Thời Gian Giao Hàng :</strong> <span id="deliveryTimeDisplay"></span></p>
+                                    <p><strong>Thời Gian Hủy :</strong> <span id="cancelTimeDisplay"></span></p>
+                                    <p><strong>Thời Gian Hoàn Thành :</strong> <span id="successTimeDisplay"></span></p>
                                 </div>
                                 <div class="col-md-6">
                                     <h4 class="font-weight-bold">Thông tin Giao Hàng</h4>
-                                    <p><strong>Địa Chỉ:</strong> <span id="addressDisplay"></span></p>
-                                    <p><strong>User ID:</strong> <span id="userIdDisplay"></span></p>
-                                    <p><strong>Số Điện Thoại:</strong> <span id="userPhoneDisplay"></span></p>
-                                    <p><strong>Tổng Tiền:</strong> <span id="totalPriceSoldDisplay"></span></p>
-                                    <p><strong>Phương Thức Thanh Toán:</strong> <span id="paymentMethodDisplay"></span>
+                                    <p><strong>Địa Chỉ :</strong> <span id="addressDisplay"></span></p>
+                                    <p><strong>Tên Người Dùng :</strong> <span id="userIdDisplay"></span></p>
+                                    <p><strong>Số Điện Thoại :</strong> <span id="userPhoneDisplay"></span></p>
+                                    <p><strong>Tổng Tiền :</strong> <span id="totalPriceSoldDisplay"></span></p>
+                                    <p><strong>Phương Thức Thanh Toán :</strong> <span id="paymentMethodDisplay"></span>
                                     </p>
-                                    <p><strong>Phương Thức Giao Hàng:</strong> <span id="shippingMethodDisplay"></span>
+                                    <p><strong>Phương Thức Giao Hàng :</strong> <span id="shippingMethodDisplay"></span>
                                     </p>
                                 </div>
                             </div>
@@ -122,7 +128,6 @@
                         <div class="card-body">
                             <h3 class="font-weight-bold mb-3">Thông tin Sản Phẩm</h3>
                             <div id="productDetails" class="row">
-
                             </div>
                         </div>
                     </div>
@@ -134,11 +139,11 @@
             <thead>
                 <tr>
                     <th>Hình Ảnh</th>
-                    <th>Tên Sản Phẩm</th>
+                    <th class="product-name-column">Tên Sản Phẩm</th>
                     <th>Giá</th>
                     <th>Ngày Đặt</th>
                     <th>Địa Điểm</th>
-                    <th>Trạng Thái</th>
+                    <th class="badge-column">Trạng Thái</th>
                 </tr>
             </thead>
             <tbody id="orderList"></tbody>

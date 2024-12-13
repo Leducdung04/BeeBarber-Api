@@ -20,6 +20,25 @@ async function getBearerToken() {
 
 exports.getNotifications = async (req, res) => {
   try {
+    const { user_id } = req.query;
+
+    const filter = { user_id };
+
+    const notifications = await Notification.find(filter).sort({ created_at: -1 });
+
+    res.status(200).json({
+      message: "Danh sách thông báo",
+      data: notifications,
+    });
+
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    res.status(500).json({ message: "Đã xảy ra lỗi", error });
+  }
+}
+
+exports.getNotificationsByStatus = async (req, res) => {
+  try {
     const { user_id, status } = req.query;
 
     const filter = { user_id };
