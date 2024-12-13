@@ -18,7 +18,7 @@ const {get_user_cart,add_cart,update_cart} = require("../controllers/cartControl
 
 // restful Api notifications
 router.post("/notifications/createNotification",createNotification)
-const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment, getAppointmentsByUserId, updateAppointmentStatusToCanceled, updateAppointmentStatusToCanceled_ByZaloPay, updateAppointmentStatus, getAppointmentsAdmin, updateAppointmentStatusAdmin, appointment_total, getBookedTimesForBarber } = require("../controllers/appointmentControllers");
+const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment, getAppointmentsByUserId, updateAppointmentStatusToCanceled, updateAppointmentStatusToCanceled_ByZaloPay, updateAppointmentStatus, getAppointmentsAdmin, updateAppointmentStatusAdmin, appointment_total, getBookedTimesForBarber, addAppointmentAdmin } = require("../controllers/appointmentControllers");
 
 const { addPayment, updatePayment_Canceled_ById, updatePaymentStatus } = require("../controllers/paymentsController");
 const { addOrderWithPayment, getOrdersByUserId, updateOderStatusToCanceled, updateOderStatusToCanceled_ByZaloPay, getAllOrdersAdmin, addOrderProduct, updateOrderStatus, totalAmount, getOrderByOrderId } = require("../controllers/order_productController");
@@ -36,6 +36,7 @@ router.post('/SignUp',SigupUser)
 router.post('/loginPhone',loginPhone)
 router.get('/users/getUserDetailById/:id',getUserDetailById)
 router.get('/user/get_all_user', getAllUser)
+router.get('/users', getAllUser)
 router.get('/user/get_all_customer', getAllCustomer)
 router.get('/user/lock_user/:id', lockupUser)
 router.put('/updateUser/:id', updateUserById);
@@ -121,6 +122,7 @@ router.put('/cartItems/update_cart',update_cartItem)
 // RESTful API Appointment
 router.post('/add_Appointment',addAppointment)
 router.post('/addAppointmentWithPayment',addAppointmentWithPayment)
+router.post('/addAppointmentAdmin',addAppointmentAdmin)
 router.put('/updateAppointmentStatusToCanceled/:appointmentId',updateAppointmentStatusToCanceled)
 router.put('/updateAppointmentStatusToCanceled_ByZaloPay/:appointmentId',updateAppointmentStatusToCanceled_ByZaloPay)
 router.put('/updateAppointmentStatus/:id',updateAppointmentStatus)
