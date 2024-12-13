@@ -216,7 +216,7 @@
                       <td><input type="number" class="form-control form-control-sm quantity-input" value="${product.quantity}" min="0" data-product-id="${product._id}" onchange="updateProductQuantity(event)" style="width: 80px;" /></td>
                   <td>
                   <div style="button-group">
-                      <button class="btn-edit" onclick="openEditModal('${product._id}', '${product.name}', '${product.description}', '${product.import_price}', '${product.price_selling}', '${product.category_id._id}', '${product.image}')">Sửa</button>
+                      <button class="btn-edit" onclick="openDetailModal('${product._id}', '${product.name}', '${product.description}', '${product.import_price}', '${product.price_selling}', '${product.category_id._id}', '${product.image}')">Chi Tiết</button>
                       <button class="btn-delete" onclick="deleteProduct('${product._id}')">Ẩn</button>
                   </div>
                   </td>
