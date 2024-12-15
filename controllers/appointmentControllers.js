@@ -1,6 +1,7 @@
 const { default: mongoose } = require('mongoose');
 const Appointment = require('../models/appointments');
 const Payment = require('../models/payments');
+const userId = new mongoose.Types.ObjectId("673caf51f316d5ff65f18607"); 
 const User = require('../models/user');
 const Notification = require('../models/notifications');
 
@@ -98,6 +99,79 @@ exports.addAppointment = async (req, res, next) => {
     }
 }
 
+exports.addAppointmentAdmin = async (req, res, next) => {
+    try {
+        const { barber_id, service_id, appointment_time, appointment_date, appointment_status, status, price } = req.body;
+        const payment = req.body.payment; // Retrieve payment data from request body
+
+        // Check for required appointment data
+        if (!userId || !barber_id || !service_id || !appointment_time || !appointment_date || !price) {
+            return res.status(400).json({ message: 'Thiếu thông tin lịch hẹn' });
+        }
+
+        // Create a new Appointment
+        const newAppointment = new Appointment({
+            barber_id,
+            user_id: userId,
+            service_id,
+            appointment_time,
+            appointment_date,
+            appointment_status,
+            status,
+            price 
+        });
+
+        // Save the Appointment and get the result
+        const appointmentResult = await newAppointment.save();
+
+        // Create a payment object with default values if payment data is not provided
+        let paymentResult;
+        if (!payment) {
+            paymentResult = new Payment({
+                related_id: appointmentResult._id, // Link payment to the appointment
+                pay_type: 'booking', // Default pay type
+                pay_method: 'cash', // Assuming cash for in-person payments
+                user_id: userId,
+                time: appointment_time,
+                date: appointment_date,
+                price: price,
+                pay_method_status: 'Success', // Assuming success for in-person payments
+                createdAt: new Date()
+            });
+            paymentResult = await paymentResult.save(); // Save the payment record
+        } else {
+            // Validate payment data if provided
+            const requiredPaymentFields = ['pay_type', 'pay_method', 'time', 'date', 'price'];
+            for (const field of requiredPaymentFields) {
+                if (!payment[field]) {
+                    return res.status(400).json({ message: `Thiếu trường thanh toán: ${field}` });
+                }
+            }
+            payment.price = parseFloat(payment.price); // Ensure the price is a number
+            if (isNaN(payment.price) || payment.price <= 0) {
+                return res.status(400).json({ message: 'Invalid price format in payment' });
+            }
+
+            // Create the payment object based on provided data
+            const newPayment = new Payment({
+                related_id: appointmentResult._id, // Link payment to the appointment
+                ...payment,
+            });
+            paymentResult = await newPayment.save(); // Save the payment record
+        }
+
+        // Respond with the results
+        res.status(201).json({
+            status: 201,
+            message: 'Appointment added successfully',
+            appointment: appointmentResult,
+            payment: paymentResult, // Include payment result if available
+        });
+    } catch (err) {
+        console.error('Error adding appointment:', err);
+        res.status(500).json({ message: 'Lỗi máy chủ', error: err.message });
+    }
+};
 exports.addAppointmentWithPayment = async (req, res) => {
     try {
         // Lấy dữ liệu từ `req.body`
@@ -143,6 +217,7 @@ exports.addAppointmentWithPayment = async (req, res) => {
         }
 
          const paymentResult = await newPayment.save();
+         
         // await newNotification.save();
         res.status(201).json({
             status: 201,

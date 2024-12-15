@@ -8,19 +8,24 @@
     <style>
         table {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
         }
 
         th,
         td {
-            border: 1px solid #e0e0e0;
-            padding: 12px;
             text-align: left;
+            padding: 8px;
+            border: 1px solid #ddd;
         }
 
         th {
-            background-color: #f8f9fa;
-            font-weight: bold;
+            background-color: #f2f2f2;
+        }
+
+        td img {
+            display: block;
+            margin: auto;
         }
 
         img {
@@ -78,71 +83,219 @@
         .selected-row {
             background-color: lavender;
         }
+
+        .product-name-column {
+            width: 25%;
+        }
+
+        .badge-column {
+            width: 13%;
+        }
+
+        .modal-dialog {
+            max-width: 900px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+            /* Add padding to the modal body */
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            /* Increase the font size of the modal title */
+            margin-bottom: 20px;
+            /* Add margin at the bottom of the modal title */
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            /* Add padding to the modal header */
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            /* Add padding to the modal footer */
+        }
+
+        .modal-body p {
+            margin-bottom: 10px;
+        }
+
+        .modal-body h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .modal-body .row {
+            margin-bottom: 20px;
+        }
+
+        .modal-body select {
+            width: 200px;
+        }
+
+        .modal-body .col-md-6 {
+            padding: 0 15px;
+        }
+
+        .modal-body .font-weight-bold {
+            font-weight: bold;
+        }
+
+        .button-container {
+            justify-self: end;
+            width: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: row;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .nav-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 30px;
+            /* Smaller width */
+            height: 30px;
+            /* Smaller height */
+            background-color: #007bff;
+            /* Blue background */
+            border: none;
+            border-radius: 50%;
+            /* Circular buttons */
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .nav-button svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .nav-button:active {
+            transform: scale(0.95);
+            /* Shrink slightly on click */
+        }
+
+
+        .nav-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: scale(1.1);
+            background-color: #e0e0e0;
+        }
+
+        .nav-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #007BFF;
+        }
     </style>
 </head>
 
 <body>
-    <div class="container mt-5">
-        <div class="container py-4">
-            <div class="row justify-content-center">
-                <!-- Order Information Section -->
-                <div class="col-lg-10">
-                    <div class="card mb-4 shadow-sm">
-                        <div class="card-body">
-                            <h3 class="font-weight-bold mb-3">Thông tin Đặt Hàng</h3>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <p><strong>ID Đơn Hàng:</strong> <span id="idDisplay"></span></p>
-                                    <p>
-                                        <strong>Trạng Thái:</strong>
-                                        <select id="statusSelect" class="form-control d-inline-block w-auto"></select>
-                                    </p>
-                                    <p><strong>Trạng Thái Hiện Tại:</strong> <span id="statusDisplay"></span></p>
-                                    <p><strong>Thời Gian Xác Nhận:</strong> <span id="confirmTimeDisplay"></span></p>
-                                    <p><strong>Thời Gian Giao Hàng:</strong> <span id="deliveryTimeDisplay"></span></p>
-                                    <p><strong>Thời Gian Hủy:</strong> <span id="cancelTimeDisplay"></span></p>
-                                    <p><strong>Thời Gian Hoàn Thành:</strong> <span id="successTimeDisplay"></span></p>
-                                </div>
-                                <div class="col-md-6">
-                                    <h4 class="font-weight-bold">Thông tin Giao Hàng</h4>
-                                    <p><strong>Địa Chỉ:</strong> <span id="addressDisplay"></span></p>
-                                    <p><strong>User ID:</strong> <span id="userIdDisplay"></span></p>
-                                    <p><strong>Số Điện Thoại:</strong> <span id="userPhoneDisplay"></span></p>
-                                    <p><strong>Tổng Tiền:</strong> <span id="totalPriceSoldDisplay"></span></p>
-                                    <p><strong>Phương Thức Thanh Toán:</strong> <span id="paymentMethodDisplay"></span>
-                                    </p>
-                                    <p><strong>Phương Thức Giao Hàng:</strong> <span id="shippingMethodDisplay"></span>
-                                    </p>
-                                </div>
+    <div class="container mt-3">
+        <div class="modal fade" id="orderInfoModal" tabindex="-1" aria-labelledby="orderInfoModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="orderInfoModalLabel">Thông tin Đặt Hàng</h5>
+                        <button type="button" class="close-btn" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <p><strong>ID Đơn Hàng:</strong> <span id="idDisplay"></span></p>
+                                <p>
+                                    <strong>Trạng Thái:</strong>
+                                    <select id="statusSelect" class="form-control d-inline-block w-auto"></select>
+                                </p>
+                                <p><strong>Trạng Thái Hiện Tại :</strong> <span id="statusDisplay"></span></p>
+                                <p><strong>Thời Gian Xác Nhận :</strong> <span id="confirmTimeDisplay"></span></p>
+                                <p><strong>Thời Gian Giao Hàng :</strong> <span id="deliveryTimeDisplay"></span></p>
+                                <p><strong>Thời Gian Hủy :</strong> <span id="cancelTimeDisplay"></span></p>
+                                <p><strong>Thời Gian Hoàn Thành :</strong> <span id="successTimeDisplay"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <h4 class="font-weight-bold">Thông tin Giao Hàng</h4>
+                                <p><strong>Địa Chỉ :</strong> <span id="addressDisplay"></span></p>
+                                <p><strong>Tên Người Dùng :</strong> <span id="userIdDisplay"></span></p>
+                                <p><strong>Số Điện Thoại :</strong> <span id="userPhoneDisplay"></span></p>
+                                <p><strong>Tổng Tiền :</strong> <span id="totalPriceSoldDisplay"></span></p>
+                                <p><strong>Phương Thức Thanh Toán :</strong> <span id="paymentMethodDisplay"></span></p>
+                                <p><strong>Phương Thức Giao Hàng :</strong> <span id="shippingMethodDisplay"></span></p>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-weight-bold mb-3">Thông tin Sản Phẩm</h3>
+                            <table class="mb-2">
+                                <thead>
+                                    <tr>
+                                        <th>Ảnh</th>
+                                        <th>Tên</th>
+                                        <th>Giá</th>
+                                        <th>Số Lượng</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productDetails">
+                                </tbody>
+                            </table>
+                            <div class="ml-5 button-container">
+                                <button class="nav-button prev" aria-label="Previous">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </button>
+                                <button class="nav-button next" aria-label="Next">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     </div>
-
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h3 class="font-weight-bold mb-3">Thông tin Sản Phẩm</h3>
-                            <div id="productDetails" class="row">
-
-                            </div>
-                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
                     </div>
                 </div>
             </div>
         </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Hình Ảnh</th>
-                    <th>Tên Sản Phẩm</th>
-                    <th>Giá</th>
-                    <th>Ngày Đặt</th>
-                    <th>Địa Điểm</th>
-                    <th>Trạng Thái</th>
-                </tr>
-            </thead>
-            <tbody id="orderList"></tbody>
-        </table>
+        <div>
+            <table>
+                <div>
+                    <h2>Danh Sách Đơn Hàng</h2>
+                </div>
+                <thead>
+                    <tr>
+                        <th>Hình Ảnh</th>
+                        <th class="product-name-column">Tên Sản Phẩm</th>
+                        <th>Giá</th>
+                        <th>Ngày Đặt</th>
+                        <th>Địa Điểm</th>
+                        <th class="badge-column">Trạng Thái</th>
+                    </tr>
+                </thead>
+                <tbody id="orderList"></tbody>
+            </table>
+            <div id="pagination" class="pagination"></div>
+        </div>
         <div id="pagination" class="pagination"></div>
         <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
             <div class="modal-dialog">

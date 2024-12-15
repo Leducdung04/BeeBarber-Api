@@ -84,34 +84,70 @@
 // });
 
 let orderId = null;
+let Orders = [];
+let currentPage = 1;
+const limit = 4;
 // Fetch order data from API
+
 fetch('api/getOrdersAdmin')
     .then(response => response.json())
     .then(data => {
-        const orderList = document.getElementById('orderList');
-        data.forEach(order => {
-            const orderDate = new Date(order.createdAt).toLocaleDateString();
-            const statusBadge = getStatusBadge(order.status);
-
-            const row = document.createElement('tr');
-            row.onclick = () => {
-                document.querySelectorAll('tr').forEach(r => r.classList.remove('selected-row'));
-                row.classList.add('selected-row');
-                viewOrderDetails(order);
-            };
-
-            row.innerHTML =
-                `<td><img src="${order.listProduct[0].image}" alt="hình ảnh sản phẩm"></td>
-         <td style="width: 300px;">${order.listProduct[0].name}</td>
-         <td>${order.total_price_sold.toLocaleString()} VND</td>
-         <td>${orderDate}</td>
-         <td style="width: 250px;">${order.location}</td>
-         <td>${statusBadge}</td>`;
-
-            orderList.appendChild(row);
-        });
+        Orders = data
+        renderOrders()
+        renderPagination()
     })
     .catch(error => console.error('Error fetching orders:', error));
+
+function renderOrders() {
+    const orderList = document.getElementById('orderList');
+    const orderInfoModal = new bootstrap.Modal(document.getElementById('orderInfoModal'));
+    orderList.innerHTML = '';
+
+    const startIndex = (currentPage - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedOrders = Orders.slice(startIndex, endIndex);
+
+    paginatedOrders.forEach(order => {
+        const orderDate = new Date(order.createdAt).toLocaleDateString();
+        const statusBadge = getStatusBadge(order.status);
+
+        const row = document.createElement('tr');
+        row.onclick = () => {
+            document.querySelectorAll('tr').forEach(r => r.classList.remove('selected-row'));
+            row.classList.add('selected-row');
+            viewOrderDetails(order);
+            orderInfoModal.show();
+        };
+
+        row.innerHTML =
+            `<td><img src="${order.listProduct[0].image}" alt="Ảnh"></td>
+             <td>${order.listProduct[0].name}</td>
+             <td>${order.total_price_sold.toLocaleString()} VND</td>
+             <td>${orderDate}</td>
+             <td>${order.location}</td>
+             <td>${statusBadge}</td>`;
+
+        orderList.appendChild(row);
+    });
+}
+
+function renderPagination() {
+    const paginationContainer = document.getElementById('pagination');
+    paginationContainer.innerHTML = '';
+
+    const totalPages = Math.ceil(Orders.length / limit);
+
+    for (let i = 1; i <= totalPages; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.innerText = i;
+        pageButton.className = i === currentPage ? 'active' : '';
+        pageButton.onclick = () => {
+            currentPage = i;
+            renderOrders(); // Render selected page
+        };
+        paginationContainer.appendChild(pageButton);
+    }
+}
 
 
 function getStatusBadge(status) {
@@ -129,8 +165,7 @@ function getStatusBadge(status) {
     }
 }
 
-
-function viewOrderDetails(order) {
+async function viewOrderDetails(order) {
     orderId = order._id;
     document.getElementById('idDisplay').textContent = order._id;
     document.getElementById('userIdDisplay').textContent = order.user_id.name;
@@ -223,27 +258,55 @@ function viewOrderDetails(order) {
     document.getElementById('shippingMethodDisplay').textContent = shippingMethodText;
 
     const productDetailsContainer = document.getElementById('productDetails');
-    productDetailsContainer.innerHTML = '';  // Clear previous content
+    productDetailsContainer.innerHTML = '';
+    const productsPerPage = 2;
+    let currentPage = 1;
 
-    order.listProduct.forEach(product => {
-        const productDiv = document.createElement('div');
-        productDiv.classList.add('row', 'mb-3', 'align-items-center');
+    async function renderTable() {
+        console.log(order.listProduct.idProduct);
+        productDetailsContainer.innerHTML = '';
+        const start = (currentPage - 1) * productsPerPage;
+        const end = start + productsPerPage;
+        const productsToShow = order.listProduct.slice(start, end);
+        productsToShow.forEach( product => {
+            const row = document.createElement('tr')
+            row.innerHTML = `
+                <td><img src="${product.image}" alt="${product.name}" style="width: 55px; height: 55px;"></td>
+                <td>${product.name}</td>
+                <td>${product.price_selling.toLocaleString()} VNĐ</td>
+                <td>${product.quantity}</td>
+            `;
+            productDetailsContainer.appendChild(row);
+        });
+        toggleButtonState();
+    }
 
-        productDiv.innerHTML = `
-    <div class="col-4">
-        <img src="${product.image}" class="img-fluid rounded" alt="Product image" />
-    </div>
-    <div class="col-8">
-        <p><strong>ID Sản phẩm:</strong> ${product.idProduct}</p>
-        <p><strong>Tên Sản phẩm:</strong> ${product.name}</p>
-        <p><strong>Giá:</strong> ${product.price_selling.toLocaleString()} VNĐ</p>
-        <p><strong>Số Lượng:</strong> ${product.quantity}</p>
-    </div>
-`;
-        productDetailsContainer.appendChild(productDiv);
-    });
+    function handlePrev() {
+        if (currentPage > 1) {
+            currentPage--;
+            renderTable();
+        }
+    }
+
+    function handleNext() {
+        const totalPages = Math.ceil(order.listProduct.length / productsPerPage);
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderTable();
+        }
+    }
+
+    function toggleButtonState() {
+        const totalPages = Math.ceil(order.listProduct.length / productsPerPage);
+        document.querySelector('.nav-button.prev').disabled = currentPage === 1;
+        document.querySelector('.nav-button.next').disabled = currentPage === totalPages;
+    }
+
+    document.querySelector('.nav-button.prev').addEventListener('click', handlePrev);
+    document.querySelector('.nav-button.next').addEventListener('click', handleNext);
+
+    renderTable();
 }
-
 
 $(document).ready(function () {
     $("#confirmStatusBtn").click(function () {

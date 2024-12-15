@@ -207,16 +207,18 @@
 
         paginatedProducts.forEach(product => {
             const row = document.createElement('tr');
+            console.log(product);
+            
             row.innerHTML = `
                       <td>${truncateText(product.name, 50)}</td>
                       <td>${product.category_id.name}</td> 
                       <td>${product.import_price.toLocaleString('vi')}</td>
                       <td>${product.price_selling.toLocaleString('vi')}</td>
-
                       <td><img src="${product.image}" alt="${product.name}" width="100"></td>
+                      <td><input type="number" class="form-control form-control-sm quantity-input" value="${product.quantity}" min="0" data-product-id="${product._id}" onchange="updateProductQuantity(event)" style="width: 80px;" /></td>
                   <td>
                   <div style="button-group">
-                      <button class="btn-edit" onclick="openEditModal('${product._id}', '${product.name}', '${product.description}', '${product.import_price}', '${product.price_selling}', '${product.category_id._id}', '${product.image}')">Sửa</button>
+                      <button class="btn-edit" onclick="openDetailModal('${product._id}', '${product.name}', '${product.description}', '${product.import_price}','${product.price_selling}' ,'${product.category_id.name}', '${product.category_id._id}', '${product.quantity}', '${product.soldQuantity}', '${product.status}', '${product.image}')">Chi Tiết</button>
                       <button class="btn-delete" onclick="deleteProduct('${product._id}')">Ẩn</button>
                   </div>
                   </td>
@@ -264,7 +266,7 @@
         document.getElementById('editProductDescription').value = description;
         document.getElementById('editImportPrice').value = import_price;
         document.getElementById('editSellingPrice').value = price_selling;
-        console.log(category_id, "is");
+
         const imagePreview = document.getElementById('currentImagePreview');
         if (image) {
             imagePreview.src = image;
@@ -280,8 +282,6 @@
                 categoryDropdown.innerHTML = '<option value="">Chọn Thể Loại</option>';
 
                 categories.forEach(category => {
-                    console.log(category, "is");
-
                     const option = document.createElement('option');
                     option.value = category._id;
                     option.textContent = category.name;
@@ -430,7 +430,7 @@
             .catch(error => console.error('Error changing product status:', error));
     }
 
-    function openDetailModal(id, name, description, importPrice, priceSelling, categoryName, categoryId, quantity, soldQuantity, status, image) {
+    function openDetailModal(id, name, description, importPrice, priceSelling, categoryName, categoryId, quantity, soldQuantity,status, image) {
         document.getElementById('detailName').textContent = name;
         document.getElementById('detailImportPrice').textContent = `${importPrice.toLocaleString('vi')} VNĐ`;
         document.getElementById('detailPriceSelling').textContent = `${priceSelling.toLocaleString('vi')} VNĐ`;

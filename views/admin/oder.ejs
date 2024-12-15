@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Appointment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f9;
+        }
+
+        .appointment-form {
+            width: 1200px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .appointment-form h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .dropdown-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .dropdown-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 120px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .dropdown-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        .dropdown-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown-item.selected {
+            border-color: #007bff;
+            background-color: #f0f8ff;
+        }
+
+        .barber-list {
+            display: flex;
+            width: 700px;
+            gap: 20px;
+            flex-wrap: nowrap;
+            overflow-y: auto;
+            /* Cho phép cuộn ngang */
+            max-height: 300px;
+            /* Giới hạn chiều cao nếu cần */
+            padding: 10px;
+            scrollbar-width: thin;
+            /* Hỗ trợ Firefox */
+            scrollbar-color: #ccc #f4f4f9;
+            /* Màu cho Firefox */
+        }
+
+        .barber-list::-webkit-scrollbar {
+            height: 8px;
+            /* Độ dày của thanh cuộn */
+        }
+
+        .barber-list::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        .barber-list::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+
+        .barber-card {
+            width: 200px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .barber-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 0px;
+        }
+
+        .barber-card:hover {
+            transform: scale(1.05);
+        }
+
+        .barber-list p {
+            font-size: 16px;
+        }
+
+        #chooseServiceBtn {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            /* Button text color */
+            border: none;
+            /* Remove border */
+            border-radius: 5px;
+            /* Rounded corners */
+            cursor: pointer;
+            /* Pointer cursor on hover */
+            transition: background-color 0.3s;
+            /* Smooth background color transition */
+        }
+
+        #chooseServiceBtn:hover {
+            background-color: #0056b3;
+            /* Darker blue on hover */
+        }
+
+        #selectedServicesNames {
+            margin-top: 10px;
+            font-weight: bold;
+            max-width: 500px;
+            overflow-wrap: break-word;
+            white-space: normal;
+
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Black w/ opacity */
+        }
+
+        .header {
+            background-color: rgb(27, 141, 235);
+            width:799px ;
+            padding: 10px 20px;
+            /* Padding for header */
+            position: sticky;
+            /* Keep header fixed */
+            top: 0;
+            color: white;
+            /* Stick to the top */
+            border-radius: 15px 15px 0px 0px;
+            display: flex;
+            /* Use flexbox for alignment */
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #888;
+            /* Optional border */
+        }
+
+        .close-btn {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            /* Pointer cursor on hover */
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            /* Content background color */
+            margin: 0;
+            border-radius: 0px 0px 10px 10px;
+            padding: 20px;
+            /* Padding for content */
+            height: calc(100% - 60px);
+            /* Adjust height to accommodate the header */
+            overflow-y: auto;
+            /* Enable vertical scrolling */
+        }
+
+
+        .modal-content img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 10px;
+         
+        }
+
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .service-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .service-card .selected {
+            background-color: #333;
+            color: #007bff;
+
+        }
+
+        .barber-card.selected {
+            border-color: #007BFF;
+            /* Highlight selected card */
+            background-color: #f0f8ff;
+            /* Light background for selected card */
+        }
+
+        .service-card.selected {
+            border-color: #007BFF;
+            /* Highlight selected service */
+            background-color: #f0f8ff;
+            /* Light background for selected service */
+        }
+
+        .service-card:hover {
+            transform: scale(1.05);
+        }
+
+        .service-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .service-card p {
+            font-size: 14px;
+            margin: 10px 0;
+        }
+
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            /* Pointer cursor on hover */
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="appointment-form">
+        <h2>Add Appointment</h2>
+
+        <div class="barber-list" id="barberList"></div>
+
+        <div class="form-group">
+            <label for="service">Service</label>
+            <button type="button" id="chooseServiceBtn">Chọn Dịch Vụ</button>
+            <p id="selectedServicesNames"></p>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price</label>
+            <input type="number" id="price" name="price" min="0" step="0.01" value="0" readonly>
+        </div>
+
+        <div class="form-group">
+            <button type="submit">Add Appointment</button>
+        </div>
+    </form>
+    <input type="hidden" id="barberId" name="barber_id">
+    <input type="hidden" id="barberName" name="barber_name">
+    <div class="modal" id="serviceModal">
+        <div class="header">
+            <h3>Select Service</h3>
+            <span class="close-btn" id="closeModal">&times;</span> <!-- Close button positioned in the header -->
+        </div>
+        <div class="modal-content">
+            <div class="service-grid" id="serviceGrid"></div>
+        </div>
+    </div>
+</body>
+<script>
+    const barberList = document.getElementById("barberList");
+    const priceField = document.getElementById('price');
+    const barberIdField = document.getElementById('barberId');
+    const barberNameField = document.getElementById('barberName');
+    const editForm = document.getElementById('appointment-form');
+    const chooseServiceBtn = document.getElementById('chooseServiceBtn');
+    const serviceModal = document.getElementById('serviceModal');
+    const closeModalBtn = document.getElementById('closeModal');
+    const serviceGrid = document.getElementById('serviceGrid');
+    const selectedServicesNames = document.getElementById('selectedServicesNames');
+    let servicePrices = {};
+    let selectedServices = [];
+    let totalPrice = 0;
+
+    fetch("/api/get_list_barber")
+        .then(response => response.json())
+        .then(barbers => {
+            barbers.forEach((barber) => {
+                const card = document.createElement("div");
+                card.classList.add("barber-card");
+                card.innerHTML = `
+                <img src="${barber.image}" alt="${barber.name}">
+                <p>${barber.name}</p>
+            `;
+                card.addEventListener("click", () => {
+                    selectBarber(barber);
+                });
+                barberList.appendChild(card);
+            });
+        })
+        .catch(error => console.error('Error fetching barber:', error));
+
+    function selectBarber(barber) {
+        barberIdField.value = barber._id;
+        barberNameField.value = barber.name;
+
+        const barberCards = document.querySelectorAll('.barber-card');
+        barberCards.forEach(card => card.classList.remove('selected'));
+        event.target.classList.add('selected');
+    }
+
+    chooseServiceBtn.addEventListener('click', () => {
+        serviceModal.style.display = 'flex';
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+        serviceModal.style.display = 'none';
+    });
+
+    fetch("/api/services/get_list_service")
+        .then(response => response.json())
+        .then(services => {
+            services.forEach(service => {
+                const serviceCard = document.createElement('div');
+                serviceCard.classList.add('service-card');
+                serviceCard.innerHTML = `
+                <img src="${service.images}" alt="${service.name}">
+                <h4>${service.name}</h4>
+                <p>Price: ${service.price} VND</p>
+                <p>Duration: ${service.duration} minutes</p>
+            `;
+                serviceCard.addEventListener('click', () => {
+                    toggleServiceSelection(service, serviceCard);
+                });
+
+                serviceGrid.appendChild(serviceCard);
+                servicePrices[service._id] = service.price;
+            });
+        })
+        .catch(error => console.error('Error fetching services:', error));
+
+    function toggleServiceSelection(service, serviceCard) {
+        const serviceIndex = selectedServices.findIndex(s => s._id === service._id);
+
+        if (serviceIndex !== -1) {
+            selectedServices.splice(serviceIndex, 1);
+            serviceCard.classList.remove('selected');
+        } else {
+            selectedServices.push(service);
+            serviceCard.classList.add('selected');
+        }
+
+        // Calculate the total price of selected services
+        totalPrice = selectedServices.reduce((sum, s) => sum + s.price, 0); // Update the global totalPrice
+        priceField.value = totalPrice;
+
+        // Update the displayed names of selected services
+        const serviceNames = selectedServices.map(s => s.name).join(', ');
+        selectedServicesNames.textContent = serviceNames;
+    }
+
+    editForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        handleAddAppointment();
+    });
+
+    async function handleAddAppointment() {
+        if (!barberIdField.value) {
+            alert('Please select a barber.');
+            return false;
+        }
+
+        const serviceIds = selectedServices.map(s => s._id);
+
+        const now = new Date();
+
+        // Format the appointment date to YYYY-MM-DD
+        const appointmentDate = now.toISOString().split('T')[0]; // Extract only the date part
+
+        const appointmentData = {
+            barber_id: barberIdField.value,
+            service_id: serviceIds,
+            appointment_time: now.toLocaleTimeString('vi-VN'),
+            appointment_date: appointmentDate,
+            appointment_status: 'pending',
+            price: totalPrice
+        };
+
+        try {
+            const response = await fetch('/api/addAppointmentAdmin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(appointmentData)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Appointment added successfully:', result);
+                alert('Appointment created successfully!');
+                // Optionally, reset the form or update the UI
+                editForm.reset();
+                priceField.value = 0; // Reset price field
+                selectedServices = []; // Clear selected services
+                selectedServicesNames.textContent = ''; // Clear displayed services
+            } else {
+                const errorData = await response.json();
+                console.error('Error adding appointment:', errorData);
+                alert('Failed to create appointment: ' + errorData.message);
+            }
+        } catch (error) {
+            console.error('Error submitting appointment:', error);
+            alert('An error occurred while creating the appointment.');
+        }
+    }
+</script>
+
+</html>

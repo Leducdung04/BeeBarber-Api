@@ -125,5 +125,12 @@ router.get("/customers", async (req, res) => {
   }
 });
 
+router.get("/oders", (req, res) => {
+  const locals = {
+    currentRoute: `/oder`,
+    title: "Hello",
+  }
+  res.render("admin/oder", { locals, layout: admin,  });
+});
 
 module.exports = router;
