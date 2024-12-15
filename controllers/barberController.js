@@ -4,7 +4,7 @@ const mongoose = require("mongoose");     // Model User (liên kết với user_
 
 exports.get_list_barber = async (req, res, next) => {
   try {
-    const banner = await Barber.find().sort({ _id: -1 });
+    const banner = await Barber.find({status: true}).sort({ _id: -1 });
     res.status(200).json(banner);
   } catch (error) {
     res.status(400).json({ msg: error.message });

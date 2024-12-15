@@ -11,6 +11,7 @@ exports.getListService = async (req, res, next) => {
     res.status(400).json({ msg: error.message });
   }
 };
+
 exports.getGroupedServices = async (req, res, next) => {
   try {
     const groupedServices = await Service.aggregate([
@@ -45,7 +46,7 @@ exports.getListServiceByCategory = async (req, res, next) => {
     const { id_category } = req.params;
 
     // Tìm các dịch vụ dựa trên id_category
-    const services = await Service.find({ id_category }).sort({ createdAt: -1 });
+    const services = await Service.find({ status:true ,id_category }).sort({ createdAt: -1 });
 
     res.status(200).json(services);
   } catch (error) {

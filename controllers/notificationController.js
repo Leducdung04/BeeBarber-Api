@@ -226,13 +226,18 @@ exports.createScheduleNotification = async (req, res) => {
 
     const vietnamOffsetInMinutes = 7 * 60;
 
+    // Convert to UTC time
     const utcScheduleTime = new Date(localScheduleTime.getTime() - vietnamOffsetInMinutes * 60000);
 
+    // Subtract 15 minutes for the agenda
+    const agendaScheduleTime = new Date(utcScheduleTime.getTime() - 15 * 60000);
+
     console.log('Converted Local Time to UTC Schedule Time:', utcScheduleTime.toISOString());
+    console.log('Adjusted UTC Schedule Time for Agenda (15 minutes earlier):', agendaScheduleTime.toISOString());
 
     const currentUTC = new Date();
     console.log('Current UTC Time:', currentUTC.toISOString());
-    console.log('Scheduled Time Difference (ms):', utcScheduleTime - currentUTC);
+    console.log('Scheduled Time Difference (ms):', agendaScheduleTime - currentUTC);
 
     const newNotification = new Notification({
       user_id,
@@ -247,7 +252,7 @@ exports.createScheduleNotification = async (req, res) => {
     await newNotification.save();
     console.log('Saved Notification:', newNotification);
 
-    await agenda.schedule(utcScheduleTime, 'send notification', {
+    await agenda.schedule(agendaScheduleTime, 'send notification', {
       user_id,
       relates_id,
       type,

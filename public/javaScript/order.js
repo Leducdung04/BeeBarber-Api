@@ -263,13 +263,18 @@ async function viewOrderDetails(order) {
     let currentPage = 1;
 
     async function renderTable() {
-        console.log(order.listProduct.idProduct);
         productDetailsContainer.innerHTML = '';
+
+        const productDetailsMap = await fetchAllProductDetails();
+    
         const start = (currentPage - 1) * productsPerPage;
         const end = start + productsPerPage;
         const productsToShow = order.listProduct.slice(start, end);
-        productsToShow.forEach( product => {
-            const row = document.createElement('tr')
+    
+        productsToShow.forEach(product => {
+            const productDetails = productDetailsMap[product.idProduct];
+            console.log(productDetails);
+            const row = document.createElement('tr');
             row.innerHTML = `
                 <td><img src="${product.image}" alt="${product.name}" style="width: 55px; height: 55px;"></td>
                 <td>${product.name}</td>
@@ -278,6 +283,7 @@ async function viewOrderDetails(order) {
             `;
             productDetailsContainer.appendChild(row);
         });
+    
         toggleButtonState();
     }
 
@@ -306,6 +312,26 @@ async function viewOrderDetails(order) {
     document.querySelector('.nav-button.next').addEventListener('click', handleNext);
 
     renderTable();
+}
+
+async function fetchAllProductDetails() {
+    try {
+        const productIds = order.listProduct.map(product => product.idProduct);
+        const productDetailsArray = await Promise.all(
+            productIds.map(id => checkProductQuantity(id))
+        );
+        const productDetailsMap = {};
+        productDetailsArray.forEach(details => {
+            if (details && details.data) {
+                productDetailsMap[details.data._id] = details.data;
+            }
+        });
+
+        return productDetailsMap; 
+    } catch (error) {
+        console.error('Error fetching all product details:', error.message);
+        return {};
+    }
 }
 
 $(document).ready(function () {

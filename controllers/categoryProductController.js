@@ -4,7 +4,10 @@ const Product = require("../models/product")
 
 exports.get_list_Category_Product = async (req, res, next) => {
   try {
-    const category_product = await Category_Product.find();
+    const { status } = req.query; 
+    const query = status ? { status: status === 'true' } : {}; 
+    const category_product = await Category_Product.find(q);
+
 
     res.status(200).json(category_product);
   } catch (error) {

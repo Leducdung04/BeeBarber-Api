@@ -14,7 +14,7 @@ exports.get_list_product_by_category = async (req, res, next) => {
   try {
     const { category_id } = req.query;
     const filter = category_id ? { category_id } : {};
-    const products = await Product.find(filter).sort({ createdAt: 1 }).populate("category_id");
+    const products = await Product.find({ filter , status:true}).sort({ createdAt: 1 }).populate("category_id");
     res.status(200).json(products);
   } catch (error) {
     res.status(400).json({ msg: error.message });
