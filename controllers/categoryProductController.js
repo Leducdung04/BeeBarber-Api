@@ -6,7 +6,7 @@ exports.get_list_Category_Product = async (req, res, next) => {
   try {
     const { status } = req.query; 
     const query = status ? { status: status === 'true' } : {}; 
-    const category_product = await Category_Product.find(q);
+    const category_product = await Category_Product.find(query);
 
 
     res.status(200).json(category_product);
