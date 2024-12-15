@@ -101,11 +101,11 @@ fetch('api/getOrdersAdmin')
             };
 
             row.innerHTML =
-                `<td><img src="${order.listProduct[0].image}" alt="${order.listProduct[0].name}"></td>
-         <td>${order.listProduct[0].name}</td>
+                `<td><img src="${order.listProduct[0].image}" alt="hình ảnh sản phẩm"></td>
+         <td style="width: 300px;">${order.listProduct[0].name}</td>
          <td>${order.total_price_sold.toLocaleString()} VND</td>
          <td>${orderDate}</td>
-         <td>${order.location}</td>
+         <td style="width: 250px;">${order.location}</td>
          <td>${statusBadge}</td>`;
 
             orderList.appendChild(row);
