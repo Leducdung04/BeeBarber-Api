@@ -182,7 +182,7 @@ agenda.define('send notification', async (job) => {
       throw new Error('User not found.');
     }
 
-    const token = await getBearerToken();
+    const token = await getBearerToken(); 
     const fcmUrl = `https://fcm.googleapis.com/v1/projects/beebarber-3a718/messages:send`;
     const message = {
       message: {
@@ -223,21 +223,17 @@ exports.createScheduleNotification = async (req, res) => {
     console.log('Received Local Schedule Time:', scheduleTime);
 
     const localScheduleTime = new Date(scheduleTime);
-
+    
+    // Vietnam timezone offset (GMT +7)
     const vietnamOffsetInMinutes = 7 * 60;
 
-    // Convert to UTC time
+    // Convert local schedule time to UTC time
     const utcScheduleTime = new Date(localScheduleTime.getTime() - vietnamOffsetInMinutes * 60000);
 
     // Subtract 15 minutes for the agenda
     const agendaScheduleTime = new Date(utcScheduleTime.getTime() - 15 * 60000);
 
-    console.log('Converted Local Time to UTC Schedule Time:', utcScheduleTime.toISOString());
-    console.log('Adjusted UTC Schedule Time for Agenda (15 minutes earlier):', agendaScheduleTime.toISOString());
-
     const currentUTC = new Date();
-    console.log('Current UTC Time:', currentUTC.toISOString());
-    console.log('Scheduled Time Difference (ms):', agendaScheduleTime - currentUTC);
 
     const newNotification = new Notification({
       user_id,
@@ -268,3 +264,4 @@ exports.createScheduleNotification = async (req, res) => {
     res.status(500).json({ message: 'An error occurred', error });
   }
 };
+
