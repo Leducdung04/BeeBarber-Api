@@ -18,7 +18,7 @@ const {get_user_cart,add_cart,update_cart} = require("../controllers/cartControl
 
 // restful Api notifications
 router.post("/notifications/createNotification",createNotification)
-const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment, getAppointmentsByUserId, updateAppointmentStatusToCanceled, updateAppointmentStatusToCanceled_ByZaloPay, updateAppointmentStatus, getAppointmentsAdmin, updateAppointmentStatusAdmin, appointment_total, getBookedTimesForBarber, addAppointmentAdmin } = require("../controllers/appointmentControllers");
+const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment, getAppointmentsByUserId, updateAppointmentStatusToCanceled, updateAppointmentStatusToCanceled_ByZaloPay, updateAppointmentStatus, getAppointmentsAdmin, updateAppointmentStatusAdmin, appointment_total, getBookedTimesForBarber, addAppointmentAdmin, getAppointmentAdminById } = require("../controllers/appointmentControllers");
 
 const { addPayment, updatePayment_Canceled_ById, updatePaymentStatus } = require("../controllers/paymentsController");
 const { addOrderWithPayment, getOrdersByUserId, updateOderStatusToCanceled, updateOderStatusToCanceled_ByZaloPay, getAllOrdersAdmin, addOrderProduct, updateOrderStatus, totalAmount, getOrderByOrderId } = require("../controllers/order_productController");
@@ -131,6 +131,7 @@ router.put('/updateAppointmentStatus/:id',updateAppointmentStatus)
 router.get('/getBookedTimesForBarber/:barberId/:appointmentDate',getBookedTimesForBarber)
     // admin
 router.get('/getAppointmentsAdmin',getAppointmentsAdmin)
+router.get('/getAppointmentAdminById/:id',getAppointmentAdminById)
 router.put('/updateAppointmentStatusAdmin/:appointmentId',updateAppointmentStatusAdmin)
 
 

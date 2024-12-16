@@ -26,7 +26,7 @@ const appointmentSchema = new mongoose.Schema({
     },
     appointment_status: {
         type: String,
-        enum: ['pending','inuse', 'completed','complete_payment ','Evaluate'], 
+        enum: ['pending', 'inuse', 'complete_payment', 'completed', 'cancel', 'reschedule'],
         default: 'pending',
     },
     status:{

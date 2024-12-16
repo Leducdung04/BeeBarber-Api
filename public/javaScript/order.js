@@ -166,6 +166,8 @@ function getStatusBadge(status) {
 }
 
 async function viewOrderDetails(order) {
+    console.log(order.status);
+    
     orderId = order._id;
     document.getElementById('idDisplay').textContent = order._id;
     document.getElementById('userIdDisplay').textContent = order.user_id.name;

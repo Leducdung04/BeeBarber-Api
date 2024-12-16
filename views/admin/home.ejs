@@ -1,238 +1,304 @@
-<header>
-    <h1>Quản lý lịch cắt tóc</h1>
-</header>
+<!DOCTYPE html>
+<html lang="en">
 
-<!-- Bộ lọc -->
-<div class="filter-container">
-    <div>
-        <label for="status-filter">Trạng thái:</label>
-        <select id="status-filter">
-            <option value="">Tất cả trạng thái</option>
-            <option value="pending">Đang chờ</option>
-            <option value="pending">Đang thực hiện</option>
-            <option value="completed">Hoàn thành</option>
-            <option value="pending">Đã Thanh Toán</option>
-        </select>
-    </div>
-    <div>
-        <button onclick="filterByToday()">Hôm nay</button>
-        <button onclick="showAllAppointments()">Tất cả</button>
-    </div>
-</div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders</title>
+    <style>
+        table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
 
-<div class="container mt-3">
-    <div class="modal fade" id="orderInfoModal" tabindex="-1" aria-labelledby="orderInfoModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="orderInfoModalLabel">Thông tin Đặt Hàng</h5>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                       
+        th,
+        td {
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        td img {
+            display: block;
+            margin: auto;
+        }
+
+        img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+        }
+
+        .bg-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .bg-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .bg-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .bg-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+
+        .user-id {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .modal {
+            z-index: 1055 !important;
+        }
+
+        .modal-backdrop {
+            z-index: 1045 !important;
+        }
+
+        .selected-row {
+            background-color: lavender;
+        }
+
+        .product-name-column {
+            width: 25%;
+        }
+
+        .badge-column {
+            width: 13%;
+        }
+
+        .modal-dialog {
+            max-width: 900px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+            /* Add padding to the modal body */
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            /* Increase the font size of the modal title */
+            margin-bottom: 20px;
+            /* Add margin at the bottom of the modal title */
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            /* Add padding to the modal header */
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            /* Add padding to the modal footer */
+        }
+
+        .modal-body p {
+            margin-bottom: 10px;
+        }
+
+        .modal-body h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .modal-body .row {
+            margin-bottom: 20px;
+        }
+
+        .modal-body select {
+            width: 200px;
+        }
+
+        .modal-body .col-md-6 {
+            padding: 0 15px;
+        }
+
+        .modal-body .font-weight-bold {
+            font-weight: bold;
+        }
+
+        .button-container {
+            justify-self: end;
+            width: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: row;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .nav-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 30px;
+            /* Smaller width */
+            height: 30px;
+            /* Smaller height */
+            background-color: #007bff;
+            /* Blue background */
+            border: none;
+            border-radius: 50%;
+            /* Circular buttons */
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .nav-button svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .nav-button:active {
+            transform: scale(0.95);
+            /* Shrink slightly on click */
+        }
+
+
+        .nav-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: scale(1.1);
+            background-color: #e0e0e0;
+        }
+
+        .nav-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #007BFF;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Bộ lọc -->
+    <div class="filter-container">
+        <div>
+            <label for="status-filter">Trạng thái:</label>
+            <select id="status-filter">
+                <option value="">Tất cả trạng thái</option>
+                <option value="pending">Đang chờ</option>
+                <option value="pending">Đang thực hiện</option>
+                <option value="completed">Hoàn thành</option>
+                <option value="pending">Đã Thanh Toán</option>
+            </select>
+        </div>
+        <div>
+            <button onclick="filterByToday()">Hôm nay</button>
+            <button onclick="showAllAppointments()">Tất cả</button>
+        </div>
+    </div>
+
+    <div class="container mt-3">
+        <div class="modal fade" id="appointmentInfoModal" tabindex="-1" aria-labelledby="appointmentInfoModal"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="appointmentInfoModalLabel">Thông tin Lịch Hẹn</h5>
                     </div>
-                    <div>
-                        <h3 class="font-weight-bold mb-3">Thông tin Sản Phẩm</h3>
-                        <table class="mb-2">
-                            <thead>
-                                <tr>
-                                    <th>Ảnh</th>
-                                    <th>Tên</th>
-                                    <th>Giá</th>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h3 class="font-weight-medium mb-3">Thông Tin Lịch Hẹn</h3>
+                                <p><strong>ID Lịch Hẹn: </strong> <span id="idDisplay"></span></p>
+                                <p>
+                                    <strong>Trạng Thái: </strong>
+                                    <select id="statusSelect" class="form-control d-inline-block w-auto"></select>
+                                </p>
+                                <p><strong>Trạng Thái: </strong><span id="statusDisplay"></span></p>
+                                <p><strong>Thời Gian Đặt: </strong><span id="appointmentTimeDisplay"></span></p>
+                                <p><strong>Ngày Đặt: </strong><span id="appointmentDateDisplay"></span></p>
+                                <p><strong>Stylist: </strong><span id="stylistDisplay"></span></p>
+                                <p><strong>Thời Gian Hoàn Thành: </strong><span id="timeCompletedDisplay"></span></p>
+                                <p><strong>Thời Gian Hủy: </strong><span id="timeCanceledDisplay"></span></p>
+                                <p><strong>Thời Gian Đánh Giá: </strong><span id="timeEvaluateDisplay"></span></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h3 class="font-weight-medium mb-3">Thông Tin Hóa Đơn</h3>
+                                <p><strong>Id Đơn Hàng: </strong><span id="idPaymentDisplay"></span></p>
+                                <p><strong>Tên Người Dùng: </strong><span id="idUserDisplay"></span></p>
+                                <p><strong>Số Điện Thoại: </strong><span id="userPhoneDisplay"></span></p>
 
-                                </tr>
-                            </thead>
-                            <tbody id="productDetails">
-                            </tbody>
-                        </table>
-                        <div class="ml-5 button-container">
-                            <button class="nav-button prev" aria-label="Previous">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </button>
-                            <button class="nav-button next" aria-label="Next">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </button>
+                                <p><strong>Phương Thức Thanh Toán: </strong><span id="payMethodDisplay"></span></p>
+                                <p><strong>Trạng Thái Thanh Toán: </strong><span id="payMethodStatusDisplay"></span></p>
+                                <p><strong>Thời Gian: </strong><span id="timeDisplay"></span></p>
+                                <p><strong>Ngày: </strong><span id="dateDisplay"></span></p>
+                                <p><strong>Tổng Tiền: </strong><span id="priceDisplay"></span></p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div>
-        <table>
-            <div>
-                <h2>Danh Sách Đơn Hàng</h2>
-            </div>
-            <thead>
-                <tr>
-                    <th>Hình Ảnh</th>
-                    <th class="product-name-column">Tên Sản Phẩm</th>
-                    <th>Giá</th>
-                    <th>Ngày Đặt</th>
-                    <th>Địa Điểm</th>
-                    <th class="badge-column">Trạng Thái</th>
-                </tr>
-            </thead>
-            <tbody id="orderList"></tbody>
-        </table>
-        <div id="pagination" class="pagination"></div>
-    </div>
-    <div id="pagination" class="pagination"></div>
 
-<!-- Danh sách lịch hẹn -->
-<div class="appointments-section">
-    <h2>Danh sách lịch hẹn</h2>
-    <div id="appointments-list" class="appointments-list"></div>
-</div>
+        <!-- Danh sách lịch hẹn -->
+        <div class="appointments-section">
+            <h2>Danh sách lịch hẹn</h2>
+            <div id="appointments-list" class="appointments-list"></div>
+        </div>
 
-<script>
-    let appointmentsData = [];
-
-    async function fetchAppointments() {
-        const response = await fetch('api/getAppointmentsAdmin');
-        const data = await response.json();
-        appointmentsData = data;
-        displayAppointments(data);
-    }
-
-    function displayAppointments(appointments) {
-        const appointmentsList = document.getElementById('appointments-list');
-        appointmentsList.innerHTML = '';
-
-        appointments.forEach(appointment => {
-            const appointmentDiv = document.createElement('div');
-            appointmentDiv.classList.add('appointment');
-
-            // Appointment header with Barber's image
-            const appointmentHeader = document.createElement('div');
-            appointmentHeader.classList.add('appointment-header');
-            appointmentHeader.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <img style=" border-radius: 50%; width: 80px; height: 80px; margin-right: 15px;" src="${appointment.barber_id.image || './img/barberBackgroug.png'}" alt="${appointment.barber_id.name}">
-                    <h3>Barber ${appointment.barber_id.name}</h3>
+        <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmModalLabel">Xác nhận thay đổi trạng thái đơn hàng</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn thay đổi trạng thái của đơn hàng?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy bỏ</button>
+                        <button id="confirmStatusBtn" type="button" class="btn btn-primary">Xác nhận</button>
+                    </div>
                 </div>
-                <span style="margin-left:24px">Time ${new Date(appointment.appointment_date).toLocaleDateString()} - ${appointment.appointment_time}</span>
-            `;
-            appointmentDiv.appendChild(appointmentHeader);
+            </div>
+        </div>
 
-            // Appointment details
-            const appointmentDetails = document.createElement('div');
-            appointmentDetails.classList.add('appointment-details');
-            const serviceNames = appointment.service_id.map(service => service.name).join(', ');
-            appointmentDetails.innerHTML = `
-                <div style="display: flex;flex-direction: column; "><strong>Người đặt: ${appointment.user_id.name}</strong><strong>${appointment.user_id.phone}</strong></div>
-                <div><strong>Dịch vụ:</strong> ${serviceNames}</div>
-                <div style="color:orange;"><strong style="color: gray;">Tổng tiền:</strong> ${appointment.price.toLocaleString()} VND</div>
-                <div><strong>Phương thức:</strong> ${appointment.payment.pay_method}</div>
-            `;
-            appointmentDiv.appendChild(appointmentDetails);
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
+        <script src="/javaScript/appointment.js"></script>
+    </div>
 
-            // Appointment footer (action buttons)
-            const appointmentFooter = document.createElement('div');
-            appointmentFooter.classList.add('appointment-footer');
-            
-            // Trạng thái và nút hành động
-             if (appointment.appointment_status === 'pending') {
-                appointmentFooter.innerHTML = `
-                    <span style="color: orange;">Đang chờ</span>
-                    <button class="btn btn-pending" onclick="markAsPending('${appointment._id}')">Chi Tiết</button>
-                `;
-            } else if(appointment.appointment_status === 'completed'){
-                appointmentFooter.innerHTML = `
-                    <span style="color: green;"> Hoàn thành</span> `;
-            }else if(appointment.appointment_status === 'canceled'){
-                appointmentFooter.innerHTML = `
-                    <span style="color: red;"> Đã hủy</span> `;
-            } else if ( appointment.payment.pay_method_status === 'Norefundyet') {
-                appointmentFooter.innerHTML = `
-                    <span style="color: red;">Đã hủy hoàn tiền<strong>${appointment.payment.bank_account}</strong></span>
-                    <button class="btn btn-refund" onclick="processRefund('${appointment._id}', '${appointment.user_id}')">Hoàn tiền</button>
-                `;
-            }else if (appointment.appointment_status === 'Evaluate' ) {
-                appointmentFooter.innerHTML = `
-                    <span style="color: blue;">Khách hàng đã đánh giá </span>
-                `;
-            }
-            if ( appointment.payment.pay_method_status === 'Norefundyet') {
-                appointmentFooter.innerHTML = `
-                    <span style="color: red;">Đã hủy hoàn tiền</span>
-                    <button class="btn btn-refund" onclick="processRefund('${appointment._id}', '${appointment.user_id}')">Hoàn tiền</button>
-                `;
-            }else if( appointment.payment.pay_method_status === 'Refunded'){
-                appointmentFooter.innerHTML = `
-                    <span style="color: orange;">Đã hoàn tiền</span>`;
-            }
-            
-            appointmentDiv.appendChild(appointmentFooter);
+</body>
 
-            // Append the appointment to the list
-            appointmentsList.appendChild(appointmentDiv);
-        });
-    }
-
-    function markAsComplete(appointmentId) {
-        alert(`Đã đánh dấu lịch hẹn ${appointmentId} là đã cắt xong.`);
-    }
-
-    function markAsPending(appointmentId) {
-        alert(`Vui lòng kiểm đúng số tiền thu trước khi hoàn thành.`);
-        fetch(`/api/updateAppointmentStatusAdmin/${appointmentId}`,
-            {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ appointment_status: 'completed',pay_method_status:'Success' }),
-            }
-        ).then(()=>{
-            fetchAppointments();
-        })
-    }
-
-    function processRefund(paymentId, userId) {
-        const userConfirmed = window.confirm(`Xác nhận hoàn tiền vui lòng kiểm tra kỹ`);
-        if (userConfirmed) {
-            fetch(`/api/updateAppointmentStatusAdmin/${paymentId}`,
-            {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ appointment_status: 'canceled',pay_method_status:'Refunded' }),
-            }
-        ).then(()=>{
-            fetchAppointments();
-        })
-        }
-    }
-
-    function filterByToday() {
-        const today = new Date().toLocaleDateString();
-        const todayAppointments = appointmentsData.filter(appointment => {
-            return new Date(appointment.appointment_date).toLocaleDateString() === today;
-        });
-        displayAppointments(todayAppointments);
-    }
-
-    function showAllAppointments() {
-        displayAppointments(appointmentsData);
-    }
-
-    fetchAppointments()
-
-    function openDetailModal(){
-
-    }
-</script>
+</html>
