@@ -10,7 +10,7 @@ const Upload = require("../config/upload");
 const {getListService,addService,updateService,getListServiceByCategory,getGroupedServices, changeStatusService, deleteService, updateStatus} = require('../controllers/serviceController');
 const {getListCategory,addCategory,updateCategory, changeStatusCategoryService, getCategoryService, deleteCategory, updateCategoryStatus} = require('../controllers/categoryController');
 const { createReview, updateReview } = require("../controllers/reviewsControllers");
-const { createBarber, updateBarber,get_list_barber } = require("../controllers/barberController");
+const { createBarber, updateBarber,get_list_barber, get_list_barberStatus } = require("../controllers/barberController");
 const { getNotifications,createNotification, updateNotification, getNotificationsByUserId, createScheduleNotification, getNotificationsByStatus } = require("../controllers/notificationController");
 const {get_list_product,add_product,update_product,get_list_product_by_category,get_product_detail,search_products_by_name, updateQuantityProduct, deleteProduct, changeProductStatus} = require("../controllers/productController")
 const {get_list_cartItem,add_cartItem,delete_cartItem,update_cartItem, update_cartItem_quantity} = require("../controllers/cartItemController");
@@ -86,6 +86,8 @@ router.put('/reviews/:id', updateReview);
 
 // RESTful API cho Barber
 router.get('/get_list_barber', get_list_barber)
+router.get('/get_list_barberStatus', get_list_barberStatus)
+
 router.post('/add_Barbers',Upload.single("image"), createBarber);
 router.put('/Update_Barbers/:id',Upload.single("image"), updateBarber);
 

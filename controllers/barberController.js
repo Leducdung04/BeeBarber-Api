@@ -11,7 +11,15 @@ exports.get_list_barber = async (req, res, next) => {
     res.status(400).json({ msg: error.message });
   }
 };
-
+exports.get_list_barberStatus = async (req, res, next) => {
+  try {
+    
+    const banner = await Barber.find({ status: true }).sort({ _id: -1 });
+    res.status(200).json(banner);
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+};
 // Thêm mới barber
 exports.createBarber = async (req, res) => {
   try {
