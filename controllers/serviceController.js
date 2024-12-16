@@ -4,6 +4,7 @@ const mongoose = require("mongoose")
 
 exports.getListService = async (req, res, next) => {
   try {
+    
     const service = await Service.find().sort({ createdAt: -1 }).populate("id_category");
 
     res.status(200).json(service);

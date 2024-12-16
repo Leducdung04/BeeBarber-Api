@@ -64,10 +64,14 @@ function displayAppointments(appointments) {
             appointmentFooter.innerHTML = `
                 <span style="color: blue;">Hoàn Thành</span>
             `;
-        } else if (appointment.appointment_status === 'canceled') {
+        } else if (appointment.appointment_status === 'canceled' && appointment.payment.pay_method_status === 'Success') {
             appointmentFooter.innerHTML = `
-            <span style="color: red;">Đã hủy</span>
-            <button class="btn btn-danger" onclick="processRefund('${appointment.payment._id}')">Hoàn Tiền</button>
+                <span style="color: red;">Đã hủy</span>
+                <button class="btn btn-danger" onclick="processRefund('${appointment.payment._id}')">Hoàn Tiền</button>
+            `;
+        } else if (appointment.appointment_status === 'canceled' && appointment.payment.pay_method_status === 'Unpaid') {
+            appointmentFooter.innerHTML = `
+                <span style="color: red;">Đã hủy</span>
             `;
         }
 
@@ -163,9 +167,9 @@ function renderAppointmentDetail(data) {
     document.getElementById('stylistDisplay').textContent = data.barber_id.name;
 
     if (data.timeCompleted) {
-         document.getElementById('timeCompletedDisplay').textContent = `${new Date(data.timeCompleted).toLocaleString()}`
+        document.getElementById('timeCompletedDisplay').textContent = `${new Date(data.timeCompleted).toLocaleString()}`
     } else {
-         document.getElementById('timeCompletedDisplay').textContent = ``
+        document.getElementById('timeCompletedDisplay').textContent = ``
     }
 
     if (data.timeCanceled) {
@@ -264,8 +268,8 @@ $(document).ready(function () {
         $.ajax({
             url: `/api/updateAppointmentStatus/${appointmentStatusId}`,
             type: "PUT",
-            data: { 
-                appointment_status: newStatus 
+            data: {
+                appointment_status: newStatus
             },
             success: function (response) {
                 showAlert("success", "Trạng thái đơn hàng đã được cập nhật thành công!");
