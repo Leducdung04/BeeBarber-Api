@@ -185,6 +185,7 @@ exports.loginPhone = async (req, res) => {
       _id: user._id,
       name: user.name,
       phone: user.phone,
+      email:user.email,
       role: user.role,
       loyaltyPoints: user.loyaltyPoints,
       status: user.status,

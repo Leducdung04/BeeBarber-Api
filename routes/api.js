@@ -18,7 +18,7 @@ const {get_user_cart,add_cart,update_cart} = require("../controllers/cartControl
 
 // restful Api notifications
 router.post("/notifications/createNotification",createNotification)
-const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment, getAppointmentsByUserId, updateAppointmentStatusToCanceled, updateAppointmentStatusToCanceled_ByZaloPay, updateAppointmentStatus, getAppointmentsAdmin, updateAppointmentStatusAdmin, appointment_total, getBookedTimesForBarber, addAppointmentAdmin } = require("../controllers/appointmentControllers");
+const { addAppointment, getAppointmentsWithPayments, addAppointmentWithPayment, getAppointmentsByUserId, updateAppointmentStatusToCanceled, updateAppointmentStatusToCanceled_ByZaloPay, updateAppointmentStatus, getAppointmentsAdmin, updateAppointmentStatusAdmin, appointment_total, getBookedTimesForBarber, addAppointmentAdmin, updateAppointmentTime, updateAppointment, getAppointmentAdminById } = require("../controllers/appointmentControllers");
 
 const { addPayment, updatePayment_Canceled_ById, updatePaymentStatus } = require("../controllers/paymentsController");
 const { addOrderWithPayment, getOrdersByUserId, updateOderStatusToCanceled, updateOderStatusToCanceled_ByZaloPay, getAllOrdersAdmin, addOrderProduct, updateOrderStatus, totalAmount, getOrderByOrderId } = require("../controllers/order_productController");
@@ -127,10 +127,12 @@ router.post('/addAppointmentAdmin',addAppointmentAdmin)
 router.put('/updateAppointmentStatusToCanceled/:appointmentId',updateAppointmentStatusToCanceled)
 router.put('/updateAppointmentStatusToCanceled_ByZaloPay/:appointmentId',updateAppointmentStatusToCanceled_ByZaloPay)
 router.put('/updateAppointmentStatus/:id',updateAppointmentStatus)
+router.put('/updateAppointmentTime/:id',updateAppointmentTime)
    // lấy danh sách thời gian bận 
 router.get('/getBookedTimesForBarber/:barberId/:appointmentDate',getBookedTimesForBarber)
     // admin
 router.get('/getAppointmentsAdmin',getAppointmentsAdmin)
+router.get('/getAppointmentAdminById/:id',getAppointmentAdminById)
 router.put('/updateAppointmentStatusAdmin/:appointmentId',updateAppointmentStatusAdmin)
 
 

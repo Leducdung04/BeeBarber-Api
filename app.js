@@ -1,4 +1,3 @@
-
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -9,11 +8,13 @@ const expressLayout = require('express-ejs-layouts');
 const agenda = require("../BeeBarber-Api/config/agenda")
 var admin = require("firebase-admin");
 
-var serviceAccount = require("./config/beebarber-3a718-firebase-adminsdk-g3v02-8bb261896a.json");
+var serviceAccount = require("./config/firebase.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
+
+
 
 // zaloPay 
 const axios = require('axios').default; // npm install axios
