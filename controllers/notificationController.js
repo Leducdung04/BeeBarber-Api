@@ -175,14 +175,12 @@ agenda.define('send notification', async (job) => {
 
   console.log('Agenda Execution Time (UTC):', new Date().toISOString());
   console.log('Executing Notification Job for User:', user_id);
-
   try {
     const user = await User.findById(user_id);
     if (!user) {
       throw new Error('User not found.');
     }
-
-    const token = await getBearerToken(); 
+    const token = await getBearerToken();
     const fcmUrl = `https://fcm.googleapis.com/v1/projects/beebarber-3a718/messages:send`;
     const message = {
       message: {
@@ -194,7 +192,6 @@ agenda.define('send notification', async (job) => {
         data: { relates_id, type, content },
       },
     };
-
     const response = await fetch(fcmUrl, {
       method: 'POST',
       headers: {
@@ -203,7 +200,6 @@ agenda.define('send notification', async (job) => {
       },
       body: JSON.stringify(message),
     });
-
     if (response.ok) {
       console.log('Notification sent successfully.');
     } else {
@@ -214,29 +210,24 @@ agenda.define('send notification', async (job) => {
   }
 });
 
-
-
 exports.createScheduleNotification = async (req, res) => {
   try {
     const { user_id, relates_id, type, content, schedule: scheduleTime } = req.body;
-
     console.log('Received Local Schedule Time:', scheduleTime);
-
     const localScheduleTime = new Date(scheduleTime);
-    
     const vietnamOffsetInMinutes = 7 * 60;
     const utcScheduleTime = new Date(localScheduleTime.getTime() - vietnamOffsetInMinutes * 60000);
-
-    const agendaScheduleTime = new Date(utcScheduleTime.getTime() - 15 * 60000);
-
+    console.log('Converted Local Time to UTC Schedule Time:', utcScheduleTime.toISOString());
     const currentUTC = new Date();
+    console.log('Current UTC Time:', currentUTC.toISOString());
+    console.log('Scheduled Time Difference (ms):', utcScheduleTime - currentUTC);
 
     const newNotification = new Notification({
       user_id,
       relates_id,
       type,
       content,
-      schedule: utcScheduleTime, 
+      schedule: utcScheduleTime, // Save in UTC
       status: 'unread',
       created_at: currentUTC,
     });
@@ -244,13 +235,13 @@ exports.createScheduleNotification = async (req, res) => {
     await newNotification.save();
     console.log('Saved Notification:', newNotification);
 
-    await agenda.schedule(agendaScheduleTime, 'send notification', {
+    await agenda.schedule(utcScheduleTime, 'send notification', {
       user_id,
       relates_id,
       type,
       content,
     });
-
+   
     res.status(200).json({
       message: 'Notification scheduled successfully.',
       notification: newNotification,
@@ -260,4 +251,6 @@ exports.createScheduleNotification = async (req, res) => {
     res.status(500).json({ message: 'An error occurred', error });
   }
 };
+  
+
 

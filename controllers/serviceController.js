@@ -4,9 +4,9 @@ const mongoose = require("mongoose")
 
 exports.getListService = async (req, res, next) => {
   try {
-    
-    const service = await Service.find().sort({ createdAt: -1 }).populate("id_category");
-
+    const { status } = req.query; 
+    const query = status ? { status: status === 'true' } : {};
+    const service = await Service.find(query).sort({ createdAt: -1 }).populate("id_category");
     res.status(200).json(service);
   } catch (error) {
     res.status(400).json({ msg: error.message });

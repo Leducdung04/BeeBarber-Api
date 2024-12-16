@@ -3,9 +3,7 @@ const CartItem = require("../models/cartItem")
 
 exports.get_list_product = async (req, res, next) => {
   try {
-    const { status } = req.query; 
-    const query = status ? { status: status === 'true' } : {};
-    const products = await Product.find(query).sort({ createdAt: 1 }).populate("category_id");
+    const products = await Product.find().sort({ createdAt: 1 }).populate("category_id");
     res.status(200).json(products);
   } catch (error) {
     res.status(400).json({ msg: error.message });
@@ -14,14 +12,26 @@ exports.get_list_product = async (req, res, next) => {
 
 exports.get_list_product_by_category = async (req, res, next) => {
   try {
-    const { category_id } = req.query;
-    const filter = category_id ? { category_id } : {};
-    const products = await Product.find({ filter,status:true}).sort({ createdAt: 1 }).populate("category_id");
-    res.status(200).json(products);
+    const { category_id, status } = req.query;
+    const filter = {};
+
+    if (category_id) {
+      filter.category_id = category_id; 
+    }
+
+    if (status) {
+      filter.status = status === "true"; 
+    }
+
+    const products = await Product.find(filter)
+      .sort({ createdAt: 1 }) 
+      .populate("category_id"); 
+
+    res.status(200).json(products); 
   } catch (error) {
-    res.status(400).json({ msg: error.message });
+    res.status(400).json({ msg: error.message }); 
   }
-}
+};
 
 exports.add_product = async (req, res, next) => {
   try {
