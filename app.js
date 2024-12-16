@@ -1,3 +1,4 @@
+require('dotenv').config();
 
 var createError = require('http-errors');
 var express = require('express');
@@ -9,7 +10,7 @@ const expressLayout = require('express-ejs-layouts');
 const agenda = require("../BeeBarber-Api/config/agenda")
 var admin = require("firebase-admin");
 
-var serviceAccount = require("");
+var serviceAccount = require("../config/firebase.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

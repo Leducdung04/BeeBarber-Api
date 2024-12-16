@@ -5,7 +5,7 @@ const agenda = require('../config/agenda');
 
 const path = require('path');
 
-const firebaseCredentialsPath = path.resolve(__dirname, "");
+const firebaseCredentialsPath = path.resolve(__dirname, "../config/firebase.json");
 
 async function getBearerToken() {
   const auth = new GoogleAuth({
