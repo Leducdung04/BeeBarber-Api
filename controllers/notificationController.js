@@ -224,13 +224,9 @@ exports.createScheduleNotification = async (req, res) => {
 
     const localScheduleTime = new Date(scheduleTime);
     
-    // Vietnam timezone offset (GMT +7)
     const vietnamOffsetInMinutes = 7 * 60;
-
-    // Convert local schedule time to UTC time
     const utcScheduleTime = new Date(localScheduleTime.getTime() - vietnamOffsetInMinutes * 60000);
 
-    // Subtract 15 minutes for the agenda
     const agendaScheduleTime = new Date(utcScheduleTime.getTime() - 15 * 60000);
 
     const currentUTC = new Date();

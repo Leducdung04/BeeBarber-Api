@@ -58,21 +58,16 @@ function displayAppointments(appointments) {
         } else if (appointment.appointment_status === 'complete_payment') {
             appointmentFooter.innerHTML = `
                 <span style="color: green;">Hoàn thành Thanh Toán</span> 
-                <button class="btn btn-pending" onclick="handleFetchAndRender('${appointment._id}')">Chi Tiết</button>
-            `;
+                <button class="btn btn-pending" onclick="handleFetchAndRender('${appointment._id}')">Chi Tiết</button>`;
+        } else if (appointment.appointment_status === 'Evaluate') {
+            appointmentFooter.innerHTML = `<span style="color: green;">Đã Đánh Giá</span>`;
         } else if (appointment.appointment_status === 'completed') {
-            appointmentFooter.innerHTML = `
-                <span style="color: blue;">Hoàn Thành</span>
-            `;
+            appointmentFooter.innerHTML = `<span style="color: blue;">Hoàn Thành</span>`;
         } else if (appointment.appointment_status === 'canceled' && appointment.payment.pay_method_status === 'Success') {
-            appointmentFooter.innerHTML = `
-                <span style="color: red;">Đã hủy</span>
-                <button class="btn btn-danger" onclick="processRefund('${appointment.payment._id}')">Hoàn Tiền</button>
-            `;
+            appointmentFooter.innerHTML = `<span style="color: red;">Đã hủy</span>
+                <button class="btn btn-danger" onclick="processRefund('${appointment.payment._id}')">Hoàn Tiền</button>`;
         } else if (appointment.appointment_status === 'canceled' && appointment.payment.pay_method_status === 'Unpaid') {
-            appointmentFooter.innerHTML = `
-                <span style="color: red;">Đã hủy</span>
-            `;
+            appointmentFooter.innerHTML = `<span style="color: red;">Đã hủy</span>`;
         }
 
         appointmentDiv.appendChild(appointmentFooter);
