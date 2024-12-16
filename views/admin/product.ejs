@@ -208,7 +208,7 @@
         paginatedProducts.forEach(product => {
             const row = document.createElement('tr');
             console.log(product);
-            
+
             row.innerHTML = `
                       <td>${truncateText(product.name, 50)}</td>
                       <td>${product.category_id.name}</td> 
@@ -219,7 +219,7 @@
                   <td>
                   <div style="button-group">
                       <button class="btn-edit" onclick="openDetailModal('${product._id}', '${product.name}', '${product.description}', '${product.import_price}','${product.price_selling}' ,'${product.category_id.name}', '${product.category_id._id}', '${product.quantity}', '${product.soldQuantity}', '${product.status}', '${product.image}')">Chi Tiết</button>
-                      <button class="btn-delete" onclick="deleteProduct('${product._id}')">Ẩn</button>
+                      <button class="btn-delete" onclick="updateProduct('${product._id}')">${product.status ? "Ẩn" : "Hiển Thị"}</button>
                   </div>
                   </td>
       `;
@@ -232,11 +232,16 @@
 
         const name = document.getElementById('productName').value;
         const description = document.getElementById('productDescription').value;
-        const import_price = document.getElementById('importPrice').value;
-        const price_selling = document.getElementById('sellingPrice').value;
+        const import_price = parseFloat(document.getElementById('importPrice').value);
+        const price_selling = parseFloat(document.getElementById('sellingPrice').value);
         const image = document.getElementById('productImage').files[0];
         const quantity = document.getElementById('productQuantity').value;
         const category_id = document.getElementById('productCategory').value;
+
+        if (import_price <= price_selling) {
+            alert('Giá Nhập phải cao hơn giá xuất');
+            return;
+        }
 
         const formData = new FormData();
         formData.append('name', name);
@@ -303,10 +308,15 @@
 
             const updatedName = document.getElementById('editProductName').value;
             const updatedDescription = document.getElementById('editProductDescription').value;
-            const updatedImportPrice = document.getElementById('editImportPrice').value;
-            const updatedSellingPrice = document.getElementById('editSellingPrice').value;
+            const updatedImportPrice = parseFloat(document.getElementById('editImportPrice').value);
+            const updatedSellingPrice = parseFloat(document.getElementById('editSellingPrice').value);
             const updatedImage = document.getElementById('editImage').files[0];
             const updatedCategoryId = categoryDropdown.value;
+
+            if (updatedImportPrice <= updatedSellingPrice) {
+                alert('Giá Nhập phải cao hơn giá xuất');
+                return; 
+            }
 
             const formData = new FormData();
             formData.append('name', updatedName);
@@ -430,7 +440,7 @@
             .catch(error => console.error('Error changing product status:', error));
     }
 
-    function openDetailModal(id, name, description, importPrice, priceSelling, categoryName, categoryId, quantity, soldQuantity,status, image) {
+    function openDetailModal(id, name, description, importPrice, priceSelling, categoryName, categoryId, quantity, soldQuantity, status, image) {
         document.getElementById('detailName').textContent = name;
         document.getElementById('detailImportPrice').textContent = `${importPrice.toLocaleString('vi')} VNĐ`;
         document.getElementById('detailPriceSelling').textContent = `${priceSelling.toLocaleString('vi')} VNĐ`;

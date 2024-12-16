@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const appointmentSchema = new mongoose.Schema({
-    barber_id: {
+    barber_id: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: "Barber",
         required: true,
@@ -26,7 +26,7 @@ const appointmentSchema = new mongoose.Schema({
     },
     appointment_status: {
         type: String,
-        enum: ['pending', 'completed', 'canceled','Evaluate'], 
+        enum: ['pending','inuse', 'completed','complete_payment ','Evaluate'], 
         default: 'pending',
     },
     status:{
