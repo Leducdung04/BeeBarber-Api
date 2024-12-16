@@ -663,9 +663,6 @@ exports.updateAppointmentStatus = async (req, res, next) => {
             { appointment_status },
             { new: true } 
         );
-
-        console.log(updatedAppointment,"jsjsjsjsjsjsjsjsjsjsjsjs")
-
         if (!updatedAppointment) {
             return res.status(404).json({ message: 'Appointment not found' });
         }

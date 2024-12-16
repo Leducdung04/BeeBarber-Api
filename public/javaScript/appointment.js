@@ -186,8 +186,8 @@ function renderAppointmentDetail(data) {
     const statusOptions = {
         pending: [
             { value: 'inuse', label: 'Đang Thực Hiện' },
+            { value: 'reschedule', label: 'Sắp Xếp Lại' }  ,
             { value: 'cancel', label: 'Hủy' },
-            { value: 'reschedule', label: 'Sắp Xếp Lại' }
         ],
         inuse: [
             { value: 'complete_payment', label: 'Hoàn Thành Thanh Toán' },
