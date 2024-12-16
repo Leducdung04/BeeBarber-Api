@@ -1,5 +1,3 @@
-
-
 let appointmentsData = [];
 let appointmentStatusId = null
 
@@ -45,19 +43,17 @@ function displayAppointments(appointments) {
         // Appointment footer (action buttons)
         const appointmentFooter = document.createElement('div');
         appointmentFooter.classList.add('appointment-footer');
-        
+
         // Trạng thái và nút hành động
         if (appointment.appointment_status === 'pending') {
             appointmentFooter.innerHTML = `
                 <span style="color: orange;">Đang chờ</span>
                 <button class="btn btn-pending" onclick="handleFetchAndRender('${appointment._id}')">Chi Tiết</button>
-                <button class="btn btn-cancel" onclick="handleCancel('${appointment._id}')">Hủy</button>
             `;
         } else if (appointment.appointment_status === 'inuse') {
             appointmentFooter.innerHTML = `
                 <span style="color: green;">Đang Thực Hiện</span> 
                 <button class="btn btn-pending" onclick="handleFetchAndRender('${appointment._id}')">Chi Tiết</button>
-                <button class="btn btn-cancel" onclick="handleCancel('${appointment._id}')">Hủy</button>
             `;
         } else if (appointment.appointment_status === 'complete_payment') {
             appointmentFooter.innerHTML = `
@@ -68,16 +64,12 @@ function displayAppointments(appointments) {
             appointmentFooter.innerHTML = `
                 <span style="color: blue;">Hoàn Thành</span>
             `;
-        } else if (appointment.appointment_status === 'reschedule') {
-            appointmentFooter.innerHTML = `
-                <span style="color: orange;">Đang Sắp Xếp Lại</span> 
-                <button class="btn btn-reschedule" onclick="handleFetchAndRender('${appointment._id}')">Chi Tiết</button>
-            `;
         } else if (appointment.appointment_status === 'canceled') {
-            appointmentFooter.innerHTML = `<span style="color: red;">Đã hủy</span>`;
+            appointmentFooter.innerHTML = `
+            <span style="color: red;">Đã hủy</span>
+            <button class="btn btn-danger" onclick="processRefund('${appointment.payment._id}')">Hoàn Tiền</button>
+            `;
         }
-        
-
 
         appointmentDiv.appendChild(appointmentFooter);
 
@@ -166,17 +158,35 @@ function renderAppointmentDetail(data) {
 
     document.getElementById('idDisplay').textContent = data._id;
     document.getElementById('statusDisplay').textContent = data.appointment_status;
-    document.getElementById('appointmentDateDisplay').textContent = data.appointment_date;
+    document.getElementById('appointmentDateDisplay').textContent = `${new Date(data.appointment_date).toLocaleString()}`;;
     document.getElementById('appointmentTimeDisplay').textContent = data.appointment_time;
     document.getElementById('stylistDisplay').textContent = data.barber_id.name;
-    document.getElementById('timeCompletedDisplay').textContent = data.timeCompleted;
-    document.getElementById('timeCanceledDisplay').textContent = data.timeCanceled;
+
+    if (data.timeCompleted) {
+         document.getElementById('timeCompletedDisplay').textContent = `${new Date(data.timeCompleted).toLocaleString()}`
+    } else {
+         document.getElementById('timeCompletedDisplay').textContent = ``
+    }
+
+    if (data.timeCanceled) {
+        document.getElementById('timeCanceledDisplay').textContent = `${new Date(data.timeCanceled).toLocaleString()}`
+    } else {
+        document.getElementById('timeCanceledDisplay').textContent = ``;
+    }
+
 
     document.getElementById('idUserDisplay').textContent = data.user_id.name
     document.getElementById('userPhoneDisplay').textContent = data.user_id.phone
     document.getElementById('idPaymentDisplay').textContent = data.payment._id
     document.getElementById('payMethodDisplay').textContent = data.payment.pay_method
-    document.getElementById('payMethodStatusDisplay').textContent = data.payment.pay_method_status
+    const payMethodStatusMap = {
+        Unpaid: 'Chưa thanh toán',
+        Success: 'Đã thanh toán',
+        canceled: 'Đã hủy lịch',
+    };
+
+    const payMethodStatusText = payMethodStatusMap[data.payment.pay_method_status] || 'Trạng thái không xác định';
+    document.getElementById('payMethodStatusDisplay').textContent = payMethodStatusText;
     document.getElementById('timeDisplay').textContent = data.payment.time
     document.getElementById('dateDisplay').textContent = data.payment.date
     document.getElementById('priceDisplay').textContent = `${data.price.toLocaleString()} VNĐ`;
@@ -186,21 +196,16 @@ function renderAppointmentDetail(data) {
     const statusOptions = {
         pending: [
             { value: 'inuse', label: 'Đang Thực Hiện' },
-            { value: 'reschedule', label: 'Sắp Xếp Lại' }  ,
-            { value: 'cancel', label: 'Hủy' },
+            { value: 'canceled', label: 'Hủy' },
         ],
         inuse: [
             { value: 'complete_payment', label: 'Hoàn Thành Thanh Toán' },
-            { value: 'cancel', label: 'Hủy' }
         ],
         complete_payment: [
             { value: 'completed', label: 'Hoàn Thành' }
         ],
         completed: [],
-        cancel: [],
-        reschedule: [
-            { value: 'pending', label: 'Chờ Xác Nhận' }
-        ]
+        canceled: [],
     };
 
     statusSelect.innerHTML = '';
@@ -212,7 +217,7 @@ function renderAppointmentDetail(data) {
         defaultOption.hidden = true;
         defaultOption.textContent = 'Chọn trạng thái';
         statusSelect.appendChild(defaultOption);
-    
+
         statusOptions[data.appointment_status].forEach(option => {
             const optionElement = document.createElement('option');
             optionElement.value = option.value;
@@ -222,7 +227,7 @@ function renderAppointmentDetail(data) {
     } else {
         statusSelect.disabled = true;
     }
-    
+
 
     let statusText;
     switch (data.appointment_status) {
@@ -230,12 +235,11 @@ function renderAppointmentDetail(data) {
         case 'inuse': statusText = 'Đang Thực Hiện'; break;
         case 'complete_payment': statusText = 'Hoàn Thành Thanh Toán'; break;
         case 'completed': statusText = 'Hoàn Thành'; break;
-        case 'cancel': statusText = 'Hủy'; break;
-        case 'reschedule': statusText = 'Sắp Xếp Lại Lịch'; break;
+        case 'canceled': statusText = 'Hủy'; break;
         default: statusText = 'Trạng thái không xác định';
     }
     statusDisplay.textContent = `${statusText}`;
-    
+
 
     statusSelect.addEventListener('change', function () {
         const newStatus = this.value;
@@ -253,8 +257,6 @@ async function handleFetchAndRender(appointmentId) {
 $(document).ready(function () {
     $("#confirmStatusBtn").click(function () {
         var newStatus = $("#statusSelect").val();
-        console.log(newStatus, "HellooHelloo");
-
         if (!newStatus) {
             showAlert("error", "Vui lòng chọn trạng thái để cập nhật.");
             return;
@@ -262,10 +264,11 @@ $(document).ready(function () {
         $.ajax({
             url: `/api/updateAppointmentStatus/${appointmentStatusId}`,
             type: "PUT",
-            data: { appointment_status: newStatus },
+            data: { 
+                appointment_status: newStatus 
+            },
             success: function (response) {
                 showAlert("success", "Trạng thái đơn hàng đã được cập nhật thành công!");
-                $("#confirmModal").modal("hide");
                 reloadPage()
             },
             error: function (err) {
@@ -275,7 +278,6 @@ $(document).ready(function () {
             },
         });
     });
-
 
     function reloadPage() {
         location.reload();

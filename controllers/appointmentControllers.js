@@ -653,21 +653,46 @@ exports.updateAppointmentStatus = async (req, res, next) => {
         const { id } = req.params; 
         const { appointment_status } = req.body; 
 
-        const validStatuses = ['pending', 'inuse', 'complete_payment', 'completed', 'cancel', 'reschedule'];
+        const validStatuses = ['pending', 'inuse', 'complete_payment', 'completed', 'canceled'];
         if (!validStatuses.includes(appointment_status)) {
             return res.status(400).json({ message: 'Invalid appointment status' });
         }
 
-        const updatedAppointment = await Appointment.findByIdAndUpdate(
-            id,
-            { appointment_status },
-            { new: true } 
-        );
-        if (!updatedAppointment) {
+        const appointment = await Appointment.findById(id);
+        if (!appointment) {
             return res.status(404).json({ message: 'Appointment not found' });
         }
 
-        res.status(200).json(updatedAppointment);
+        appointment.appointment_status = appointment_status;
+        switch (appointment_status) {
+            case "completed":
+                appointment.timeCompleted = new Date();
+                break;
+            case "canceled":
+                appointment.timeCanceled = new Date();
+                break;
+            default:
+                break;
+        }
+
+        let updatedPayment = null;
+        if (appointment_status === 'complete_payment') {
+            const payment = await Payment.findOne({ related_id: appointment._id });
+            if (!payment) {
+                return res.status(404).json({ message: 'Payment not found for this appointment' });
+            }
+
+            payment.pay_method_status = 'Success';
+            updatedPayment = await payment.save();
+        }
+
+        const updatedAppointment = await appointment.save();
+
+        res.status(200).json({
+            message: 'Appointment status updated successfully',
+            appointment: updatedAppointment,
+            payment: updatedPayment,
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server Error' });
