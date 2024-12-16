@@ -250,6 +250,42 @@ exports.updateAppointment = async (req, res, next) => {
         res.status(400).json({ message: 'Server Error' });
     }
 }
+
+
+exports.updateAppointmentTime = async (req, res, next) => {
+    try {
+        const { id } = req.params; // Lấy ID của cuộc hẹn từ URL params
+        const { appointment_time, appointment_date } = req.body; // Lấy dữ liệu từ body request
+
+        // Kiểm tra nếu thiếu dữ liệu cần thiết
+        if (!appointment_time || !appointment_date) {
+            return res.status(400).json({ message: 'appointment_time and appointment_date are required' });
+        }
+
+        // Tìm và cập nhật thông tin
+        const updatedAppointment = await Appointment.findByIdAndUpdate(
+            id,
+            { 
+                appointment_time, 
+                appointment_date 
+            },
+            { new: true } // Trả về tài liệu đã cập nhật
+        );
+        // Kiểm tra nếu không tìm thấy cuộc hẹn
+        if (!updatedAppointment) {
+            return res.status(404).json({ message: 'Appointment not found' });
+        }
+
+        // Trả về kết quả thành công
+        res.status(200).json({
+            message: 'Appointment updated successfully',
+            data: updatedAppointment,
+        });
+    } catch (err) {
+        console.error('Error updating appointment:', err.message);
+        res.status(500).json({ message: 'Server Error', error: err.message });
+    }
+}
 exports.getListAppointments = async (req, res, next) => {
     try {
         const appointments = await Appointment.find().sort({ createdAt: -1 });
