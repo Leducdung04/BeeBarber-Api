@@ -252,7 +252,10 @@ exports.updateAppointment = async (req, res, next) => {
 }
 exports.getListAppointments = async (req, res, next) => {
     try {
-        const appointments = await Appointment.find().sort({ createdAt: -1 });
+        const appointments = await Appointment.find().sort({ createdAt: -1 })
+        .populate('barber_id')
+        .populate('user_id')
+        .populate('service_id');
 
         res.status(200).json(appointments);
     } catch (error) {

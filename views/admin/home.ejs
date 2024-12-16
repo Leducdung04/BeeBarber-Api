@@ -9,8 +9,9 @@
         <select id="status-filter">
             <option value="">Tất cả trạng thái</option>
             <option value="pending">Đang chờ</option>
+            <option value="pending">Đang thực hiện</option>
             <option value="completed">Hoàn thành</option>
-            <option value="canceled">Đã hủy</option>
+            <option value="pending">Đã Thanh Toán</option>
         </select>
     </div>
     <div>
@@ -18,6 +19,77 @@
         <button onclick="showAllAppointments()">Tất cả</button>
     </div>
 </div>
+
+<div class="container mt-3">
+    <div class="modal fade" id="orderInfoModal" tabindex="-1" aria-labelledby="orderInfoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderInfoModalLabel">Thông tin Đặt Hàng</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                       
+                    </div>
+                    <div>
+                        <h3 class="font-weight-bold mb-3">Thông tin Sản Phẩm</h3>
+                        <table class="mb-2">
+                            <thead>
+                                <tr>
+                                    <th>Ảnh</th>
+                                    <th>Tên</th>
+                                    <th>Giá</th>
+
+                                </tr>
+                            </thead>
+                            <tbody id="productDetails">
+                            </tbody>
+                        </table>
+                        <div class="ml-5 button-container">
+                            <button class="nav-button prev" aria-label="Previous">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                            <button class="nav-button next" aria-label="Next">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <table>
+            <div>
+                <h2>Danh Sách Đơn Hàng</h2>
+            </div>
+            <thead>
+                <tr>
+                    <th>Hình Ảnh</th>
+                    <th class="product-name-column">Tên Sản Phẩm</th>
+                    <th>Giá</th>
+                    <th>Ngày Đặt</th>
+                    <th>Địa Điểm</th>
+                    <th class="badge-column">Trạng Thái</th>
+                </tr>
+            </thead>
+            <tbody id="orderList"></tbody>
+        </table>
+        <div id="pagination" class="pagination"></div>
+    </div>
+    <div id="pagination" class="pagination"></div>
 
 <!-- Danh sách lịch hẹn -->
 <div class="appointments-section">
@@ -75,7 +147,7 @@
              if (appointment.appointment_status === 'pending') {
                 appointmentFooter.innerHTML = `
                     <span style="color: orange;">Đang chờ</span>
-                    <button class="btn btn-pending" onclick="markAsPending('${appointment._id}')">Đã cắt </button>
+                    <button class="btn btn-pending" onclick="markAsPending('${appointment._id}')">Chi Tiết</button>
                 `;
             } else if(appointment.appointment_status === 'completed'){
                 appointmentFooter.innerHTML = `
@@ -159,4 +231,8 @@
     }
 
     fetchAppointments()
+
+    function openDetailModal(){
+
+    }
 </script>
