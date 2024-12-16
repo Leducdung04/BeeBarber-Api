@@ -5,7 +5,7 @@ const agenda = require('../config/agenda');
 
 const path = require('path');
 
-const firebaseCredentialsPath = path.resolve(__dirname, "../config/beebarber-3a718-firebase-adminsdk-g3v02-8bb261896a.json");
+const firebaseCredentialsPath = path.resolve(__dirname, "");
 
 async function getBearerToken() {
   const auth = new GoogleAuth({
