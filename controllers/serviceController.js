@@ -5,12 +5,12 @@ const mongoose = require("mongoose")
 exports.getListService = async (req, res, next) => {
   try {
     const service = await Service.find().sort({ createdAt: -1 }).populate("id_category");
-
     res.status(200).json(service);
   } catch (error) {
     res.status(400).json({ msg: error.message });
   }
 };
+
 exports.getGroupedServices = async (req, res, next) => {
   try {
     const groupedServices = await Service.aggregate([
@@ -42,10 +42,18 @@ exports.getGroupedServices = async (req, res, next) => {
 
 exports.getListServiceByCategory = async (req, res, next) => {
   try {
-    const { id_category } = req.params;
+    const { id_category, status } = req.query;
+    const filter = {};
 
+    if (category_id) {
+      filter.id_category =  id_category; 
+    }
+
+    if (status) {
+      filter.status = status === "true"; 
+    }
     // Tìm các dịch vụ dựa trên id_category
-    const services = await Service.find({ id_category }).sort({ createdAt: -1 });
+    const services = await Service.find(filter).sort({ createdAt: -1 });
 
     res.status(200).json(services);
   } catch (error) {

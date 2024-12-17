@@ -4,7 +4,9 @@ const Service = require("../models/service")
 
 exports.getListCategory = async (req, res, next) => {
   try {
-    const category = await Category.find().sort({ createdAt: -1})
+    const { status } = req.query; 
+    const query = status ? { status: status === 'true' } : {};
+    const category = await Category.find(query).sort({ createdAt: -1})
     res.status(200).json(category);
   } catch (error) {
     res.status(400).json({ msg: error.message });
