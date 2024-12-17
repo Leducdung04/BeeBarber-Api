@@ -59,7 +59,7 @@ router.put('/user_vouchers/:userVoucher_id/use', useVoucher);  // Sử dụng vo
 router.get('/services/get_list_service',getListService)
 router.post('/services/add_service',Upload.single("images"),addService)
 router.put('/services/update_service/:id',Upload.single("images"),updateService)
-router.get('/services/getListServiceByCategory/:id_category',getListServiceByCategory)
+router.get('/services/getListServiceByCategory',getListServiceByCategory)
 router.get('/getGroupedServices',getGroupedServices)
 router.put('/services/update_status_service/:id',changeStatusService)
 router.delete('/services/delete_service/:id',deleteService)
